@@ -4,32 +4,32 @@ import derelict.sdl2.sdl;
 import array : Array;
 import color : Color;
 
-const GLchar* vertex_shader = "#version 130 
-in vec3 position; 
-in vec2 tex_coord; 
-in vec4 color; 
-uniform mat4 transform; 
-out vec4 Color; 
-out vec2 Tex_coord; 
-void main() { 
-	Color = color; 
-	Tex_coord = tex_coord; 
-	gl_Position = transform * vec4(position, 1.0); 
+const GLchar* vertex_shader = "#version 130
+in vec3 position;
+in vec2 tex_coord;
+in vec4 color;
+uniform mat4 transform;
+out vec4 Color;
+out vec2 Tex_coord;
+void main() {
+	Color = color;
+	Tex_coord = tex_coord;
+	gl_Position = transform * vec4(position, 1.0);
 }";
 const GLchar* fragment_shader = "#version 130
-in vec4 Color; 
-in vec2 Tex_coord; 
-out vec4 outColor; 
-uniform sampler2D tex; 
-void main() { 
+in vec4 Color;
+in vec2 Tex_coord;
+out vec4 outColor;
+uniform sampler2D tex;
+void main() {
 	vec4 tex_color = texture(tex, Tex_coord);
 	outColor = Color * tex_color;
 }";
 
-struct GLBackend 
+struct GLBackend
 {
 	//The draw data
-	private Array!GLuint textureIDs;
+	private GLuint texture = 0;
 	private Array!float vertices;
 	private Array!GLuint indices;
 
@@ -58,7 +58,7 @@ struct GLBackend
 		glCompileShader(vertex);
 		GLint status;
 		glGetShaderiv(vertex, GL_COMPILE_STATUS, &status);
-		if (status != GL_TRUE) 
+		if (status != GL_TRUE)
 		{
 			//TODO: Print vertex shader failure message
 			/* printf("Vertex shader compilation failed\n");
@@ -71,7 +71,7 @@ struct GLBackend
 		glShaderSource(fragment, 1, &fragment_shader, null);
 		glCompileShader(fragment);
 		glGetShaderiv(fragment, GL_COMPILE_STATUS, &status);
-		if (status != GL_TRUE) 
+		if (status != GL_TRUE)
 		{
 			//TODO: Print fragment shader failure message
 			/* printf("Fragment shader compilation failed\n");
@@ -88,13 +88,12 @@ struct GLBackend
 		glUseProgram(shader);
 	//	glEnable (GL_DEPTH_TEST);
 		glEnable (GL_BLEND);
-		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);  
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	}
 
 	@nogc nothrow:
-	void destroy() 
+	public void destroy()
 	{
-		textureIDs.destroy();
 		vertices.destroy();
 		indices.destroy();
 		glDeleteProgram(shader);
@@ -106,5 +105,10 @@ struct GLBackend
 
 		glDeleteVertexArrays(1, &vao);
 		SDL_GL_DeleteContext(ctx);
+	}
+
+	@nogc nothrow pure:
+	void switchTexture(GLuint texture)
+	{
 	}
 }
