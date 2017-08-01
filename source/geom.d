@@ -24,17 +24,23 @@ struct Vector(T, size_t N)
 struct Matrix(T, size_t M, size_t N)
 {
     static assert(M > 0 && N > 0);
-    private T[M][N] data;
+    private T[M * N] data;
 
     @nogc nothrow pure:
 
-    public void setToIdentity() {
+	public T* getDataPointer() 
+	{
+		return data.ptr;
+	}
+
+    public void setToIdentity() 
+	{
         static assert(M == N);
         for(size_t i = 0; i < M; i++)
             for(size_t j = 0; j < N; j++)
-                data[i][j] = 0;
+                this[i, j] = 0;
         for(size_t i = 0; i < M; i++)
-            data[i][i] = 1;
+            this[i, i] = 1;
     }
 
     public Matrix!(T, m, N) opBinary(string op, size_t m)(Matrix!(T, m, N) other)
@@ -44,7 +50,7 @@ struct Matrix(T, size_t M, size_t N)
         for (size_t i = 0; i < m; i++) {
     		for (size_t j = 0; j < N; j++) {
     			for (size_t k = 0; k < M; k++) {
-    				ret.data[i][j] += this.data[k][j] * other.data[i][k];
+    				ret[i, j] = ret[i, j] + this[k, j] * other[i, k];
     			}
     		}
     	}
@@ -57,7 +63,7 @@ struct Matrix(T, size_t M, size_t N)
         Vector!(T, N) ret;
 		for (size_t i = 0; i < N; i++) {
 			for (size_t j = 0; j < M; j++) {
-				ret.data[i] += this.data[j][i] * other.data[j];
+				ret.data[i] += this[j, i] * other.data[j];
 			}
 		}
         return ret;
@@ -65,12 +71,12 @@ struct Matrix(T, size_t M, size_t N)
 
     public T opIndex(size_t i, size_t j)
     {
-        return data[i][j];
+        return data[i * N + j];
     }
 
     public T opIndexAssign(T val, size_t i, size_t j)
     {
-        return data[i][j] = val;
+        return data[i * N + j] = val;
     }
 }
 
