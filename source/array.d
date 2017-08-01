@@ -25,6 +25,11 @@ struct Array(T)
 		*count += 1;
 	}
 
+	public void destroy()
+	{
+		free(backingBuffer);
+	}
+
 	pure:
 	public void remove(size_t index) 
 	{
@@ -59,4 +64,5 @@ struct Array(T)
 	}
 	assert(x[0] == 0);
 	assert(x[16] == 16);
+	x.destroy();
 }
