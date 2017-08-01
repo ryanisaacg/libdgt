@@ -57,6 +57,11 @@ struct Array(T)
 		return buffer[index] = value; 
 	}
 
+	public void clear()
+	{
+		*count = 0;
+	}
+
 	public size_t length() { return *count; }
 	public size_t* count() { return cast(size_t*) backingBuffer; }
 	public size_t* capacity() {	return count + 1; }
