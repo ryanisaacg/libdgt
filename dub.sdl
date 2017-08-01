@@ -1,0 +1,7 @@
+name "libau"
+description "An ergonomic 2D game engine"
+authors "Ryan Goldstein"
+copyright "Copyright © 2017, Ryan"
+license "MIT"
+dependency "derelict-sdl2" version="~>2.1.4"
+dependency "derelict-gl3" version="~>1.0.23"
