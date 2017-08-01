@@ -25,6 +25,14 @@ struct Array(T)
 		*count += 1;
 	}
 
+	public void add(A...)(A a)
+	{
+		foreach(val; a) 
+		{
+			add(val);
+		}
+	}
+
 	public void destroy()
 	{
 		free(backingBuffer);
