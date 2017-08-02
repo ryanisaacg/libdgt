@@ -28,7 +28,7 @@ struct Matrix(T, size_t M, size_t N)
 
     @nogc nothrow pure:
 
-	public T* getDataPointer() 
+	public T* dataPointer() 
 	{
 		return data.ptr;
 	}
