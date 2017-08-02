@@ -3,7 +3,7 @@ import derelict.sdl2.sdl;
 
 import array : Array;
 import color : Color;
-import geom : Matrix;
+import geom : Matrix, Vector;
 
 const GLchar* vertex_shader = "#version 130
 in vec2 position;
@@ -26,6 +26,12 @@ void main() {
 	vec4 tex_color = texture(tex, Tex_coord);
 	outColor = Color * tex_color;
 }";
+
+struct Vertex 
+{
+	Vector!(float, 2) pos, texPos;
+	Color col;
+}
 
 struct GLBackend
 {
@@ -159,5 +165,17 @@ struct GLBackend
 		if (this.texture != 0)
 			flush();
 		this.texture = texture;
+	}
+
+	@nogc nothrow pure:
+	public void add(size_t Vertices, size_t Indices)(GLuint texture, Vertex[Vertices] newVertices, GLuint[Indices] newIndices)
+	{
+		if(this.texture != texture)
+			switchTexture(texture);
+		foreach(v; newVertices)
+			vertices.add(v.pos.x, v.pos.y, v.texPos.x, v.texPos.y, v.col.r, v.col.g, v.col.b, v.col.a);
+		auto offset = indices.length;
+		foreach(i; newIndices)
+			indices.add(i + offset);
 	}
 }
