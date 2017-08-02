@@ -3,18 +3,19 @@ import derelict.sdl2.sdl;
 
 import array : Array;
 import color : Color;
+import geom : Matrix;
 
 const GLchar* vertex_shader = "#version 130
-in vec3 position;
+in vec2 position;
 in vec2 tex_coord;
 in vec4 color;
-uniform mat4 transform;
+uniform mat3 transform;
 out vec4 Color;
 out vec2 Tex_coord;
 void main() {
 	Color = color;
 	Tex_coord = tex_coord;
-	gl_Position = transform * vec4(position, 1.0);
+	gl_Position = transform * vec4(position, 0.0, 1.0);
 }";
 const GLchar* fragment_shader = "#version 130
 in vec4 Color;
@@ -37,6 +38,7 @@ struct GLBackend
 	//OpenGL opbjects
 	private GLuint shader, fragment, vertex, vbo, ebo, vao, texture_location;
 	private SDL_Window* window;
+	private Matrix!(float, 3, 3) transform;
 
 	//The amount of floats per vertex
 	private static immutable size_t vertex_size = 8;
@@ -107,8 +109,55 @@ struct GLBackend
 		SDL_GL_DeleteContext(ctx);
 	}
 
-	@nogc nothrow pure:
-	void switchTexture(GLuint texture)
+	public void clear(Color col)
 	{
+		vertices.clear();
+		indices.clear();
+		glClearColor(col.r, col.g, col.b, col.a);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	}
+
+	public void flush()
+	{
+		GLint transform_attrib = glGetUniformLocation(shader, "transform");
+		glUniformMatrix3fv(transform_attrib, 1, GL_FALSE, transform.dataPointer);
+		//Bind the vertex data
+		glBindBuffer(GL_ARRAY_BUFFER, vbo);
+		glBufferData(GL_ARRAY_BUFFER, vertices.length * float.sizeof, vertices.buffer, GL_STREAM_DRAW);
+		//Bind the index data
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.length * GLuint.sizeof, indices.buffer, GL_STREAM_DRAW);
+		//Set up the vertex attributes
+		GLint posAttrib = glGetAttribLocation(shader, "position");
+		glEnableVertexAttribArray(posAttrib);
+		glVertexAttribPointer(posAttrib, 3, GL_FLOAT, GL_FALSE, 9 * GLfloat.sizeof, cast(void*)0);
+		GLint texAttrib = glGetAttribLocation(shader, "tex_coord");
+		glEnableVertexAttribArray(texAttrib);
+		glVertexAttribPointer(texAttrib, 2, GL_FLOAT, GL_FALSE, 9 * GLfloat.sizeof, cast(void*)(3 * GLfloat.sizeof));
+		GLint colAttrib = glGetAttribLocation(shader, "color");
+		glEnableVertexAttribArray(colAttrib);
+		glVertexAttribPointer(colAttrib, 4, GL_FLOAT, GL_FALSE, 9 * GLfloat.sizeof, cast(void*)(5 * GLfloat.sizeof));
+		//Upload the texture to the GPU
+		texture_location = glGetUniformLocation(shader, "tex");
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, texture);
+		glUniform1i(texture_location, 0);
+		//Draw the triangles
+		glDrawElements(GL_TRIANGLES, cast(int)indices.length, GL_UNSIGNED_INT, cast(void*)0);
+		vertices.clear();
+		indices.clear();
+	}
+
+	public void flip()
+	{
+		flush();
+		SDL_GL_SwapWindow(window);
+	}
+
+	private void switchTexture(GLuint texture)
+	{
+		if (this.texture != 0)
+			flush();
+		this.texture = texture;
 	}
 }
