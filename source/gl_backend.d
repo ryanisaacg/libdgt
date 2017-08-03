@@ -27,9 +27,9 @@ void main() {
 	outColor = Color * tex_color;
 }";
 
-struct Vertex 
+struct Vertex
 {
-	Vector!(float, 2) pos, texPos;
+	Vector2f pos, texPos;
 	Color col;
 }
 

@@ -1,4 +1,4 @@
-import std.math : sqrt;
+import std.math : sqrt, cos, sin;
 
 @nogc nothrow pure:
 
@@ -8,6 +8,19 @@ struct Vector(T, size_t N)
     private T[N] data;
 
     @nogc nothrow pure public:
+    static if(N == 1)
+    {
+        this(T a) { data[0] = a; }
+    }
+    static if(N == 2)
+    {
+        this(T a, T b) { data[0] = a; data[1] = b; }
+    }
+    static if(N == 3)
+    {
+        this(T a, T b, T c) { data[0] = a; data[1] = b; data[2] = c; }
+    }
+
     @property T x() { return data[0]; }
     @property T x(T val) { return data[0] = val; }
 
@@ -59,6 +72,22 @@ struct Vector(T, size_t N)
 		for(size_t i = 0; i < N; i++)
 			data[i] = a[i];
 	}
+
+    Vector!(T, N + n) expand(size_t n)()
+    {
+        Vector!(T, N + n) result;
+        for(size_t i = 0; i < N; i++)
+            result.data[i] = this.data[i];
+        return result;
+    }
+
+    Vector!(T, N - n) shrink(size_t n)()
+    {
+        Vector!(T, N - n) result;
+        for(size_t i = 0; i < N - n; i++)
+            result.data[i] = this.data[i];
+        return result;
+    }
 }
 
 unittest
@@ -72,8 +101,8 @@ unittest
 
 struct Rectangle(T)
 {
-	private Vector!(T, 2) topLeft, size;
-    
+	public Vector!(T, 2) topLeft, size;
+
 	@nogc nothrow pure public:
 	@property T x() { return topLeft.x; }
     @property T x(T val) { return topLeft.x = val; }
@@ -137,7 +166,7 @@ unittest
 
 struct Circle(T)
 {
-	private Vector!(T, 2) center;
+	public Vector!(T, 2) center;
 	public T radius;
 
 	@nogc nothrow pure public:
@@ -194,12 +223,12 @@ struct Matrix(T, size_t M, size_t N)
 
     @nogc nothrow pure:
 
-	public T* dataPointer() 
+	public T* dataPointer()
 	{
 		return data.ptr;
 	}
 
-    public void setToIdentity() 
+    public void setToIdentity()
 	{
         static assert(M == N);
         for(size_t i = 0; i < M; i++)
@@ -235,6 +264,19 @@ struct Matrix(T, size_t M, size_t N)
         return ret;
     }
 
+    public Vector!(T, N - 1) opBinary(string op)(Vector!(T, N - 1) other)
+    {
+        static assert (N > 1)
+        static assert (op == "*");
+        Vector!(T, N) ret;
+		for (size_t i = 0; i < N; i++) {
+			for (size_t j = 0; j < M; j++) {
+				ret.data[i] += this[j, i] * other.data[j];
+			}
+		}
+        return ret;
+    }
+
     public T opIndex(size_t i, size_t j)
     {
         return data[i * N + j];
@@ -244,24 +286,94 @@ struct Matrix(T, size_t M, size_t N)
     {
         return data[i * N + j] = val;
     }
+
+    public ref Matrix!(T, M, N) opAssign(T[M * N] array)
+    {
+        data = array;
+        return this;
+    }
 }
+
+Transform2D identity()
+{
+    Transform2D transform;
+    transform = {
+        1, 0, 0,
+        0, 1, 0,
+        0, 0, 1
+    };
+    return transform;
+}
+
+Transform2D rotation(float rotation)
+{
+    float c = cos(angle * PI / 180);
+	float s = sin(angle * PI / 180);
+    Transform2D transform;
+    transform = {
+        c, -s, 0,
+        s, c, 0,
+        0, 0, 1
+    };
+    return transform;
+}
+
+Transform2D translate(float x, float y)
+{
+    Transform2D transform;
+    transform = {
+        1, 0, x,
+        0, 1, y,
+        0, 0, 1
+    };
+    return transform;
+}
+
+Transform2D scale(float x, float y)
+{
+    Transform2D transform;
+    transform = {
+        x_scale, 0, 0,
+        0, y_scale, 0,
+        0, 0, 1
+    };
+    return transform;
+}
+
+alias Vector2i = Vector!(int, 2);
+alias Vector2f = Vector!(float, 2);
+alias Rectanglei = Rectangle!int;
+alias Rectanglef = Rectangle!float;
+alias Circlei = Circle!int;
+alias Circlef = Circle!float;
+alias Matrix2i = Matrix!(int, 2, 2);
+alias Matrix3i = Matrix!(int, 3, 3);
+alias Matrix2f = Matrix!(float, 2, 2);
+alias Matrix3f = Matrix!(float, 3, 3);
+alias Transform2D = Matrix!(float, 3, 3);
+alias Trnasform3D = Matrix!(float, 4, 4);
 
 unittest
 {
-    Matrix!(int, 2, 2) m, n;
+    Matrix2i m, n;
     m.setToIdentity();
     n[0, 0] = 5;
     assert((m * n)[0, 0] == 5);
     m[0, 0] = 2;
     assert((m * n)[0, 0] = 10);
 
-    Matrix!(int, 3, 3) scale;
+    Matrix3i scale;
     scale.setToIdentity();
     scale[0, 0] = 2;
     scale[1, 1] = 2;
-    Vector!(int, 3) vector;
+    Vector3i vector;
     vector.x = 2;
     vector.y = 5;
     auto scaled = scale * vector;
     assert(scaled.x == 4 && scaled.y == 10);
+
+    auto trans = translate(3, 4);
+    auto vector = Vector2f(1, 1);
+    vector = trans * vector;
+    assert(vector.x == 4 && vector.y == 5);
 }
