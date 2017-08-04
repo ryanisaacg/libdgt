@@ -69,12 +69,11 @@ struct GLBackend
 		glGetShaderiv(vertex, GL_COMPILE_STATUS, &status);
 		if (status != GL_TRUE)
 		{
-			//TODO: Print vertex shader failure message
-			/* printf("Vertex shader compilation failed\n");
-			char[512] buffer;
-			glGetShaderInfoLog(ctx.vertex, 512, NULL, buffer);
-			printf("Error: %s\n", buffer);
-			exit(-1); */
+			printf("Vertex shader compilation failed\n");
+			Array!char buffer;
+			buffer.ensureCapacity(512);
+			glGetShaderInfoLog(vertex, 512, null, buffer.buffer);
+			printf("Error: %s\n", buffer.buffer);
 		}
 		fragment = glCreateShader(GL_FRAGMENT_SHADER);
 		glShaderSource(fragment, 1, &fragment_shader, null);
@@ -82,12 +81,11 @@ struct GLBackend
 		glGetShaderiv(fragment, GL_COMPILE_STATUS, &status);
 		if (status != GL_TRUE)
 		{
-			//TODO: Print fragment shader failure message
-			/* printf("Fragment shader compilation failed\n");
-			char buffer[512];
-			glGetShaderInfoLog(ctx.fragment, 512, null, buffer);
-			printf("Error: %s\n", buffer);
-			exit(-1); */
+			printf("Fragment shader compilation failed\n");
+			Array!char buffer;
+			buffer.ensureCapacity(512);
+			glGetShaderInfoLog(fragment, 512, null, buffer.buffer);
+			printf("Error: %s\n", buffer.buffer);
 		}
 		shader = glCreateProgram();
 		glAttachShader(shader, vertex);
