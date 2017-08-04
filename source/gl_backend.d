@@ -97,6 +97,8 @@ struct GLBackend
 	//	glEnable (GL_DEPTH_TEST);
 		glEnable (GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		vertices.ensureCapacity(1024);
+		indices.ensureCapacity(1024);
 	}
 
 	@nogc nothrow:

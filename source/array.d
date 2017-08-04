@@ -9,7 +9,10 @@ struct Array(T)
 	@nogc nothrow:
 	public void ensureCapacity(size_t newCapacity)
 	{
+		void* old = backingBuffer;
 		backingBuffer = realloc(backingBuffer, size_t.sizeof * 2 + T.sizeof * newCapacity);
+		*capacity = newCapacity;
+		if (old == null) *count = 0;
 	}
 
 	public void add(T val)

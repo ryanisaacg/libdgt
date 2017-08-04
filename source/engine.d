@@ -1,10 +1,7 @@
 import derelict.opengl3.gl;
 import derelict.sdl2.sdl, derelict.sdl2.image;
 
-import color;
-import geom;
-import gl_backend;
-import texture;
+import color, geom, gl_backend, texture;
 
 struct WindowConfig
 {
@@ -32,10 +29,12 @@ struct Window
 	int window_width, window_height;
 	Texture white;
 
-	void init(char* title, int width, int height, char* icon, WindowConfig config)
+	void init(string title, int width, int height, /*char* icon,*/ WindowConfig config)
 	{
+		DerelictSDL2.load();
+		DerelictSDL2Image.load();
 		SDL_Init(SDL_INIT_VIDEO/*| SDL_INIT_AUDIO*/);
-		window = SDL_CreateWindow(title,
+		window = SDL_CreateWindow(title.ptr,
 			SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width, height,
 			SDL_WINDOW_OPENGL | (SDL_WINDOW_RESIZABLE && config.resizable) |
 			(SDL_WINDOW_FULLSCREEN && config.fullscreen) |
@@ -141,7 +140,7 @@ struct Window
 		mouse_middle = (button_mask & SDL_BUTTON(SDL_BUTTON_MIDDLE)) != 0;
 	}
 
-	void au_end()
+	void end()
 	{
 		//Update particles
 		/*if (eng.map != NULL) {

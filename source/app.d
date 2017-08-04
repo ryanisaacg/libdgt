@@ -1,7 +1,15 @@
 import std.stdio;
-import engine;
+import au;
 
 void main()
 {
-	writeln("Edit source/app.d to start your project.");
+	Window engine;
+	WindowConfig config;
+	engine.init("Test title", 640, 480, config);
+	while(engine.should_continue)
+	{
+		engine.begin(black);
+		engine.end();
+	}
+	engine.destroy();
 }
