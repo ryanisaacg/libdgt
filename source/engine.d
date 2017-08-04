@@ -225,16 +225,16 @@ struct Window
 		drawShape(color, points);
 	}
 
-	void drawTexture(ref Texture tex, Color color, float x, float y, float w, float h,
-						float rot, float or_x, float or_y, float scale_x, float scale_y,
-						bool flip_x, bool flip_y) {
+	void drawTexture(ref Texture tex, float x, float y, float w, float h,
+						float rot = 0, float or_x = 0, float or_y = 0, float scale_x = 1, float scale_y = 1,
+						bool flip_x = false, bool flip_y = false, Color color = color.white) {
 		Transform2D trans = identity();
 		trans = trans * translate(-or_x, -or_y) * rotate(rot) * scale(scale_x, scale_y);
-		drawTexture(tex, color, trans, x + or_x, y + or_y, w, h, flip_x, flip_y);
+		drawTexture(tex, trans, x + or_x, y + or_y, w, h, flip_x, flip_y, color);
 	}
 
-	void drawTexture(ref Texture tex, Color color, Transform2D trans, float x, float y,
-							   float w, float h, bool flip_x, bool flip_y) {
+	void drawTexture(ref Texture tex, Transform2D trans, float x, float y,
+							   float w, float h, bool flip_x = false, bool flip_y = false, Color color = color.white) {
 		//Calculate the destination points with the transformation
 		auto tl = trans * Vector2f(0, 0);
 		auto tr = trans * Vector2f(w, 0);
