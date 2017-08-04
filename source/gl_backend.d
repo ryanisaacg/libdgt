@@ -3,7 +3,7 @@ import derelict.sdl2.sdl;
 
 import array : Array;
 import color : Color;
-import geom : Matrix, Vector;
+import geom;
 
 const GLchar* vertex_shader = "#version 130
 in vec2 position;
@@ -167,7 +167,6 @@ struct GLBackend
 		this.texture = texture;
 	}
 
-	@nogc nothrow pure:
 	public void add(size_t Vertices, size_t Indices)(GLuint texture, Vertex[Vertices] newVertices, GLuint[Indices] newIndices)
 	{
 		if(this.texture != texture)

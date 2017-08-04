@@ -1,6 +1,7 @@
 import derelict.opengl3.gl;
-import derelict.sdl2.sdl;
+import derelict.sdl2.sdl, derelict.sdl2.image;
 
+import color;
 import geom;
 import gl_backend;
 import texture;
@@ -44,10 +45,10 @@ struct Window
 			(SDL_WINDOW_INPUT_GRABBED && config.input_grabbed) |
 			(SDL_WINDOW_ALLOW_HIGHDPI && config.highdpi));
 		ctx.init(window);
-//		engine->particle_capacity = 128;
-//		engine->particles = au_memory_alloc(sizeof(AU_Particle) * engine->particle_capacity);
-//		engine->particle_count = 0;
-//		engine->map = NULL;
+//		engine.particle_capacity = 128;
+//		engine.particles = au_memory_alloc(sizeof(AU_Particle) * engine.particle_capacity);
+//		engine.particle_count = 0;
+//		engine.map = NULL;
 		camera.set(0, 0, width, height);
 		window_width = width;
 		window_height = height;
@@ -58,8 +59,8 @@ struct Window
 //		Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 1024);
 //		Mix_AllocateChannels(512);
 
-		ubyte[3] white_pixel = { 255, 255, 255 };
-		white = loadTexture(white_pixel.ptr(), 1, 1, false);
+		ubyte[3] white_pixel = [ 255, 255, 255 ];
+		white = loadTexture(white_pixel.ptr, 1, 1, false);
 		glViewport(0, 0, width, height);
 	}
 
@@ -74,7 +75,7 @@ struct Window
 		SDL_Quit();
 	}
 
-	@nogc nothrow pure:
+	@nogc nothrow:
 	Texture loadTexture(ubyte* data, int w, int h, bool has_alpha)
 	{
 		GLuint texture;
@@ -88,7 +89,7 @@ struct Window
 					 data);
 		glGenerateMipmap(GL_TEXTURE_2D);
 		glBindTexture(GL_TEXTURE_2D, 0);
-		Texture tex = { id: texture, width: w, height: h, region: { x: 0, y: 0, width: w, height: h}};
+		Texture tex = { id: texture, width: w, height: h, region: Rectangle!int(0, 0, w, h)};
 		return tex;
 	}
 
@@ -96,20 +97,19 @@ struct Window
 	{
 		SDL_Surface* surface = IMG_Load(name);
 		Texture tex = loadTexture(surface);
-		SDL_DestroySurface(surface);
+		SDL_FreeSurface(surface);
 		return tex;
 	}
 
 	Texture loadTexture(SDL_Surface* sur) {
-		return loadTexture(eng, sur->pixels, sur->w, sur->h, sur->format->BytesPerPixel == 4);
+		return loadTexture(cast(ubyte*)sur.pixels, sur.w, sur.h, sur.format.BytesPerPixel == 4);
 	}
 
 	//TODO: Pass a rectangle and create a camera
-	void begin(AU_Color bg)
+	void begin(Color bg)
 	{
 		previous_ticks = SDL_GetTicks();
-		ctx.clear(bg);
-		memcpy(eng->previous_keys, eng->current_keys, sizeof(bool) * SDL_NUM_KEYS);
+		previous_keys = current_keys;
 		SDL_Event e;
 		while (SDL_PollEvent(&e))
 		{
@@ -124,57 +124,59 @@ struct Window
 				case SDL_KEYUP:
 					current_keys[e.key.keysym.scancode] = false;
 					break;
-				case SDL_WINDOWEVENT_RESIZED: {
+				case SDL_WINDOWEVENT_RESIZED:
 					int w, h;
 					SDL_GetWindowSize(window, &w, &h);
 					glViewport(0, 0, w, h); //TODO: Letterbox
-				}
+					break;
+				default:
+					break;
 			}
 		}
 		int x, y;
 		int button_mask = SDL_GetMouseState(&x, &y);
-		mouse.set(x, y);
-		mouse_left = button_mask & SDL_BUTTON(SDL_BUTTON_LEFT);
-		mouse_right = button_mask & SDL_BUTTON(SDL_BUTTON_RIGHT);
-		mouse_middle = button_mask & SDL_BUTTON(SDL_BUTTON_MIDDLE);
+		mouse.set([x, y]);
+		mouse_left = (button_mask & SDL_BUTTON(SDL_BUTTON_LEFT)) != 0;
+		mouse_right = (button_mask & SDL_BUTTON(SDL_BUTTON_RIGHT)) != 0;
+		mouse_middle = (button_mask & SDL_BUTTON(SDL_BUTTON_MIDDLE)) != 0;
 	}
 
-	void au_end(AU_Engine* eng)
+	void au_end()
 	{
 		//Update particles
-		/*if (eng->map != NULL) {
-			for (size_t i = 0; i < eng->particle_count; i++) {
-				AU_Particle* part = eng->particles + i;
-				switch (part->behavior) {
+		/*if (eng.map != NULL) {
+			for (size_t i = 0; i < eng.particle_count; i++) {
+				AU_Particle* part = eng.particles + i;
+				switch (part.behavior) {
 					case AU_MAP_IGNORE:
 						break;
 					case AU_MAP_DIE:
-						if (au_tmap_get(eng->map, part->position.x, part->position.y)) {
-							eng->particles[i].lifetime = 0;
+						if (au_tmap_get(eng.map, part.position.x, part.position.y)) {
+							eng.particles[i].lifetime = 0;
 						}
 						break;
 					case AU_MAP_BOUNCE:
-						if (au_tmap_get(eng->map, part->position.x + part->velocity.x, part->position.y)) {
-							part->velocity.x *= -1;
+						if (au_tmap_get(eng.map, part.position.x + part.velocity.x, part.position.y)) {
+							part.velocity.x *= -1;
 						}
-						if (au_tmap_get(eng->map, part->position.x, part->position.y + part->velocity.y)) {
-							part->velocity.y *= -1;
+						if (au_tmap_get(eng.map, part.position.x, part.position.y + part.velocity.y)) {
+							part.velocity.y *= -1;
 						}
 				}
 			}
 		}
 
-		for (size_t i = 0; i < eng->particle_count; i++) {
-			AU_Particle* part = eng->particles + i;
+		for (size_t i = 0; i < eng.particle_count; i++) {
+			AU_Particle* part = eng.particles + i;
 			au_particle_update(part);
-			if (part->lifetime <= 0) {
-				eng->particles[i] = eng->particles[eng->particle_count - 1];
-				eng->particle_count--;
+			if (part.lifetime <= 0) {
+				eng.particles[i] = eng.particles[eng.particle_count - 1];
+				eng.particle_count--;
 				i--;
 			} else {
-				AU_Sprite sprite = au_sprite_new(part->region);
-				sprite.transform.x = part->position.x;
-				sprite.transform.y = part->position.y;
+				AU_Sprite sprite = au_sprite_new(part.region);
+				sprite.transform.x = part.position.x;
+				sprite.transform.y = part.position.y;
 				au_draw_sprite(eng, &sprite);
 			}
 		}*/
@@ -190,7 +192,7 @@ struct Window
 
 	void drawShape(size_t Len)(Color color, Vector2f[Len] points)
 	{
-		static assert ( Len < 3 );
+		static assert ( Len >= 3 );
 		Vertex[Len] vertices;
 		GLuint[Len * 3] indices;
 		for (size_t i = 0; i < Len; i++)
@@ -198,12 +200,12 @@ struct Window
 			vertices[i].pos = points[i];
 			vertices[i].col = color;
 		}
-		for (size_t i = 0; i < length; i++) {
+		for (size_t i = 0; i < Len; i++) {
 			indices[i * 3] = 0;
-			indices[i * 3 + 1] = i;
-			indices[i * 3 + 2] = i + 1;
+			indices[i * 3 + 1] = cast(uint)i;
+			indices[i * 3 + 2] = cast(uint)i + 1;
 		}
-		ctx.add(white, vertices, indices);
+		ctx.add(white.id, vertices, indices);
 	}
 
 
@@ -233,7 +235,7 @@ struct Window
 	}
 
 	void drawTexture(ref Texture tex, Color color, Transform2D trans, float x, float y,
-							   float w, float h, bool flip_x, bool flip_y, float depth) {
+							   float w, float h, bool flip_x, bool flip_y) {
 		//Calculate the destination points with the transformation
 		auto tl = trans * Vector2f(0, 0);
 		auto tr = trans * Vector2f(w, 0);
@@ -269,29 +271,28 @@ struct Window
 			src_bl = tmp;
 		}
 		//Add all of the vertices to the context
-		uint id = tex.source.id;
-		auto translate = Vector2f(x, y)
+		auto translate = Vector2f(x, y);
 		Vertex[4] vertices = [ Vertex(tl + translate, src_tl, color),
 			Vertex(tr + translate, src_tr, color),
 			Vertex(br + translate, src_br, color),
 			Vertex(bl + translate, src_bl, color)];
-		Gluint[6] indices = [0, 1, 2, 2, 3, 0];
+		GLuint[6] indices = [0, 1, 2, 2, 3, 0];
 		ctx.add(tex.id, vertices, indices);
 	}
 
 /*	static void au_draw_sprite_transformed(AU_Engine* eng, AU_TextureRegion region, AU_SpriteTransform* trans) {
-		au_draw_texture_ex(eng, region, trans->color, trans->x, trans->y, trans->width, trans->height, trans->rotation,
-						   trans->origin_x, trans->origin_y, trans->scale_x, trans->scale_y, trans->flip_x, trans->flip_y, trans->depth);
+		au_draw_texture_ex(eng, region, trans.color, trans.x, trans.y, trans.width, trans.height, trans.rotation,
+						   trans.origin_x, trans.origin_y, trans.scale_x, trans.scale_y, trans.flip_x, trans.flip_y, trans.depth);
 	}
 
 	void au_draw_sprite(AU_Engine* eng, AU_Sprite* sprite) {
-		au_draw_sprite_transformed(eng, sprite->region, &(sprite->transform));
+		au_draw_sprite_transformed(eng, sprite.region, &(sprite.transform));
 	}
 
 	void au_draw_sprite_animated(AU_Engine* eng, AU_AnimatedSprite* sprite) {
-		au_anim_manager_update(&(sprite->animations));
-		AU_TextureRegion region = au_anim_manager_get_frame(&(sprite->animations));
-		au_draw_sprite_transformed(eng, region, &(sprite->transform));
+		au_anim_manager_update(&(sprite.animations));
+		AU_TextureRegion region = au_anim_manager_get_frame(&(sprite.animations));
+		au_draw_sprite_transformed(eng, region, &(sprite.transform));
 	}
 
 	AU_Font* au_load_font(AU_Engine* eng, int size, AU_Color col, const char* filename) {
@@ -321,7 +322,7 @@ struct Window
 					position += au_draw_char(eng, font, ' ', position + x, y);
 				}
 			} else if (c == '\n') {
-				y += font->height;
+				y += font.height;
 			} else if (c == '\r') {
 				//just ignore CR characters
 			} else {
@@ -332,14 +333,14 @@ struct Window
 	}
 
 	void au_add_particles(AU_Engine* eng, AU_ParticleEmitter* emitter) {
-		int parts = au_util_randi_range(emitter->particle_min, emitter->particle_max);
-		if (eng->particle_count + parts >= eng->particle_capacity) {
-			eng->particle_capacity *= 2;
-			eng->particles = au_memory_realloc(eng->particles, sizeof(AU_Particle) * eng->particle_capacity);
+		int parts = au_util_randi_range(emitter.particle_min, emitter.particle_max);
+		if (eng.particle_count + parts >= eng.particle_capacity) {
+			eng.particle_capacity *= 2;
+			eng.particles = au_memory_realloc(eng.particles, sizeof(AU_Particle) * eng.particle_capacity);
 		}
 		for (int i = 0; i < parts; i++) {
-			eng->particles[eng->particle_count] = au_particle_emitter_emit(emitter);
-			eng->particle_count++;
+			eng.particles[eng.particle_count] = au_particle_emitter_emit(emitter);
+			eng.particle_count++;
 		}
 	}*/
 }
