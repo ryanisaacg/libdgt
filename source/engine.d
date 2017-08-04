@@ -25,7 +25,7 @@ struct Window
 	size_t particle_count, particle_capacity;
 //	AU_Tilemap map;
 	uint previous_ticks;
-	Rectangle!int camera;
+	Rectangle!float camera;
 	int window_width, window_height;
 	Texture white;
 
@@ -138,6 +138,12 @@ struct Window
 		mouse_left = (button_mask & SDL_BUTTON(SDL_BUTTON_LEFT)) != 0;
 		mouse_right = (button_mask & SDL_BUTTON(SDL_BUTTON_RIGHT)) != 0;
 		mouse_middle = (button_mask & SDL_BUTTON(SDL_BUTTON_MIDDLE)) != 0;
+		float left = camera.x, right = camera.x + camera.width, top = camera.y, bottom = camera.y + camera.height;
+		ctx.transform = [
+			2 / (right - left), 0, 0,
+			0, 2 / (top - bottom), 0,
+			-(right + left) / (right - left), -(top + bottom) / (top - bottom), 1
+		];
 	}
 
 	void end()
