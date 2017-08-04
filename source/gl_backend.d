@@ -139,13 +139,13 @@ struct GLBackend
 		//Set up the vertex attributes
 		GLint posAttrib = glGetAttribLocation(shader, "position");
 		glEnableVertexAttribArray(posAttrib);
-		glVertexAttribPointer(posAttrib, 3, GL_FLOAT, GL_FALSE, 9 * GLfloat.sizeof, cast(void*)0);
+		glVertexAttribPointer(posAttrib, 2, GL_FLOAT, GL_FALSE, 8 * GLfloat.sizeof, cast(void*)0);
 		GLint texAttrib = glGetAttribLocation(shader, "tex_coord");
 		glEnableVertexAttribArray(texAttrib);
-		glVertexAttribPointer(texAttrib, 2, GL_FLOAT, GL_FALSE, 9 * GLfloat.sizeof, cast(void*)(3 * GLfloat.sizeof));
+		glVertexAttribPointer(texAttrib, 2, GL_FLOAT, GL_FALSE, 8 * GLfloat.sizeof, cast(void*)(2 * GLfloat.sizeof));
 		GLint colAttrib = glGetAttribLocation(shader, "color");
 		glEnableVertexAttribArray(colAttrib);
-		glVertexAttribPointer(colAttrib, 4, GL_FLOAT, GL_FALSE, 9 * GLfloat.sizeof, cast(void*)(5 * GLfloat.sizeof));
+		glVertexAttribPointer(colAttrib, 4, GL_FLOAT, GL_FALSE, 8 * GLfloat.sizeof, cast(void*)(4 * GLfloat.sizeof));
 		//Upload the texture to the GPU
 		texture_location = glGetUniformLocation(shader, "tex");
 		glActiveTexture(GL_TEXTURE0);
