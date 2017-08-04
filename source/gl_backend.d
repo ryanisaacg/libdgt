@@ -51,6 +51,7 @@ struct GLBackend
 
 	public void init(SDL_Window* window)
 	{
+		import core.stdc.stdio;
 		DerelictGL3.load();
 		this.window = window;
 		SDL_GL_SetSwapInterval(1);
@@ -174,9 +175,9 @@ struct GLBackend
 		if(this.texture != texture)
 			switchTexture(texture);
 		foreach(v; newVertices)
-			vertices.add(v.pos.x, v.pos.y, v.texPos.x, v.texPos.y, v.col.r, v.col.g, v.col.b, v.col.a);
+			vertices.addAll(v.pos.x, v.pos.y, v.texPos.x, v.texPos.y, v.col.r, v.col.g, v.col.b, v.col.a);
 		auto offset = indices.length;
 		foreach(i; newIndices)
-			indices.add(i + offset);
+			indices.add(cast(uint)(i + offset));
 	}
 }

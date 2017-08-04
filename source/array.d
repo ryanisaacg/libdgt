@@ -28,7 +28,7 @@ struct Array(T)
 		*count += 1;
 	}
 
-	public void add(A...)(A a)
+	public void addAll(A...)(A a)
 	{
 		foreach(val; a)
 		{
