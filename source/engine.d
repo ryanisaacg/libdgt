@@ -3,6 +3,9 @@ import derelict.sdl2.sdl, derelict.sdl2.image;
 
 import color, geom, gl_backend, texture;
 
+import core.stdc.stdio;
+
+
 struct WindowConfig
 {
 	bool fullscreen, resizable, borderless, minimized, maximized, input_grabbed, highdpi;
@@ -18,7 +21,7 @@ struct Window
 	bool should_continue = true;
 	bool[SDL_NUM_KEYS] current_keys; //The total number of SDL keys
 	bool[SDL_NUM_KEYS] previous_keys;
-	Vector2i mouse;
+	Vectorf mouse;
 	bool mouse_left, mouse_right, mouse_middle;
 	//TODO: Add a function to wait on IO
 //	AU_Particle* particles;
@@ -134,7 +137,7 @@ struct Window
 		}
 		int x, y;
 		int button_mask = SDL_GetMouseState(&x, &y);
-		mouse.set([x, y]);
+		mouse = Vectorf(x, y);
 		mouse_left = (button_mask & SDL_BUTTON(SDL_BUTTON_LEFT)) != 0;
 		mouse_right = (button_mask & SDL_BUTTON(SDL_BUTTON_RIGHT)) != 0;
 		mouse_middle = (button_mask & SDL_BUTTON(SDL_BUTTON_MIDDLE)) != 0;
@@ -195,7 +198,7 @@ struct Window
 		previous_ticks = time;
 	}
 
-	void drawShape(size_t Len)(Color color, Vector2f[Len] points)
+	void drawShape(size_t Len)(Color color, Vectorf[Len] points)
 	{
 		static assert ( Len >= 3 );
 		Vertex[Len] vertices;
@@ -215,9 +218,9 @@ struct Window
 
 
 	void drawCircle(size_t NumPoints = 32)(Color color, Circlef circle) {
-		Vector2f[NumPoints] points; //A large array of points to simulate a circle
+		Vectorf[NumPoints] points; //A large array of points to simulate a circle
 		auto rotation = rotation(360 / num_points);
-		auto pointer = Vector2f(0, -circle.radius);
+		auto pointer = Vectorf(0, -circle.radius);
 		for (size_t i = 0; i < NumPoints; i++) {
 			pointing  = (rotation * pointing.expand(1)).shrink(1);
 			points[i] = circle.center + pointing;
@@ -226,8 +229,8 @@ struct Window
 	}
 
 	void drawRect(Color color, Rectanglef rect) {
-		Vector2f[4] points = [ rect.topLeft, Vector2f(rect.x + rect.width, rect.y),
-			rect.topLeft + rect.size, Vector2f(rect.x, rect.y + rect.height)];
+		Vectorf[4] points = [ rect.topLeft, Vectorf(rect.x + rect.width, rect.y),
+			rect.topLeft + rect.size, Vectorf(rect.x, rect.y + rect.height)];
 		drawShape(color, points);
 	}
 
@@ -235,17 +238,22 @@ struct Window
 						float rot = 0, float or_x = 0, float or_y = 0, float scale_x = 1, float scale_y = 1,
 						bool flip_x = false, bool flip_y = false, Color color = color.white) {
 		Transform2D trans = identity();
+		import core.stdc.stdio;
+
 		trans = trans * translate(-or_x, -or_y) * rotate(rot) * scale(scale_x, scale_y);
+		for(size_t i = 0; i < 3; i++)
+			for(size_t j = 0; j < 3; j++)
+				printf("%f:", trans[i, j]);
 		drawTexture(tex, trans, x + or_x, y + or_y, w, h, flip_x, flip_y, color);
 	}
 
-	void drawTexture(ref Texture tex, Transform2D trans, float x, float y,
+	void drawTexture(ref Texture tex, ref Transform2D trans, float x, float y,
 							   float w, float h, bool flip_x = false, bool flip_y = false, Color color = color.white) {
 		//Calculate the destination points with the transformation
-		auto tl = trans * Vector2f(0, 0);
-		auto tr = trans * Vector2f(w, 0);
-		auto bl = trans * Vector2f(0, h);
-		auto br = trans * Vector2f(w, h);
+		auto tl = trans * Vectorf(0, 0);
+		auto tr = trans * Vectorf(w, 0);
+		auto bl = trans * Vectorf(0, h);
+		auto br = trans * Vectorf(w, h);
 
 		//Calculate the source points normalized to [0, 1]
 		//The conversion factor for normalizing vectors
@@ -255,10 +263,10 @@ struct Window
 		float norm_y = tex.region.y * conv_factor_y;
 		float norm_w = tex.region.width * conv_factor_x;
 		float norm_h = tex.region.height * conv_factor_y;
-		auto src_tl = Vector2f(norm_x, norm_y);
-		auto src_tr = Vector2f(norm_x + norm_w, norm_y);
-		auto src_br = Vector2f(norm_x + norm_w, norm_y + norm_h);
-		auto src_bl = Vector2f(norm_x, norm_y + norm_h);
+		auto src_tl = Vectorf(norm_x, norm_y);
+		auto src_tr = Vectorf(norm_x + norm_w, norm_y);
+		auto src_br = Vectorf(norm_x + norm_w, norm_y + norm_h);
+		auto src_bl = Vectorf(norm_x, norm_y + norm_h);
 		if (flip_x) {
 			auto tmp = src_tr;
 			src_tr = src_tl;
@@ -276,7 +284,7 @@ struct Window
 			src_bl = tmp;
 		}
 		//Add all of the vertices to the context
-		auto translate = Vector2f(x, y);
+		auto translate = Vectorf(x, y);
 		Vertex[4] vertices = [ Vertex(tl + translate, src_tl, color),
 			Vertex(tr + translate, src_tr, color),
 			Vertex(br + translate, src_br, color),

@@ -31,7 +31,7 @@ void main() {
 
 struct Vertex
 {
-	Vector2f pos, texPos;
+	Vectorf pos, texPos;
 	Color col;
 }
 
@@ -39,14 +39,14 @@ struct GLBackend
 {
 	//The draw data
 	private GLuint texture = 0;
-	private Array!float vertices;
+	public Array!float vertices;
 	private Array!GLuint indices;
 
 	private SDL_GLContext ctx;
 	//OpenGL opbjects
 	private GLuint shader, fragment, vertex, vbo, ebo, vao, texture_location;
 	private SDL_Window* window;
-	private Matrix!(float, 3, 3) transform;
+	public Matrix!(float, 3, 3) transform;
 
 	//The amount of floats per vertex
 	private static immutable size_t vertex_size = 8;
@@ -128,6 +128,15 @@ struct GLBackend
 
 	public void flush()
 	{
+		import core.stdc.stdio;
+		for(size_t i = 0; i < vertices.length; i++)
+		{
+		//	printf("%f:", vertices[i]);
+		}
+		for(size_t i = 0; i < indices.length; i++)
+		{
+		}
+		//printf("\n");
 		GLint transform_attrib = glGetUniformLocation(shader, "transform");
 		glUniformMatrix3fv(transform_attrib, 1, GL_FALSE, transform.dataPointer);
 		//Bind the vertex data

@@ -11,135 +11,79 @@ unittest
     m[0, 0] = 2;
     result = m * n;
     assert(result[0, 0] = 10);
-
-    Matrix3f scale;
-    scale.setToIdentity();
-    scale[0, 0] = 2;
-    scale[1, 1] = 2;
-    Vector3f vector;
-    vector.x = 2;
-    vector.y = 5;
-	vector.z = 0;
-    auto scaled = scale * vector;
+}
+unittest
+{
+    auto trans = scale(2, 2);
+    auto vec = Vectorf(2, 5);
+    auto scaled = trans * vec;
     assert(scaled.x == 4 && scaled.y == 10);
-
-
+}
+unittest
+{
     auto trans = translate(3, 4);
-    auto vec = Vector2f(1, 1);
+    auto vec = Vectorf(1, 1);
     vec = trans * vec;
     assert(vec.x == 4 && vec.y == 5);
 }
-
-@nogc nothrow pure:
-
-struct Vector(T, size_t N)
+unittest
 {
-    static assert(N > 0);
-    private T[N] data;
+	auto trans = identity() * translate(-0, -0) * rotate(0) * scale(1, 1);
+	auto vec = trans * Vectorf(15, 12);
+	assert(vec.x == 15);
+}
+
+struct Vector(T)
+{
+    public T x = 0, y = 0;
 
     @nogc nothrow pure public:
-    static if(N == 1)
-    {
-        this(T a) { data[0] = a; }
-    }
-    static if(N == 2)
-    {
-        this(T a, T b) { data[0] = a; data[1] = b; }
-    }
-    static if(N == 3)
-    {
-        this(T a, T b, T c) { data[0] = a; data[1] = b; data[2] = c; }
-    }
+    this(T x, T y) {
+		this.x = x;
+		this.y = y;
+	}
 
-    @property T x() { return data[0]; }
-    @property T x(T val) { return data[0] = val; }
-
-    static if(N > 1)
-    {
-        @property T y() { return data[1]; }
-        @property T y(T val) { return data[1] = val; }
-    }
-
-    static if(N > 2)
-    {
-        @property T z() { return data[2]; }
-        @property T z(T val) { return data[2] = val; }
-    }
-
-	Vector!(T, N) opBinary(string op)(Vector!(T, N) other)
+	Vector!T opBinary(string op)(Vector!T other)
 	{
 		static if (op == "+")
 		{
-			Vector!(T, N) result;
-			for(size_t i = 0; i < N; i++)
-				result.data[i] = data[i] + other.data[i];
-			return result;
+			return Vector!T(x + other.x, y + other.y);
 		}
 		static if (op == "-")
 		{
-			Vector!(T, N) result;
-			for(size_t i = 0; i < N; i++)
-				result.data[i] = data[i] - other.data[i];
-			return result;
+			return Vector!T(x - other.x, y - other.y);
 		}
 	}
 
 	float len2()
 	{
-		T total = 1;
-		for(size_t i = 0; i < N; i++)
-			total *= data[i];
-		return total;
+		return x * x + y * y;
 	}
 
 	float len()
 	{
 		return sqrt(len2());
 	}
-
-	void set(size_t N)(T[N] a)
-	{
-		for(size_t i = 0; i < N; i++)
-			data[i] = a[i];
-	}
-
-    Vector!(T, N + n) expand(size_t n)()
-    {
-        Vector!(T, N + n) result;
-        for(size_t i = 0; i < N; i++)
-            result.data[i] = this.data[i];
-		for(size_t i = N; i < N + n; i++)
-			result.data[i] = 0;
-        return result;
-    }
-
-    Vector!(T, N - n) shrink(size_t n)()
-    {
-        Vector!(T, N - n) result;
-        for(size_t i = 0; i < N - n; i++)
-            result.data[i] = this.data[i];
-        return result;
-    }
 }
 
 unittest
 {
-	Vector!(int, 2) a, b;
-	a.set([5, 10]);
-	b.set([1, -2]);
-	assert((a + b).x = 6);
-	assert((a - b).y = 12);
+	Vector!int a, b;
+	a = Vector!int(5, 10);
+	b = Vector!int(1, -2);
+	assert((a + b).x == 6);
+	assert((a - b).y == 12);
 }
 
 struct Rectangle(T)
 {
-	public Vector!(T, 2) topLeft, size;
+	public Vector!T topLeft = Vector!T(0, 0), size = Vector!T(0, 0);
 
 	@nogc nothrow pure public:
 	this(T x, T y, T width, T height)
 	{
-		topLeft.set([x, y]);
-		size.set([width, height]);
+		topLeft = Vector!T(x, y);
+		size = Vector!T(x, y);
 	}
 
 	@property T x() { return topLeft.x; }
@@ -151,7 +95,7 @@ struct Rectangle(T)
 	@property T height() { return size.y; }
 	@property T height(T val) { return size.y = val; }
 
-	bool contains(Vector!(T, 2) v)
+	bool contains(Vector!T v)
 	{
 		return v.x >= x && v.y >= y && v.x < x + width && v.y < y + height;
 	}
@@ -163,7 +107,7 @@ struct Rectangle(T)
 
 	bool overlaps(Circle!T c)
 	{
-		Vector!(T, 2) closest;
+		Vector!T closest;
 		if (c.x < x) {
 			closest.x = x;
 		} else if (c.x > x + width) {
@@ -195,17 +139,17 @@ struct Rectangle(T)
 unittest
 {
 	Rectangle!int a, b, c;
-	a.set(0, 0, 32, 32);
-	b.set(16, 16, 32, 32);
-	c.set(50, 50, 5, 5);
+	a = Rectangle!int(0, 0, 32, 32);
+	b = Rectangle!int(16, 16, 32, 32);
+	c = Rectangle!int(50, 50, 5, 5);
 	assert(a.overlaps(b));
 	assert(!a.overlaps(c));
 }
 
 struct Circle(T)
 {
-	public Vector!(T, 2) center;
-	public T radius;
+	public Vector!T center = Vector!T(0, 0);
+	public T radius = 0;
 
 	@nogc nothrow pure public:
 	@property T x() { return center.x; }
@@ -213,9 +157,9 @@ struct Circle(T)
 	@property T y() { return center.y; }
 	@property T y(T val) { return center.y = val; }
 
-	bool contains(Vector!(T, 2) v)
+	bool contains(Vector!T v)
 	{
-		Vector!(T, 2) dist = v - center;
+		Vector!T dist = v - center;
 		return dist.len2 < radius * radius;
 	}
 
@@ -266,22 +210,25 @@ struct Matrix(T, size_t M, size_t N)
 		return data.ptr;
 	}
 
-    public void setToIdentity()
+	static if (M == N)
 	{
-        static assert(M == N);
-        for(size_t i = 0; i < M; i++)
-            for(size_t j = 0; j < N; j++)
-                this[i, j] = 0;
-        for(size_t i = 0; i < M; i++)
-            this[i, i] = 1;
-    }
+	    public void setToIdentity()
+		{
+	        for(size_t i = 0; i < M; i++)
+	            for(size_t j = 0; j < N; j++)
+	                this[i, j] = 0;
+	        for(size_t i = 0; i < M; i++)
+	            this[i, i] = 1;
+	    }
+	}
 
-    public Matrix!(T, m, N) opBinary(string op, size_t m)(Matrix!(T, m, N) other)
+    public Matrix!(T, N, m) opBinary(string op, size_t m)(Matrix!(T, N, m) other)
     {
         static assert(op == "*");
-        Matrix!(T, m, N) ret;
+        Matrix!(T, N, m) ret;
         for (size_t i = 0; i < m; i++) {
     		for (size_t j = 0; j < N; j++) {
+				ret[i, j] = 0;
     			for (size_t k = 0; k < M; k++) {
     				ret[i, j] = ret[i, j] + this[k, j] * other[i, k];
     			}
@@ -290,27 +237,24 @@ struct Matrix(T, size_t M, size_t N)
         return ret;
     }
 
-    public Vector!(T, N) opBinary(string op)(Vector!(T, N) other)
+    public Vector!T opBinary(string op)(Vector!T other)
     {
-		static assert ( M == N );
+		static assert ( M == N && (N == 3 || N == 2));
         static assert ( op == "*" );
-        Vector!(T, N) ret;
-		for (size_t i = 0; i < N; i++) {
-			ret.data[i] = 0;
-			for (size_t j = 0; j < M; j++) {
-				ret.data[i] += this[i, j] * other.data[j];
-			}
+		static if (N == 3)
+		{
+			Matrix!(T, 3, 1) expanded;
+			expanded = [other.x, other.y, 1];
+			expanded = this * expanded;
+			return Vector!T(expanded[0, 1], expanded[0, 2]);
 		}
-        return ret;
-    }
-
-    public Vector!(T, N - 1) opBinary(string op)(Vector!(T, N - 1) other)
-    {
-        static assert (N > 1);
-        static assert (op == "*");
-		auto expanded = other.expand!1;
-		expanded.data[N - 1] = 1;
-		return (this * expanded).shrink!1;
+		static if (N == 2)
+		{
+			Matrix!(T, 2, 1) matrix;
+			matrix = [other.x, other.y];
+			matrix = this * expanded;
+			return Vector!T(expanded[0, 1], expanded[0, 2]);
+		}
     }
 
     public T opIndex(size_t i, size_t j)
@@ -329,6 +273,8 @@ struct Matrix(T, size_t M, size_t N)
         return this;
     }
 }
+
+@nogc nothrow pure:
 
 Transform2D identity()
 {
@@ -376,10 +322,8 @@ Transform2D scale(float x, float y)
     return transform;
 }
 
-alias Vector2i = Vector!(int, 2);
-alias Vector2f = Vector!(float, 2);
-alias Vector3i = Vector!(int, 3);
-alias Vector3f = Vector!(float, 3);
+alias Vectori = Vector!int;
+alias Vectorf = Vector!float;
 alias Rectanglei = Rectangle!int;
 alias Rectanglef = Rectangle!float;
 alias Circlei = Circle!int;
@@ -390,4 +334,3 @@ alias Matrix2f = Matrix!(float, 2, 2);
 alias Matrix3f = Matrix!(float, 3, 3);
 alias Transform2D = Matrix!(float, 3, 3);
 alias Trnasform3D = Matrix!(float, 4, 4);
-
