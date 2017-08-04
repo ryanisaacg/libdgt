@@ -15,7 +15,9 @@ out vec2 Tex_coord;
 void main() {
 	Color = color;
 	Tex_coord = tex_coord;
-	gl_Position = transform * vec4(position, 0.0, 1.0);
+	vec3 transformed = transform * vec3(position, 1.0);
+	transformed.z = 0;
+	gl_Position = vec4(transformed, 1.0);
 }";
 const GLchar* fragment_shader = "#version 130
 in vec4 Color;
