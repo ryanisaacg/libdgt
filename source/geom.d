@@ -6,9 +6,11 @@ unittest
     Matrix2i m, n;
     m.setToIdentity();
     n[0, 0] = 5;
-    assert((m * n)[0, 0] == 5);
+    auto result = m * n;
+    assert(result[0, 0] == 5);
     m[0, 0] = 2;
-    assert((m * n)[0, 0] = 10);
+    result = m * n;
+    assert(result[0, 0] = 10);
 
     Matrix3f scale;
     scale.setToIdentity();
@@ -17,9 +19,10 @@ unittest
     Vector3f vector;
     vector.x = 2;
     vector.y = 5;
+	vector.z = 0;
     auto scaled = scale * vector;
-	printf("%f:%f\n", scaled.x, scaled.y);
     assert(scaled.x == 4 && scaled.y == 10);
+
 
     auto trans = translate(3, 4);
     auto vec = Vector2f(1, 1);
@@ -105,6 +108,8 @@ struct Vector(T, size_t N)
         Vector!(T, N + n) result;
         for(size_t i = 0; i < N; i++)
             result.data[i] = this.data[i];
+		for(size_t i = N; i < N + n; i++)
+			result.data[i] = 0;
         return result;
     }
 
@@ -288,11 +293,12 @@ struct Matrix(T, size_t M, size_t N)
     public Vector!(T, N) opBinary(string op)(Vector!(T, N) other)
     {
 		static assert ( M == N );
-        static assert (op == "*");
+        static assert ( op == "*" );
         Vector!(T, N) ret;
 		for (size_t i = 0; i < N; i++) {
+			ret.data[i] = 0;
 			for (size_t j = 0; j < M; j++) {
-				ret.data[i] += this[j, i] * other.data[j];
+				ret.data[i] += this[i, j] * other.data[j];
 			}
 		}
         return ret;
@@ -302,13 +308,9 @@ struct Matrix(T, size_t M, size_t N)
     {
         static assert (N > 1);
         static assert (op == "*");
-        Vector!(T, N) ret = other.expand!1;
-		for (size_t i = 0; i < N; i++) {
-			for (size_t j = 0; j < M; j++) {
-				ret.data[i] += this[j, i] * ret.data[j];
-			}
-		}
-        return ret.shrink!1;
+		auto expanded = other.expand!1;
+		expanded.data[N - 1] = 1;
+		return (this * expanded).shrink!1;
     }
 
     public T opIndex(size_t i, size_t j)
