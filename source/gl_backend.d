@@ -184,10 +184,10 @@ struct GLBackend
 	{
 		if(this.texture != texture)
 			switchTexture(texture);
+		auto offset = vertices.length / vertex_size;
 		foreach(v; newVertices)
 			vertices.addAll(v.pos.x, v.pos.y, v.texPos.x, v.texPos.y,
 				v.col.r, v.col.g, v.col.b, v.col.a);
-		auto offset = indices.length;
 		foreach(i; newIndices)
 			indices.add(cast(uint)(i + offset));
 	}
