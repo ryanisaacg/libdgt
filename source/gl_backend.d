@@ -46,7 +46,7 @@ struct GLBackend
 	//OpenGL opbjects
 	private GLuint shader, fragment, vertex, vbo, ebo, vao, texture_location;
 	private SDL_Window* window;
-	public Matrix!(float, 3, 3) transform;
+	public Transform!float transform;
 
 	//The amount of floats per vertex
 	private static immutable size_t vertex_size = 8;
@@ -138,7 +138,7 @@ struct GLBackend
 		}
 		//printf("\n");
 		GLint transform_attrib = glGetUniformLocation(shader, "transform");
-		glUniformMatrix3fv(transform_attrib, 1, GL_FALSE, transform.dataPointer);
+		glUniformMatrix3fv(transform_attrib, 1, GL_FALSE, transform.ptr);
 		//Bind the vertex data
 		glBindBuffer(GL_ARRAY_BUFFER, vbo);
 		glBufferData(GL_ARRAY_BUFFER, vertices.length * float.sizeof, vertices.buffer, GL_STREAM_DRAW);

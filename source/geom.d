@@ -2,9 +2,7 @@ import std.math : sqrt, cos, sin, PI;
 
 unittest
 {
-	import core.stdc.stdio;
-    Matrix2i m, n;
-    m.setToIdentity();
+    Transform!int m, n;
     n[0, 0] = 5;
     auto result = m * n;
     assert(result[0, 0] == 5);
@@ -14,6 +12,7 @@ unittest
 }
 unittest
 {
+	import std.stdio;
     auto trans = scale(2, 2);
     auto vec = Vectorf(2, 5);
     auto scaled = trans * vec;
@@ -83,7 +82,7 @@ struct Rectangle(T)
 	this(T x, T y, T width, T height)
 	{
 		topLeft = Vector!T(x, y);
-		size = Vector!T(x, y);
+		size = Vector!T(width, height);
 	}
 
 	@property T x() { return topLeft.x; }
@@ -198,38 +197,29 @@ unittest
 	assert(!c.overlaps(d));
 }
 
-struct Matrix(T, size_t M, size_t N)
+struct Transform(T)
 {
-    static assert(M > 0 && N > 0);
-    private T[M * N] data;
+    private T[9] data = [
+		1, 0, 0,
+		0, 1, 0,
+		0, 0, 1
+	];
 
     @nogc nothrow pure:
 
-	public T* dataPointer()
+	public T* ptr()
 	{
 		return data.ptr;
 	}
 
-	static if (M == N)
-	{
-	    public void setToIdentity()
-		{
-	        for(size_t i = 0; i < M; i++)
-	            for(size_t j = 0; j < N; j++)
-	                this[i, j] = 0;
-	        for(size_t i = 0; i < M; i++)
-	            this[i, i] = 1;
-	    }
-	}
-
-    public Matrix!(T, N, m) opBinary(string op, size_t m)(Matrix!(T, N, m) other)
+    public Transform!T opBinary(string op)(Transform!T other)
+	if (op == "*")
     {
-        static assert(op == "*");
-        Matrix!(T, N, m) ret;
-        for (size_t i = 0; i < m; i++) {
-    		for (size_t j = 0; j < N; j++) {
+        Transform!T ret;
+        for (size_t i = 0; i < 3; i++) {
+    		for (size_t j = 0; j < 3; j++) {
 				ret[i, j] = 0;
-    			for (size_t k = 0; k < M; k++) {
+    			for (size_t k = 0; k < 3; k++) {
     				ret[i, j] = ret[i, j] + this[k, j] * other[i, k];
     			}
     		}
@@ -238,36 +228,31 @@ struct Matrix(T, size_t M, size_t N)
     }
 
     public Vector!T opBinary(string op)(Vector!T other)
+	if (op == "*")
     {
-		static assert ( M == N && (N == 3 || N == 2));
-        static assert ( op == "*" );
-		static if (N == 3)
-		{
-			Matrix!(T, 3, 1) expanded;
-			expanded = [other.x, other.y, 1];
-			expanded = this * expanded;
-			return Vector!T(expanded[0, 1], expanded[0, 2]);
-		}
-		static if (N == 2)
-		{
-			Matrix!(T, 2, 1) matrix;
-			matrix = [other.x, other.y];
-			matrix = this * expanded;
-			return Vector!T(expanded[0, 1], expanded[0, 2]);
-		}
+		return Vector!T(other.x * this[0, 0] + other.y * this[0, 1] + this[0, 2],
+			other.x * this[1, 0] + other.y * this[1, 1] + this[1, 2]);
+    }
+
+	public Vector!U opBinary(string op, U)(Vector!U other)
+	if (op == "*")
+    {
+		auto converted = Vertex!T(cast(T)other.x, cast(T)other.y);
+		auto transformed = this * converted;
+		return Vector!U(cast(U)transformed.x, cast(U)transformed.y);
     }
 
     public T opIndex(size_t i, size_t j)
     {
-        return data[i * N + j];
+        return data[i * 3 + j];
     }
 
     public T opIndexAssign(T val, size_t i, size_t j)
     {
-        return data[i * N + j] = val;
+        return data[i * 3 + j] = val;
     }
 
-    public ref Matrix!(T, M, N) opAssign(T[M * N] array)
+    public ref Transform!T opAssign(T[9] array)
     {
         data = array;
         return this;
@@ -276,22 +261,16 @@ struct Matrix(T, size_t M, size_t N)
 
 @nogc nothrow pure:
 
-Transform2D identity()
+Transformf identity()
 {
-    Transform2D transform;
-    transform = [
-        1, 0, 0,
-        0, 1, 0,
-        0, 0, 1
-    ];
-    return transform;
+    return Transform!float();
 }
 
-Transform2D rotate(float angle)
+Transformf rotate(float angle)
 {
     float c = cos(angle * PI / 180);
 	float s = sin(angle * PI / 180);
-    Transform2D transform;
+    Transform!float transform;
     transform = [
         c, -s, 0,
         s, c, 0,
@@ -300,9 +279,9 @@ Transform2D rotate(float angle)
     return transform;
 }
 
-Transform2D translate(float x, float y)
+Transformf translate(float x, float y)
 {
-    Transform2D transform;
+    Transform!float transform;
     transform = [
         1, 0, x,
         0, 1, y,
@@ -311,9 +290,9 @@ Transform2D translate(float x, float y)
     return transform;
 }
 
-Transform2D scale(float x, float y)
+Transformf scale(float x, float y)
 {
-    Transform2D transform;
+    Transform!float transform;
     transform = [
         x, 0, 0,
         0, y, 0,
@@ -328,9 +307,4 @@ alias Rectanglei = Rectangle!int;
 alias Rectanglef = Rectangle!float;
 alias Circlei = Circle!int;
 alias Circlef = Circle!float;
-alias Matrix2i = Matrix!(int, 2, 2);
-alias Matrix3i = Matrix!(int, 3, 3);
-alias Matrix2f = Matrix!(float, 2, 2);
-alias Matrix3f = Matrix!(float, 3, 3);
-alias Transform2D = Matrix!(float, 3, 3);
-alias Trnasform3D = Matrix!(float, 4, 4);
+alias Transformf = Transform!float;

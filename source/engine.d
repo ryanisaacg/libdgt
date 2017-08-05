@@ -237,17 +237,11 @@ struct Window
 	void drawTexture(ref Texture tex, float x, float y, float w, float h,
 						float rot = 0, float or_x = 0, float or_y = 0, float scale_x = 1, float scale_y = 1,
 						bool flip_x = false, bool flip_y = false, Color color = color.white) {
-		Transform2D trans = identity();
-		import core.stdc.stdio;
-
-		trans = trans * translate(-or_x, -or_y) * rotate(rot) * scale(scale_x, scale_y);
-		for(size_t i = 0; i < 3; i++)
-			for(size_t j = 0; j < 3; j++)
-				printf("%f:", trans[i, j]);
+		auto trans = identity() * translate(-or_x, -or_y) * rotate(rot) * scale(scale_x, scale_y);
 		drawTexture(tex, trans, x + or_x, y + or_y, w, h, flip_x, flip_y, color);
 	}
 
-	void drawTexture(ref Texture tex, ref Transform2D trans, float x, float y,
+	void drawTexture(ref Texture tex, ref Transform!float trans, float x, float y,
 							   float w, float h, bool flip_x = false, bool flip_y = false, Color color = color.white) {
 		//Calculate the destination points with the transformation
 		auto tl = trans * Vectorf(0, 0);
