@@ -151,6 +151,11 @@ struct Circle(T)
 	public T radius = 0;
 
 	@nogc nothrow pure public:
+    this(T x, T y, T radius)
+    {
+        center = Vector!T(x, y);
+        this.radius = radius;
+    }
 	@property T x() { return center.x; }
     @property T x(T val) { return center.x = val; }
 	@property T y() { return center.y; }
