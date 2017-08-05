@@ -284,12 +284,10 @@ struct Window
 		}
 		//Add all of the vertices to the context
 		auto translate = Vectorf(x, y);
-		Vertex[4] vertices = [ Vertex(tl + translate, src_tl, color),
+		ctx.add(tex.id, [ Vertex(tl + translate, src_tl, color),
 			Vertex(tr + translate, src_tr, color),
 			Vertex(br + translate, src_br, color),
-			Vertex(bl + translate, src_bl, color)];
-		GLuint[6] indices = [0, 1, 2, 2, 3, 0];
-		ctx.add(tex.id, vertices, indices);
+			Vertex(bl + translate, src_bl, color)], [0, 1, 2, 2, 3, 0]);
 	}
 
 /*	static void au_draw_sprite_transformed(AU_Engine* eng, AU_TextureRegion region, AU_SpriteTransform* trans) {
