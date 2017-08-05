@@ -179,12 +179,14 @@ struct GLBackend
 		this.texture = texture;
 	}
 
-	public void add(size_t Vertices, size_t Indices)(GLuint texture, Vertex[Vertices] newVertices, GLuint[Indices] newIndices)
+	public void add(size_t Vertices, size_t Indices)(GLuint texture,
+					Vertex[Vertices] newVertices, GLuint[Indices] newIndices)
 	{
 		if(this.texture != texture)
 			switchTexture(texture);
 		foreach(v; newVertices)
-			vertices.addAll(v.pos.x, v.pos.y, v.texPos.x, v.texPos.y, v.col.r, v.col.g, v.col.b, v.col.a);
+			vertices.addAll(v.pos.x, v.pos.y, v.texPos.x, v.texPos.y,
+				v.col.r, v.col.g, v.col.b, v.col.a);
 		auto offset = indices.length;
 		foreach(i; newIndices)
 			indices.add(cast(uint)(i + offset));
