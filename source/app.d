@@ -10,7 +10,10 @@ void main()
 	while(engine.should_continue)
 	{
 		engine.begin(black);
-		engine.draw(tex, 0, 0, 32, 32);
+		engine.draw(tex, 100, 0, 32, 32);
+		engine.draw(tex, 100, 100, 32, 32);
+		engine.draw(red, Rectanglef(30, 30, 40, 40));
+		engine.draw(blue, Rectanglef(100, 100, 40, 40));
 		engine.draw(blue, Circlef(100, 100, 32));
 		engine.end();
 	}
