@@ -27,12 +27,22 @@ void main()
 			],
 			[0, 1, 2, 2, 3, 0]
 			);
-			/*
+		engine.ctx.add(tex.id, [
+			Vertex(Vectorf(300, 400), Vectorf(0, 0), white),
+			Vertex(Vectorf(332, 400), Vectorf(0, 0), white),
+			Vertex(Vectorf(332, 432), Vectorf(0, 0), white),
+			Vertex(Vectorf(300, 432), Vectorf(0, 0), white)
+			],
+			[0, 1, 2, 2, 3, 0]
+			);
+
 		engine.draw(tex, 100, 0, 32, 32);
-		engine.draw(tex, 100, 400, 32, 32);
+		engine.draw(tex, 200, 500, 32, 32);
+		engine.draw(tex, 300, 500, 32, 32);
+
 		engine.draw(red, Rectanglef(30, 30, 40, 40));
 		engine.draw(blue, Rectanglef(100, 100, 40, 40));
-		engine.draw(blue, Circlef(100, 100, 32));*/
+		engine.draw(blue, Circlef(100, 100, 32));
 		engine.end();
 	}
 	engine.destroy();
