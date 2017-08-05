@@ -32,7 +32,7 @@ struct Window
 	int window_width, window_height;
 	Texture white;
 
-	void init(string title, int width, int height, /*char* icon,*/ WindowConfig config)
+	void init(string title, int width, int height, WindowConfig config)
 	{
 		DerelictSDL2.load();
 		DerelictSDL2Image.load();
