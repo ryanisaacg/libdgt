@@ -11,6 +11,8 @@ void main()
 	while(engine.should_continue)
 	{
 		engine.begin(black);
+
+		engine.draw(tex, 100, 0, 32, 32);
 		engine.ctx.add(tex.id,
 			[Vertex(Vectorf(0, 0), Vectorf(0, 0), white),
 			Vertex(Vectorf(32, 0), Vectorf(0, 0), white),
@@ -36,7 +38,6 @@ void main()
 			[0, 1, 2, 2, 3, 0]
 			);
 
-		engine.draw(tex, 100, 0, 32, 32);
 		engine.draw(tex, 200, 500, 32, 32);
 		engine.draw(tex, 300, 500, 32, 32);
 
