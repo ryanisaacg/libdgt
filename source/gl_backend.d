@@ -74,8 +74,8 @@ struct GLBackend
 			printf("Vertex shader compilation failed\n");
 			Array!char buffer;
 			buffer.ensureCapacity(512);
-			glGetShaderInfoLog(vertex, 512, null, buffer.buffer);
-			printf("Error: %s\n", buffer.buffer);
+			glGetShaderInfoLog(vertex, 512, null, buffer.ptr);
+			printf("Error: %s\n", buffer.ptr);
 		}
 		fragment = glCreateShader(GL_FRAGMENT_SHADER);
 		glShaderSource(fragment, 1, &fragment_shader, null);
@@ -86,8 +86,8 @@ struct GLBackend
 			printf("Fragment shader compilation failed\n");
 			Array!char buffer;
 			buffer.ensureCapacity(512);
-			glGetShaderInfoLog(fragment, 512, null, buffer.buffer);
-			printf("Error: %s\n", buffer.buffer);
+			glGetShaderInfoLog(fragment, 512, null, buffer.ptr);
+			printf("Error: %s\n", buffer.ptr);
 		}
 		shader = glCreateProgram();
 		glAttachShader(shader, vertex);
@@ -141,10 +141,10 @@ struct GLBackend
 		glUniformMatrix3fv(transform_attrib, 1, GL_FALSE, transform.ptr);
 		//Bind the vertex data
 		glBindBuffer(GL_ARRAY_BUFFER, vbo);
-		glBufferData(GL_ARRAY_BUFFER, vertices.length * float.sizeof, vertices.buffer, GL_STREAM_DRAW);
+		glBufferData(GL_ARRAY_BUFFER, vertices.length * float.sizeof, vertices.ptr, GL_STREAM_DRAW);
 		//Bind the index data
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
-		glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.length * GLuint.sizeof, indices.buffer, GL_STREAM_DRAW);
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.length * GLuint.sizeof, indices.ptr, GL_STREAM_DRAW);
 		//Set up the vertex attributes
 		GLint posAttrib = glGetAttribLocation(shader, "position");
 		glEnableVertexAttribArray(posAttrib);

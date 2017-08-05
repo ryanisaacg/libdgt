@@ -66,9 +66,10 @@ struct Array(T)
 	}
 
 	public size_t length() { return *count; }
-	public size_t* count() { return cast(size_t*) backingBuffer; }
-	public size_t* capacity() {	return count + 1; }
-	public T* buffer() { return cast(T*)(capacity + 1); }
+	private size_t* count() { return cast(size_t*) backingBuffer; }
+	private size_t* capacity() {	return count + 1; }
+	private T* buffer() { return cast(T*)(capacity + 1); }
+	public T* ptr() { return buffer; }
 }
 
 @nogc nothrow unittest
