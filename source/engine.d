@@ -221,9 +221,10 @@ struct Window
 		Vectorf[NumPoints] points; //A large array of points to simulate a circle
 		auto rotation = rotate(360 / NumPoints);
 		auto pointer = Vectorf(0, -circle.radius);
-		for (size_t i = 0; i < NumPoints; i++) {
-			pointer  = rotation * pointer;
+		for (size_t i = 0; i < NumPoints; i++)
+		{
 			points[i] = circle.center + pointer;
+			pointer  = rotation * pointer;
 		}
 		draw(color, points);
 	}
@@ -235,14 +236,18 @@ struct Window
 	}
 
 	void draw(ref Texture tex, float x, float y, float w, float h,
-						float rot = 0, float or_x = 0, float or_y = 0, float scale_x = 1, float scale_y = 1,
-						bool flip_x = false, bool flip_y = false, Color color = color.white) {
-		auto trans = identity() * translate(-or_x, -or_y) * rotate(rot) * scale(scale_x, scale_y);
+						float rot = 0, float or_x = 0, float or_y = 0,
+						float scale_x = 1, float scale_y = 1,
+						bool flip_x = false, bool flip_y = false,
+						Color color = color.white) {
+		auto trans = identity() * translate(-or_x, -or_y) * rotate(rot)
+			* scale(scale_x, scale_y);
 		draw(tex, trans, x + or_x, y + or_y, w, h, flip_x, flip_y, color);
 	}
 
 	void draw(ref Texture tex, ref Transform!float trans, float x, float y,
-							   float w, float h, bool flip_x = false, bool flip_y = false, Color color = color.white) {
+					   float w, float h, bool flip_x = false, bool flip_y = false,
+					   Color color = color.white) {
 		//Calculate the destination points with the transformation
 		auto tl = trans * Vectorf(0, 0);
 		auto tr = trans * Vectorf(w, 0);
