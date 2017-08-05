@@ -11,6 +11,7 @@ void main()
 	{
 		engine.begin(black);
 		engine.draw(tex, 0, 0, 32, 32);
+		engine.draw(blue, Circlef(100, 100, 32));
 		engine.end();
 	}
 	engine.destroy();
