@@ -5,7 +5,8 @@ struct Color
 	float r, g, b, a;
 
 	@nogc pure nothrow:
-	SDL_Color toSDL() 
+	public T opCast(T)()
+	if(T == SDL_Color)
 	{
 		SDL_Color c = {
 			cast(ubyte)(255 * r), cast(ubyte)(255 * g), cast(ubyte)(255 * b), cast(ubyte)(255 * a)
@@ -24,5 +25,3 @@ static immutable cyan = Color(0, 1, 1, 1);
 static immutable blue = Color(0, 0, 1, 1);
 static immutable purple = Color(1, 0, 1, 1);
 static immutable indigo = Color(0.5, 0, 1, 1);
-
-
