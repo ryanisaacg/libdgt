@@ -219,11 +219,11 @@ struct Window
 
 	void draw(size_t NumPoints = 32)(Color color, Circlef circle) {
 		Vectorf[NumPoints] points; //A large array of points to simulate a circle
-		auto rotation = rotation(360 / num_points);
+		auto rotation = rotate(360 / NumPoints);
 		auto pointer = Vectorf(0, -circle.radius);
 		for (size_t i = 0; i < NumPoints; i++) {
-			pointing  = (rotation * pointing.expand(1)).shrink(1);
-			points[i] = circle.center + pointing;
+			pointer  = rotation * pointer;
+			points[i] = circle.center + pointer;
 		}
 		draw(color, points);
 	}
