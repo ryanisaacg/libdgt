@@ -198,7 +198,7 @@ struct Window
 		previous_ticks = time;
 	}
 
-	void drawShape(size_t Len)(Color color, Vectorf[Len] points)
+	void draw(size_t Len)(Color color, Vectorf[Len] points)
 	{
 		static assert ( Len >= 3 );
 		Vertex[Len] vertices;
@@ -217,7 +217,7 @@ struct Window
 	}
 
 
-	void drawCircle(size_t NumPoints = 32)(Color color, Circlef circle) {
+	void draw(size_t NumPoints = 32)(Color color, Circlef circle) {
 		Vectorf[NumPoints] points; //A large array of points to simulate a circle
 		auto rotation = rotation(360 / num_points);
 		auto pointer = Vectorf(0, -circle.radius);
@@ -225,23 +225,23 @@ struct Window
 			pointing  = (rotation * pointing.expand(1)).shrink(1);
 			points[i] = circle.center + pointing;
 		}
-		drawShape(color, points);
+		draw(color, points);
 	}
 
-	void drawRect(Color color, Rectanglef rect) {
+	void draw(Color color, Rectanglef rect) {
 		Vectorf[4] points = [ rect.topLeft, Vectorf(rect.x + rect.width, rect.y),
 			rect.topLeft + rect.size, Vectorf(rect.x, rect.y + rect.height)];
-		drawShape(color, points);
+		draw(color, points);
 	}
 
-	void drawTexture(ref Texture tex, float x, float y, float w, float h,
+	void draw(ref Texture tex, float x, float y, float w, float h,
 						float rot = 0, float or_x = 0, float or_y = 0, float scale_x = 1, float scale_y = 1,
 						bool flip_x = false, bool flip_y = false, Color color = color.white) {
 		auto trans = identity() * translate(-or_x, -or_y) * rotate(rot) * scale(scale_x, scale_y);
-		drawTexture(tex, trans, x + or_x, y + or_y, w, h, flip_x, flip_y, color);
+		draw(tex, trans, x + or_x, y + or_y, w, h, flip_x, flip_y, color);
 	}
 
-	void drawTexture(ref Texture tex, ref Transform!float trans, float x, float y,
+	void draw(ref Texture tex, ref Transform!float trans, float x, float y,
 							   float w, float h, bool flip_x = false, bool flip_y = false, Color color = color.white) {
 		//Calculate the destination points with the transformation
 		auto tl = trans * Vectorf(0, 0);

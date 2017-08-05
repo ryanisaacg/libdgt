@@ -10,7 +10,7 @@ void main()
 	while(engine.should_continue)
 	{
 		engine.begin(black);
-		engine.drawTexture(tex, 0, 0, 32, 32);
+		engine.draw(tex, 0, 0, 32, 32);
 		engine.end();
 	}
 	engine.destroy();
