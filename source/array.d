@@ -1,4 +1,5 @@
 import core.stdc.stdlib : malloc, realloc, free;
+import io;
 
 struct Array(T)
 {
@@ -6,8 +7,8 @@ struct Array(T)
 	private void* backingBuffer = null;
 	private static immutable initialSize = 16;
 
-	@nogc nothrow:
-	public void ensureCapacity(size_t newCapacity)
+	@nogc nothrow public:
+	void ensureCapacity(size_t newCapacity)
 	{
 		void* old = backingBuffer;
 		backingBuffer = realloc(backingBuffer, size_t.sizeof * 2 + T.sizeof * newCapacity);
@@ -15,7 +16,7 @@ struct Array(T)
 		if (old == null) *count = 0;
 	}
 
-	public void add(T val)
+	void add(T val)
 	{
 		if (backingBuffer == null)
 		{
@@ -28,7 +29,7 @@ struct Array(T)
 		*count += 1;
 	}
 
-	public void addAll(A...)(A a)
+	void addAll(A...)(A a)
 	{
 		foreach(val; a)
 		{
@@ -36,40 +37,74 @@ struct Array(T)
 		}
 	}
 
-	public void destroy()
+	void destroy()
 	{
 		free(backingBuffer);
 	}
 
+	int opApply(int delegate(T) @nogc nothrow dg) {
+		for(size_t i = 0; i < length; i++) {
+			dg(buffer[i]);
+		}
+        return 0;
+    }
+
+	void print()
+	{
+		io.print("Array!", T.stringof, "[");
+		for(size_t i = 0; i < length; i++)
+		{
+			io.print(this[i]);
+			if(i != length - 1)
+			{
+				io.print(", ");
+			}
+		}
+		io.print("]");
+	}
+
 	pure:
-	public void remove(size_t index)
+	void remove(size_t index)
 	{
 		buffer[index] = buffer[*count];
 		*count -= 1;
 	}
 
-	public ref T opIndex(size_t index)
+	ref T opIndex(size_t index)
 	{
 		assert(index < *count);
 		return buffer[index];
 	}
 
-	public ref T opIndexAssign(T value, size_t index)
+	ref T opIndexAssign(T value, size_t index)
 	{
 		assert(index < *count);
 		return buffer[index] = value;
 	}
 
-	public void clear()
+	ref Array!T opAssign(size_t N)(T[N] data)
+	{
+		ensureCapacity(N);
+		clear();
+		for(size_t i = 0; i < N; i++)
+		{
+			this[i] = data[i];
+		}
+		return this;
+	}
+
+	void clear()
 	{
 		*count = 0;
 	}
 
-	public size_t length() { return *count; }
+	T* ptr() { return buffer; }
+	size_t length() { return *count; }
+
+	private:
 	private size_t* count() { return cast(size_t*) backingBuffer; }
 	private size_t* capacity() {	return count + 1; }
 	private T* buffer() { return cast(T*)(capacity + 1); }
-	public T* ptr() { return buffer; }
 }
 
 @nogc nothrow unittest

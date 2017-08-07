@@ -1,19 +1,26 @@
 import derelict.sdl2.sdl : SDL_Color;
+import core.stdc.stdio;
 
 struct Color
 {
 	float r, g, b, a;
 
-	@nogc pure nothrow:
-	public T opCast(T)()
-	if(T == SDL_Color)
+	@nogc nothrow:
+	void print()
 	{
-		SDL_Color c = {
+		printf("Color(%f, %f, %f, %f)", r, g, b, a);
+	}
+
+	pure:
+	public T opCast(T)() if(T == SDL_Color)
+	{
+		SDL_Color c = SDL_Color(
 			cast(ubyte)(255 * r), cast(ubyte)(255 * g), cast(ubyte)(255 * b), cast(ubyte)(255 * a)
-		};
+		);
 		return c;
 	}
 }
+
 
 static immutable white = Color(1, 1, 1, 1);
 static immutable black = Color(0, 0, 0, 0);

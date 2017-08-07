@@ -1,4 +1,5 @@
 import std.math : sqrt, cos, sin, PI;
+import io;
 
 unittest
 {
@@ -304,6 +305,38 @@ Transformf scale(float x, float y)
         0, 0, 1
     ];
     return transform;
+}
+
+void print(T)(Vector!T vec)
+{
+    print("Vector(", vec.x, ", ", vec.y, ")");
+}
+
+void print(T)(Rectangle!T rect)
+{
+    print("Rectangle(", rect.x, ", ", rect.y, ", ", rect.width, ", ", rect.height, ")");
+}
+
+void print(T)(Circle!T vec)
+{
+    print("Circle(", rect.x, ", ", rect.y, ", ", rect.radius, ")");
+}
+
+void print(T)(Transform!T transform)
+{
+    print("Matrix[");
+    for(size_t x = 0; x < 3; x++)
+    {
+        print("[");
+        for(size_t y = 0; y < 3; y++)
+        {
+            print(transform[x, y]);
+            if(y != 2) print(", ");
+        }
+        print("]");
+        if(x != 2) print(", ");
+    }
+    print("]");
 }
 
 alias Vectori = Vector!int;

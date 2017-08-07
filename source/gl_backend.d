@@ -4,6 +4,7 @@ import derelict.sdl2.sdl;
 import array : Array;
 import color : Color;
 import geom;
+import io;
 
 const GLchar* vertex_shader = "#version 130
 in vec2 position;
@@ -33,6 +34,11 @@ struct Vertex
 {
 	Vectorf pos, texPos;
 	Color col;
+
+	@nogc nothrow void print(Vertex vert)
+	{
+		io.print("Vertex(", vert.pos, ", ", vert.texPos, ", ", vert.col, ")");
+	}
 }
 
 struct GLBackend
@@ -129,13 +135,8 @@ struct GLBackend
 	public void flush()
 	{
 		import core.stdc.stdio;
-		for(size_t i = 0; i < vertices.length; i++)
-		{
-		//	printf("%f:", vertices[i]);
-		}
-		for(size_t i = 0; i < indices.length; i++)
-		{
-		}
+		print(vertices);
+		print(indices);
 		//printf("\n");
 		GLint transform_attrib = glGetUniformLocation(shader, "transform");
 		glUniformMatrix3fv(transform_attrib, 1, GL_FALSE, transform.ptr);
