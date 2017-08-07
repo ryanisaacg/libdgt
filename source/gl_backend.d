@@ -135,9 +135,9 @@ struct GLBackend
 	public void flush()
 	{
 		import core.stdc.stdio;
-		print(vertices);
-		print(indices);
-		//printf("\n");
+		println(vertices);
+		println(indices);
+		
 		GLint transform_attrib = glGetUniformLocation(shader, "transform");
 		glUniformMatrix3fv(transform_attrib, 1, GL_FALSE, transform.ptr);
 		//Bind the vertex data
