@@ -31,8 +31,10 @@ The project is written in D to take advantage of its ability for both low and hi
     - [ ] 2D tilemap for storing and pixel-perfect geometry collision
 	- [ ] Loading and playing sound
 	- [ ] Gamepad API
+	- [ ] Unified gamepad / mouse / keyboard press API
 	- [ ] Screen-shake, inverted screen, etc.
 	- [ ] User-created shaders
 	- [ ] Non-power-of-two textures
+	- [ ] Immediate-mode UI
 - [ ] Bugs
 	- [ ] Viewports seem not to correctly apply when the window is resized
