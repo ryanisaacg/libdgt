@@ -104,9 +104,9 @@ struct Window
 		return loadTexture(cast(ubyte*)sur.pixels, sur.w, sur.h, sur.format.BytesPerPixel == 4);
 	}
 
-	//TODO: Pass a rectangle and create a camera
 	void begin(Color bg)
 	{
+		ctx.clear(bg);
 		previous_ticks = SDL_GetTicks();
 		previous_keys = current_keys;
 		SDL_Event e;
