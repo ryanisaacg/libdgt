@@ -18,7 +18,7 @@ void main()
 
 		engine.draw(red, Rectanglef(30, 30, 40, 40));
 		engine.draw(blue, Rectanglef(100, 100, 40, 40));
-		engine.draw(green, Circlef(100, 100, 32));
+		engine.draw(Color(0, 1, 0, 0.5), Circlef(100, 100, 32));
 		engine.end();
 	}
 	engine.destroy();
