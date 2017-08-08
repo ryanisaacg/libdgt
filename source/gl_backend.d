@@ -176,7 +176,7 @@ struct GLBackend
 	}
 
 	public void add(size_t Vertices, size_t Indices)(GLuint texture,
-					Vertex[Vertices] newVertices, GLuint[Indices] newIndices)
+					ref Vertex[Vertices] newVertices, ref GLuint[Indices] newIndices)
 	{
 		if(this.texture != texture)
 			switchTexture(texture);
