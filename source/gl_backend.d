@@ -101,7 +101,6 @@ struct GLBackend
 		glBindFragDataLocation(shader, 0, "outColor");
 		glLinkProgram(shader);
 		glUseProgram(shader);
-	//	glEnable (GL_DEPTH_TEST);
 		glEnable (GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		vertices.ensureCapacity(1024);
