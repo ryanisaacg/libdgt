@@ -33,8 +33,6 @@ class Window
 	this(string title, int width, int height, WindowConfig config)
 	{
 		DerelictSDL2.load();
-		DerelictSDL2Image.load();
-		DerelictSDL2ttf.load();
 		SDL_Init(SDL_INIT_VIDEO/*| SDL_INIT_AUDIO*/);
 		window = SDL_CreateWindow(title.ptr,
 			SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width, height,
@@ -53,7 +51,8 @@ class Window
 		camera.set(0, 0, width, height);
 		window_width = width;
 		window_height = height;
-
+		DerelictSDL2Image.load();
+		DerelictSDL2ttf.load();
 		IMG_Init(IMG_INIT_JPG | IMG_INIT_PNG);
 		TTF_Init(); //initialize the SDL font subsystem
 //		Mix_Init(MIX_INIT_FLAC | MIX_INIT_MOD | MIX_INIT_MP3 | MIX_INIT_OGG); //Initialize the SDL mixer
