@@ -115,7 +115,6 @@ class Window
 		return bitmap_font;
 	}
 
-	//TODO: Pass a rectangle and create a camera
 	void begin(Color bg)
 	{
 		previous_ticks = SDL_GetTicks();
