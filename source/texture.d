@@ -1,3 +1,4 @@
+import derelict.opengl3.gl;
 import geom : Rectangle;
 
 struct Texture
@@ -6,7 +7,13 @@ struct Texture
     int width, height;
     Rectangle!int region;
 
-    @nogc nothrow pure:
+    @nogc nothrow:
+    void destroy()
+    {
+        glDeleteTextures(1, &id);
+    }
+
+    pure:
     Texture getSlice(Rectangle!int region)
     {
         Texture tex = this;
