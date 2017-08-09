@@ -12,7 +12,7 @@ struct Color
 	}
 
 	pure:
-	public T opCast(T)() if(T == SDL_Color)
+	public SDL_Color opCast()
 	{
 		SDL_Color c = SDL_Color(
 			cast(ubyte)(255 * r), cast(ubyte)(255 * g), cast(ubyte)(255 * b), cast(ubyte)(255 * a)
