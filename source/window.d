@@ -1,8 +1,8 @@
 import derelict.opengl3.gl;
-import derelict.sdl2.sdl, derelict.sdl2.image, derelict.sdl2.ttf;
+import derelict.sdl2.sdl, derelict.sdl2.image, derelict.sdl2.mixer, derelict.sdl2.ttf;
 import core.stdc.stdio;
 
-import color, font, geom, gl_backend, texture;
+import color, font, geom, gl_backend, sound, music, texture;
 
 struct WindowConfig
 {
@@ -53,11 +53,12 @@ class Window
 		window_height = height;
 		DerelictSDL2Image.load();
 		DerelictSDL2ttf.load();
+		DerelictSDL2Mixer.load();
 		IMG_Init(IMG_INIT_JPG | IMG_INIT_PNG);
 		TTF_Init(); //initialize the SDL font subsystem
-//		Mix_Init(MIX_INIT_FLAC | MIX_INIT_MOD | MIX_INIT_MP3 | MIX_INIT_OGG); //Initialize the SDL mixer
-//		Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 1024);
-//		Mix_AllocateChannels(512);
+		Mix_Init(MIX_INIT_FLAC | MIX_INIT_MOD | MIX_INIT_MP3 | MIX_INIT_OGG); //Initialize the SDL mixer
+		Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 1024);
+		Mix_AllocateChannels(512);
 
 		ubyte[3] white_pixel = [ 255, 255, 255 ];
 		white = loadTexture(white_pixel.ptr, 1, 1, false);
@@ -101,11 +102,13 @@ class Window
 		return tex;
 	}
 
-	Texture loadTexture(SDL_Surface* sur) {
+	Texture loadTexture(SDL_Surface* sur)
+	{
 		return loadTexture(cast(ubyte*)sur.pixels, sur.w, sur.h, sur.format.BytesPerPixel == 4);
 	}
 
-	Font loadFont(int size, Color col, string* filename) {
+	Font loadFont(int size, Color col, string filename)
+	{
 		TTF_Font* font = TTF_OpenFont(filename.ptr, size);
 		if (font == null) {
 			fprintf(stderr, "Font with filename %s not found\n", filename.ptr);
@@ -113,6 +116,16 @@ class Window
 		Font bitmap_font = Font(this, font, col);
 		TTF_CloseFont(font);
 		return bitmap_font;
+	}
+
+	SoundClip loadSound(string filename)
+	{
+		return SoundClip(filename);
+	}
+
+	Music loadMusic(string filename)
+	{
+		return Music(filename);
 	}
 
 	void begin(Color bg)

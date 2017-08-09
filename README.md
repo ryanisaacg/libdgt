@@ -17,6 +17,8 @@ The project is written in D to take advantage of its ability for both low and hi
 - Polygon, rectangle, and circle rendering
 - Basic geometry module with circles, rects, etc.
 - TTF Font rendering
+- Sound playing API
+- Streaming music API
 
 ## To-Do
 
@@ -31,7 +33,6 @@ The project is written in D to take advantage of its ability for both low and hi
     - [ ] Sprites and animated sprites
     - [ ] Zero effort game loops
     - [ ] 2D tilemap for storing and pixel-perfect geometry collision
-	- [ ] Loading and playing sound
 	- [ ] Gamepad API
 	- [ ] Screen-shake, inverted screen, etc.
 	- [ ] User-created shaders
