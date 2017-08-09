@@ -26,6 +26,8 @@ The project is written in D to take advantage of its ability for both low and hi
 	- [ ] Link to the documentation from the README
 - [ ] Featureset
     - [ ] Particle system
+	- [ ] Letterboxing
+	- [ ] Add a function to wait for IO
     - [ ] Sprites and animated sprites
     - [ ] Zero effort game loops
     - [ ] 2D tilemap for storing and pixel-perfect geometry collision
