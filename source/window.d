@@ -1,7 +1,8 @@
 import derelict.opengl3.gl;
-import derelict.sdl2.sdl, derelict.sdl2.image;
+import derelict.sdl2.sdl, derelict.sdl2.image, derelict.sdl2.ttf;
+import core.stdc.stdio;
 
-import color, geom, gl_backend, texture;
+import color, font, geom, gl_backend, texture;
 
 struct WindowConfig
 {
@@ -33,6 +34,7 @@ class Window
 	{
 		DerelictSDL2.load();
 		DerelictSDL2Image.load();
+		DerelictSDL2ttf.load();
 		SDL_Init(SDL_INIT_VIDEO/*| SDL_INIT_AUDIO*/);
 		window = SDL_CreateWindow(title.ptr,
 			SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width, height,
@@ -53,7 +55,7 @@ class Window
 		window_height = height;
 
 		IMG_Init(IMG_INIT_JPG | IMG_INIT_PNG);
-//		TTF_Init(); //initialize the SDL font subsystem
+		TTF_Init(); //initialize the SDL font subsystem
 //		Mix_Init(MIX_INIT_FLAC | MIX_INIT_MOD | MIX_INIT_MP3 | MIX_INIT_OGG); //Initialize the SDL mixer
 //		Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 1024);
 //		Mix_AllocateChannels(512);
@@ -68,7 +70,7 @@ class Window
 	{
 		ctx.destroy();
 		SDL_DestroyWindow(window);
-		//TTF_Quit();
+		TTF_Quit();
 		//Mix_Quit();
 		IMG_Quit();
 		SDL_Quit();
@@ -92,9 +94,9 @@ class Window
 		return tex;
 	}
 
-	Texture loadTexture(const char* name)
+	Texture loadTexture(string name)
 	{
-		SDL_Surface* surface = IMG_Load(name);
+		SDL_Surface* surface = IMG_Load(name.ptr);
 		Texture tex = loadTexture(surface);
 		SDL_FreeSurface(surface);
 		return tex;
@@ -102,6 +104,16 @@ class Window
 
 	Texture loadTexture(SDL_Surface* sur) {
 		return loadTexture(cast(ubyte*)sur.pixels, sur.w, sur.h, sur.format.BytesPerPixel == 4);
+	}
+
+	Font loadFont(int size, Color col, string* filename) {
+		TTF_Font* font = TTF_OpenFont(filename.ptr, size);
+		if (font == null) {
+			fprintf(stderr, "Font with filename %s not found\n", filename.ptr);
+		}
+		Font bitmap_font = Font(this, font, col);
+		TTF_CloseFont(font);
+		return bitmap_font;
 	}
 
 	//TODO: Pass a rectangle and create a camera
@@ -234,6 +246,11 @@ class Window
 		draw(color, points);
 	}
 
+	void draw(ref Texture tex, float x, float y)
+	{
+		draw(tex, x, y, tex.region.width, tex.region.height);
+	}
+
 	void draw(ref Texture tex, float x, float y, float w, float h,
 						float rot = 0, float or_x = 0, float or_y = 0,
 						float scale_x = 1, float scale_y = 1,
@@ -291,6 +308,32 @@ class Window
 		ctx.add!(4, 6)(tex.id, vertices, indices);
 	}
 
+
+	int draw(ref Font font, char c, float x, float y) {
+		Texture renderChar = font.render(c);
+		draw(renderChar, x, y);
+		return renderChar.region.width;
+	}
+
+	void draw(ref Font font, string str, float x, float y) {
+		int position = 0;
+		//Loop from the beginning to end of the string
+		for(size_t i = 0; i < str.length; i++)
+		{
+			char c = str[i];
+			if (c == '\t')
+			{
+				for (int j = 0; j < 4; i++)
+				{
+					position += draw(font, ' ', position + x, y);
+				}
+			} else if (c == '\n')
+				y += font.height;
+			else if (c != '\r')
+				position += draw(font, c, position + x, y);
+		}
+	}
+
 /*	static void au_draw_sprite_transformed(AU_Engine* eng, AU_TextureRegion region, AU_SpriteTransform* trans) {
 		au_draw_texture_ex(eng, region, trans.color, trans.x, trans.y, trans.width, trans.height, trans.rotation,
 						   trans.origin_x, trans.origin_y, trans.scale_x, trans.scale_y, trans.flip_x, trans.flip_y, trans.depth);
@@ -304,43 +347,6 @@ class Window
 		au_anim_manager_update(&(sprite.animations));
 		AU_TextureRegion region = au_anim_manager_get_frame(&(sprite.animations));
 		au_draw_sprite_transformed(eng, region, &(sprite.transform));
-	}
-
-	AU_Font* au_load_font(AU_Engine* eng, int size, AU_Color col, const char* filename) {
-		TTF_Font* font = TTF_OpenFont(filename, size);
-		if (font == NULL) {
-			fprintf(stderr, "Font with filename %s not found\n", filename);
-			exit(1);
-		}
-		AU_Font* bitmap_font = au_font_init(eng, font, col);
-		TTF_CloseFont(font);
-		return bitmap_font;
-	}
-
-	int au_draw_char(AU_Engine* eng, AU_Font* font, char c, float x, float y) {
-		AU_TextureRegion renderChar = au_font_get_char(font, c);
-		au_draw_texture(eng, renderChar, x, y);
-		return renderChar.rect.width;
-	}
-
-	void au_draw_string(AU_Engine* eng, AU_Font* font, const char* str, float x, float y) {
-		char c;
-		int position = 0;
-		//Loop from the beginning to end of the string
-		while ((c = *str) != '\0') {
-			if (c == '\t') {
-				for (int i = 0; i < 4; i++) {
-					position += au_draw_char(eng, font, ' ', position + x, y);
-				}
-			} else if (c == '\n') {
-				y += font.height;
-			} else if (c == '\r') {
-				//just ignore CR characters
-			} else {
-				position += au_draw_char(eng, font, c, position + x, y);
-			}
-			str++;
-		}
 	}
 
 	void au_add_particles(AU_Engine* eng, AU_ParticleEmitter* emitter) {
