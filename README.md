@@ -16,6 +16,7 @@ The project is written in D to take advantage of its ability for both low and hi
 - Camera / viewport system
 - Polygon, rectangle, and circle rendering
 - Basic geometry module with circles, rects, etc.
+- TTF Font rendering
 
 ## To-Do
 
@@ -24,7 +25,6 @@ The project is written in D to take advantage of its ability for both low and hi
 	- [ ] Generate and host the documentation on a github page
 	- [ ] Link to the documentation from the README
 - [ ] Featureset
-    - [ ] TTF font rendering
     - [ ] Particle system
     - [ ] Sprites and animated sprites
     - [ ] Zero effort game loops
