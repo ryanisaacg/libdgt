@@ -10,7 +10,7 @@ struct WindowConfig
 
 static immutable SDL_NUM_KEYS = 284;
 
-struct Window
+class Window
 {
 	SDL_Window *window;
 	GLBackend ctx;
@@ -29,7 +29,7 @@ struct Window
 	int window_width, window_height;
 	Texture white;
 
-	void init(string title, int width, int height, WindowConfig config)
+	this(string title, int width, int height, WindowConfig config)
 	{
 		DerelictSDL2.load();
 		DerelictSDL2Image.load();

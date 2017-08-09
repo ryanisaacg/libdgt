@@ -4,9 +4,8 @@ import gl_backend;
 
 void main()
 {
-	Window engine;
 	WindowConfig config;
-	engine.init("Test title", 640, 480, config);
+	Window engine = new Window("Test title", 640, 480, config);
 	auto tex = engine.loadTexture("test.png");
 	while(engine.should_continue)
 	{
