@@ -1,8 +1,10 @@
 import derelict.opengl3.gl;
 import derelict.sdl2.sdl, derelict.sdl2.image, derelict.sdl2.mixer, derelict.sdl2.ttf;
-import core.stdc.stdio;
+import core.stdc.stdio, core.stdc.stdlib, core.stdc.time;
 
-import color, font, geom, gl_backend, sound, music, texture;
+import std.typecons : Nullable;
+
+import array, color, font, geom, gl_backend, sound, music, particle, texture, tilemap;
 
 struct WindowConfig
 {
@@ -22,9 +24,8 @@ class Window
 	Vectorf mouse;
 	bool mouse_left, mouse_right, mouse_middle;
 	//TODO: Add a function to wait on IO
-//	AU_Particle* particles;
+	Array!Particle particles;
 	size_t particle_count, particle_capacity;
-//	AU_Tilemap map;
 	uint previous_ticks;
 	Rectangle!float camera;
 	int window_width, window_height;
@@ -44,10 +45,7 @@ class Window
 			(SDL_WINDOW_INPUT_GRABBED && config.input_grabbed) |
 			(SDL_WINDOW_ALLOW_HIGHDPI && config.highdpi));
 		ctx.init(window);
-//		engine.particle_capacity = 128;
-//		engine.particles = au_memory_alloc(sizeof(AU_Particle) * engine.particle_capacity);
-//		engine.particle_count = 0;
-//		engine.map = NULL;
+		particles.ensureCapacity(128);
 		camera.set(0, 0, width, height);
 		window_width = width;
 		window_height = height;
@@ -59,6 +57,8 @@ class Window
 		Mix_Init(MIX_INIT_FLAC | MIX_INIT_MOD | MIX_INIT_MP3 | MIX_INIT_OGG); //Initialize the SDL mixer
 		Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 1024);
 		Mix_AllocateChannels(512);
+
+		srand(time(null));
 
 		ubyte[3] white_pixel = [ 255, 255, 255 ];
 		white = loadTexture(white_pixel.ptr, 1, 1, false);
@@ -170,47 +170,41 @@ class Window
 		];
 	}
 
-	void end()
+	void stepParticles(T)(Nullable!(Tilemap!T) map = Nullable!(Tilemap!T)())
 	{
-		//Update particles
-		/*if (eng.map != NULL) {
-			for (size_t i = 0; i < eng.particle_count; i++) {
-				AU_Particle* part = eng.particles + i;
-				switch (part.behavior) {
-					case AU_MAP_IGNORE:
-						break;
-					case AU_MAP_DIE:
-						if (au_tmap_get(eng.map, part.position.x, part.position.y)) {
-							eng.particles[i].lifetime = 0;
-						}
-						break;
-					case AU_MAP_BOUNCE:
-						if (au_tmap_get(eng.map, part.position.x + part.velocity.x, part.position.y)) {
-							part.velocity.x *= -1;
-						}
-						if (au_tmap_get(eng.map, part.position.x, part.position.y + part.velocity.y)) {
-							part.velocity.y *= -1;
-						}
+		if(!map.isNull)
+			for(size_t i = 0; i < particles.length; i++) {
+				switch (particles[i].behavior) {
+				case ParticleBehavior.Die:
+					if (!map.empty(particles[i].position.x, particles[i].position.y))
+						particles[i].lifetime = 0;
+					break;
+				case ParticleBehavior.Bounce:
+					if (!map.empty(particles[i].position.x + particles[i].velocity.x, particles[i].position.y))
+						particles[i].velocity.x *= -1;
+					if (!map.empty(particles[i].position.x, particles[i].position.y + particles[i].velocity.y))
+						particles[i].velocity.y *= -1;
+					break;
+				default: break;
 				}
 			}
-		}
 
-		for (size_t i = 0; i < eng.particle_count; i++) {
-			AU_Particle* part = eng.particles + i;
-			au_particle_update(part);
-			if (part.lifetime <= 0) {
-				eng.particles[i] = eng.particles[eng.particle_count - 1];
-				eng.particle_count--;
+		for (size_t i = 0; i < particles.length; i++) {
+			particles[i].update();
+			if (particles[i].lifetime <= 0) {
+				particles.remove(i);
 				i--;
 			} else {
-				AU_Sprite sprite = au_sprite_new(part.region);
-				sprite.transform.x = part.position.x;
-				sprite.transform.y = part.position.y;
-				au_draw_sprite(eng, &sprite);
+				draw(particles[i].region, particles[i].position.x, particles[i].position.y);
 			}
-		}*/
+		}
+	}
 
+	void end(T)(Nullable!(Tilemap!T) map = Nullable!(Tilemap!T)())
+	{
 		ctx.flip();
+
+		stepParticles(map);
 
 		uint time = SDL_GetTicks();
 		if (time - previous_ticks < 1000 / fps) {
