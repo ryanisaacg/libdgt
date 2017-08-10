@@ -27,7 +27,7 @@ void main()
 		auto move = map.slideContact(x, y, 32, 32, Vector!int(1, 3));
 		x += move.x;
 		y += move.y;
-		engine.end!bool();
+		engine.end();
 	}
 	engine.destroy();
 }

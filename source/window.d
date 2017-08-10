@@ -200,7 +200,12 @@ class Window
 		}
 	}
 
-	void end(T)(Nullable!(Tilemap!T) map = Nullable!(Tilemap!T)())
+	void end()
+	{
+		end!bool(Nullable!(Tilemap!bool)());
+	}
+
+	void end(T)(Nullable!(Tilemap!T) map)
 	{
 		ctx.flip();
 
