@@ -19,6 +19,7 @@ The project is written in D to take advantage of its ability for both low and hi
 - TTF Font rendering
 - Sound playing API
 - Streaming music API
+- 2D tilemap for pixel-perfect geometry checking
 
 ## To-Do
 
@@ -32,12 +33,12 @@ The project is written in D to take advantage of its ability for both low and hi
 	- [ ] Add a function to wait for IO
     - [ ] Sprites and animated sprites
     - [ ] Zero effort game loops
-    - [ ] 2D tilemap for storing and pixel-perfect geometry collision
 	- [ ] Gamepad API
 	- [ ] Unified gamepad / mouse / keyboard press API
 	- [ ] Screen-shake, inverted screen, etc.
 	- [ ] User-created shaders
 	- [ ] Non-power-of-two textures
 	- [ ] Immediate-mode UI
+	- [ ] Tiled file format support
 - [ ] Bugs
 	- [ ] Viewports seem not to correctly apply when the window is resized
