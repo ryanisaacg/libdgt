@@ -16,6 +16,9 @@ The project is written in D to take advantage of its ability for both low and hi
 - Camera / viewport system
 - Polygon, rectangle, and circle rendering
 - Basic geometry module with circles, rects, etc.
+- TTF Font rendering
+- Sound playing API
+- Streaming music API
 
 ## To-Do
 
@@ -24,12 +27,12 @@ The project is written in D to take advantage of its ability for both low and hi
 	- [ ] Generate and host the documentation on a github page
 	- [ ] Link to the documentation from the README
 - [ ] Featureset
-    - [ ] TTF font rendering
     - [ ] Particle system
+	- [ ] Letterboxing
+	- [ ] Add a function to wait for IO
     - [ ] Sprites and animated sprites
     - [ ] Zero effort game loops
     - [ ] 2D tilemap for storing and pixel-perfect geometry collision
-	- [ ] Loading and playing sound
 	- [ ] Gamepad API
 	- [ ] Unified gamepad / mouse / keyboard press API
 	- [ ] Screen-shake, inverted screen, etc.
