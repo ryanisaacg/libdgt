@@ -1,1 +1,1 @@
-public import array, color, geom, texture, window;
+public import array, color, geom, texture, tilemap, window;
