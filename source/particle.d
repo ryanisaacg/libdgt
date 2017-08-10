@@ -43,7 +43,7 @@ struct ParticleEmitter
 
     Particle emit()
     {
-        return Particle(regions[randi_range(0, regions.length)],
+        return Particle(regions[randi_range(0, cast(int)regions.length)],
 			 randvectori_range(top_left, bottom_right),
 			 randvectori_range(velocity_min, velocity_max),
 			 randvectori_range(acceleration_min, acceleration_max),

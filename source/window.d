@@ -58,7 +58,7 @@ class Window
 		Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 1024);
 		Mix_AllocateChannels(512);
 
-		srand(time(null));
+		srand(cast(uint)time(null));
 
 		ubyte[3] white_pixel = [ 255, 255, 255 ];
 		white = loadTexture(white_pixel.ptr, 1, 1, false);
