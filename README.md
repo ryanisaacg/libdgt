@@ -20,6 +20,7 @@ The project is written in D to take advantage of its ability for both low and hi
 - Sound playing API
 - Streaming music API
 - 2D tilemap for pixel-perfect geometry checking
+- Particle system
 
 ## To-Do
 
@@ -28,7 +29,6 @@ The project is written in D to take advantage of its ability for both low and hi
 	- [ ] Generate and host the documentation on a github page
 	- [ ] Link to the documentation from the README
 - [ ] Featureset
-    - [ ] Particle system
 	- [ ] Letterboxing
 	- [ ] Add a function to wait for IO
     - [ ] Sprites and animated sprites
