@@ -6,14 +6,18 @@ void main()
 {
 	WindowConfig config;
 	Window engine = new Window("Test title", 640, 480, config);
+	scope(exit) engine.destroy();
 	auto tex = engine.loadTexture("test.png");
+	scope(exit) tex.destroy();
 	int x = 100, y = 10;
 	auto map = Tilemap!bool(640, 480, 32);
+	scope(exit) map.destroy();
 	map[96, 100] = Tile!bool(true, true);
 	map[128, 100] = Tile!bool(true, true);
 	while(engine.should_continue)
 	{
 		engine.begin(black);
+		scope(exit) engine.end();
 
 		engine.draw(tex, 100, 0, 32, 32);
 		engine.draw(tex, 200, 400, 32, 32);
@@ -27,7 +31,5 @@ void main()
 		auto move = map.slideContact(x, y, 32, 32, Vector!int(1, 3));
 		x += move.x;
 		y += move.y;
-		engine.end();
 	}
-	engine.destroy();
 }
