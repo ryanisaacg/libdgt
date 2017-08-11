@@ -15,7 +15,7 @@ void main()
 	scope(exit) map.destroy();
 	map[96, 100] = Tile!bool(true, true);
 	map[128, 100] = Tile!bool(true, true);
-	while(engine.should_continue)
+	while(engine.isOpen)
 	{
 		engine.begin(black);
 		scope(exit) engine.end();

@@ -372,6 +372,7 @@ class Window
 	bool mouseLeft() { return mouse_left; }
 	bool mouseRight() { return mouse_right; }
 	bool mouseMiddle() { return mouse_middle; }
+	bool isOpen() { return should_continue; }
 
 /*	static void au_draw_sprite_transformed(AU_Engine* eng, AU_TextureRegion region, AU_SpriteTransform* trans) {
 		au_draw_texture_ex(eng, region, trans.color, trans.x, trans.y, trans.width, trans.height, trans.rotation,
