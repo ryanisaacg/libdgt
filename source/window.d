@@ -34,7 +34,7 @@ class Window
 	this(string title, int width, int height, WindowConfig config)
 	{
 		DerelictSDL2.load();
-		SDL_Init(SDL_INIT_VIDEO/*| SDL_INIT_AUDIO*/);
+		SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO);
 		window = SDL_CreateWindow(title.ptr,
 			SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width, height,
 			SDL_WINDOW_OPENGL | 
