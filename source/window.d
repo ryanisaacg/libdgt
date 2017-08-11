@@ -37,13 +37,14 @@ class Window
 		SDL_Init(SDL_INIT_VIDEO/*| SDL_INIT_AUDIO*/);
 		window = SDL_CreateWindow(title.ptr,
 			SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width, height,
-			SDL_WINDOW_OPENGL | (SDL_WINDOW_RESIZABLE && config.resizable) |
-			(SDL_WINDOW_FULLSCREEN && config.fullscreen) |
-			(SDL_WINDOW_BORDERLESS && config.borderless) |
-			(SDL_WINDOW_MINIMIZED && config.minimized) |
-			(SDL_WINDOW_MAXIMIZED && config.maximized) |
-			(SDL_WINDOW_INPUT_GRABBED && config.input_grabbed) |
-			(SDL_WINDOW_ALLOW_HIGHDPI && config.highdpi));
+			SDL_WINDOW_OPENGL | 
+			(config.resizable ? SDL_WINDOW_RESIZABLE : 0) |
+			(config.fullscreen ? SDL_WINDOW_FULLSCREEN : 0) |
+			(config.borderless ? SDL_WINDOW_BORDERLESS : 0) | 
+			(config.minimized ? SDL_WINDOW_MINIMIZED : 0) | 
+			(config.maximized ? SDL_WINDOW_MAXIMIZED : 0) |
+			(config.input_grabbed ? SDL_WINDOW_INPUT_GRABBED : 0) |
+			(config.highdpi ? SDL_WINDOW_ALLOW_HIGHDPI : 0));
 		ctx.init(window);
 		particles.ensureCapacity(128);
 		camera.set(0, 0, width, height);
