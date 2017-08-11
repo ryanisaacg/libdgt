@@ -5,6 +5,7 @@ import gl_backend;
 void main()
 {
 	WindowConfig config;
+	config.resizable = true;
 	Window engine = new Window("Test title", 640, 480, config);
 	scope(exit) engine.destroy();
 	auto tex = engine.loadTexture("test.png");
