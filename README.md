@@ -40,5 +40,4 @@ The project is written in D to take advantage of its ability for both low and hi
 	- [ ] Immediate-mode UI
 	- [ ] Tiled file format support
 - [ ] Bugs
-	- [ ] Viewports seem not to correctly apply when the window is resized
 	- [ ] The framerate dropped drastically when particles were adde

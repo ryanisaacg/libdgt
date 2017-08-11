@@ -4,7 +4,7 @@ import core.stdc.stdio, core.stdc.stdlib, core.stdc.time;
 
 import std.typecons : Nullable;
 
-import array, color, font, geom, gl_backend, sound, music, particle, texture, tilemap;
+import array, color, font, geom, gl_backend, io, sound, music, particle, texture, tilemap;
 
 struct WindowConfig
 {
@@ -148,10 +148,17 @@ class Window
 				case SDL_KEYUP:
 					current_keys[e.key.keysym.scancode] = false;
 					break;
-				case SDL_WINDOWEVENT_RESIZED:
-					int w, h;
-					SDL_GetWindowSize(window, &w, &h);
-					glViewport(0, 0, w, h); //TODO: Letterbox
+				case SDL_WINDOWEVENT:
+					switch(e.window.event) {
+						case SDL_WINDOWEVENT_RESIZED:
+						case SDL_WINDOWEVENT_SIZE_CHANGED:
+							int w, h;
+							SDL_GetWindowSize(window, &w, &h);
+							glViewport(0, 0, w, h); //TODO: Letterbox
+							break;
+						default:
+							break;
+					}
 					break;
 				default:
 					break;
