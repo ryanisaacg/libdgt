@@ -15,21 +15,23 @@ static immutable SDL_NUM_KEYS = 284;
 
 class Window
 {
+	private:
 	SDL_Window *window;
 	GLBackend ctx;
-	uint fps = 60;
 	bool should_continue = true;
 	bool[SDL_NUM_KEYS] current_keys; //The total number of SDL keys
 	bool[SDL_NUM_KEYS] previous_keys;
-	Vectorf mouse;
+	Vectori mouse;
 	bool mouse_left, mouse_right, mouse_middle;
 	//TODO: Add a function to wait on IO
 	Array!Particle particles;
-	size_t particle_count, particle_capacity;
 	uint previous_ticks;
-	Rectangle!float camera;
 	int window_width, window_height;
 	Texture white;
+	public:
+	uint fps = 60;
+	Rectangle!float camera;
+	float aspectRatio;	
 
 	this(string title, int width, int height, WindowConfig config)
 	{
@@ -64,6 +66,7 @@ class Window
 		ubyte[3] white_pixel = [ 255, 255, 255 ];
 		white = loadTexture(white_pixel.ptr, 1, 1, false);
 		glViewport(0, 0, width, height);
+		aspectRatio = cast(float)width / height;
 	}
 
 	@nogc nothrow:
@@ -166,7 +169,7 @@ class Window
 		}
 		int x, y;
 		int button_mask = SDL_GetMouseState(&x, &y);
-		mouse = Vectorf(x, y);
+		mouse = Vectori(x, y);
 		mouse_left = (button_mask & SDL_BUTTON(SDL_BUTTON_LEFT)) != 0;
 		mouse_right = (button_mask & SDL_BUTTON(SDL_BUTTON_RIGHT)) != 0;
 		mouse_middle = (button_mask & SDL_BUTTON(SDL_BUTTON_MIDDLE)) != 0;
@@ -352,6 +355,16 @@ class Window
 				position += draw(font, c, position + x, y);
 		}
 	}
+	
+	bool isKeyDown(string name) { return current_keys[SDL_GetScancodeFromName(name.ptr)]; }
+	bool wasKeyDown(string name) { return previous_keys[SDL_GetScancodeFromName(name.ptr)]; }
+
+	pure:
+	int mouseX() { return mouse.x; }
+	int mouseY() { return mouse.y; }
+	bool mouseLeft() { return mouse_left; }
+	bool mouseRight() { return mouse_right; }
+	bool mouseMiddle() { return mouse_middle; }
 
 /*	static void au_draw_sprite_transformed(AU_Engine* eng, AU_TextureRegion region, AU_SpriteTransform* trans) {
 		au_draw_texture_ex(eng, region, trans.color, trans.x, trans.y, trans.width, trans.height, trans.rotation,
