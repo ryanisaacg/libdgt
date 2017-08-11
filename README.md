@@ -32,7 +32,6 @@ The project is written in D to take advantage of its ability for both low and hi
 	- [ ] Letterboxing
 	- [ ] Add a function to wait for IO
     - [ ] Sprites and animated sprites
-    - [ ] Zero effort game loops
 	- [ ] Gamepad API
 	- [ ] Unified gamepad / mouse / keyboard press API
 	- [ ] Screen-shake, inverted screen, etc.
