@@ -4,7 +4,7 @@ import core.stdc.stdio, core.stdc.stdlib, core.stdc.time;
 
 import std.typecons : Nullable;
 
-import array, color, font, geom, gl_backend, io, sound, music, particle, texture, tilemap;
+import array, color, font, geom, gl_backend, io, sound, music, particle, texture, tilemap, util;
 
 struct WindowConfig
 {
@@ -356,6 +356,13 @@ class Window
 		}
 	}
 	
+	void addParticleBurst(ref ParticleEmitter emitter) 
+	{
+		int parts = randi_range(emitter.particle_min, emitter.particle_max);
+		for (int i = 0; i < parts; i++)
+			particles.add(emitter.emit());
+	}
+	
 	bool isKeyDown(string name) { return current_keys[SDL_GetScancodeFromName(name.ptr)]; }
 	bool wasKeyDown(string name) { return previous_keys[SDL_GetScancodeFromName(name.ptr)]; }
 
@@ -380,16 +387,5 @@ class Window
 		AU_TextureRegion region = au_anim_manager_get_frame(&(sprite.animations));
 		au_draw_sprite_transformed(eng, region, &(sprite.transform));
 	}
-
-	void au_add_particles(AU_Engine* eng, AU_ParticleEmitter* emitter) {
-		int parts = au_util_randi_range(emitter.particle_min, emitter.particle_max);
-		if (eng.particle_count + parts >= eng.particle_capacity) {
-			eng.particle_capacity *= 2;
-			eng.particles = au_memory_realloc(eng.particles, sizeof(AU_Particle) * eng.particle_capacity);
-		}
-		for (int i = 0; i < parts; i++) {
-			eng.particles[eng.particle_count] = au_particle_emitter_emit(emitter);
-			eng.particle_count++;
-		}
-	}*/
+*/
 }
