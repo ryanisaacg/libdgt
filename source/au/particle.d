@@ -1,17 +1,18 @@
-import array, geom, texture, util;
+module au.particle;
+import au.array, au.geom, au.texture, au.util;
 
 enum ParticleBehavior
 {
-	Ignore, Die, Bounce
+    Ignore, Die, Bounce
 }
 
 struct Particle
 {
-	Texture region;
-	Vector!int position, velocity, acceleration, scale, scale_velocity;
-	float rotation = 0, rotational_velocity = 0;
-	int lifetime = 0;
-	ParticleBehavior behavior = ParticleBehavior.Ignore;
+    Texture region;
+    Vector!int position, velocity, acceleration, scale, scale_velocity;
+    float rotation = 0, rotational_velocity = 0;
+    int lifetime = 0;
+    ParticleBehavior behavior = ParticleBehavior.Ignore;
 
     @nogc nothrow pure public void update()
     {
@@ -26,14 +27,14 @@ struct Particle
 struct ParticleEmitter
 {
     Array!Texture regions;
-	Vector!int top_left, bottom_right, velocity_min, velocity_max,
+    Vector!int top_left, bottom_right, velocity_min, velocity_max,
         acceleration_min, acceleration_max, scale_min, scale_max,
-		scale_velocity_min, scale_velocity_max;
-	float rotation_min = 0, rotation_max = 0, rotational_velocity_min = 0,
+        scale_velocity_min, scale_velocity_max;
+    float rotation_min = 0, rotation_max = 0, rotational_velocity_min = 0,
         rotational_velocity_max = 0;
-	int lifetime_min, lifetime_max;
-	int particle_min, particle_max;
-	ParticleBehavior behavior = ParticleBehavior.Ignore;
+    int lifetime_min, lifetime_max;
+    int particle_min, particle_max;
+    ParticleBehavior behavior = ParticleBehavior.Ignore;
 
     @nogc nothrow public:
     this(Array!Texture regions)
@@ -44,14 +45,14 @@ struct ParticleEmitter
     Particle emit()
     {
         return Particle(regions[randi_range(0, cast(int)regions.length)],
-			 randvectori_range(top_left, bottom_right),
-			 randvectori_range(velocity_min, velocity_max),
-			 randvectori_range(acceleration_min, acceleration_max),
-			 randvectori_range(scale_min, scale_max),
-			 randvectori_range(scale_velocity_min, scale_velocity_max),
-			 randf_range(rotation_min, rotation_max),
-			 randf_range(rotational_velocity_min, rotational_velocity_max),
-			 randi_range(lifetime_min, lifetime_max),
-			 behavior);
+             randvectori_range(top_left, bottom_right),
+             randvectori_range(velocity_min, velocity_max),
+             randvectori_range(acceleration_min, acceleration_max),
+             randvectori_range(scale_min, scale_max),
+             randvectori_range(scale_velocity_min, scale_velocity_max),
+             randf_range(rotation_min, rotation_max),
+             randf_range(rotational_velocity_min, rotational_velocity_max),
+             randi_range(lifetime_min, lifetime_max),
+             behavior);
     }
 }

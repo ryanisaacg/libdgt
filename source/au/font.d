@@ -1,5 +1,6 @@
+module au.font;
 import derelict.sdl2.sdl, derelict.sdl2.ttf;
-import array, color, geom, texture, window;
+import au.array, au.color, au.geom, au.texture, au.window;
 
 static immutable FONT_MAX_CHARS = 223;
 static immutable FONT_CHAR_OFFSET = 32;

@@ -1,10 +1,11 @@
+module au.gl_backend;
 import derelict.opengl3.gl;
 import derelict.sdl2.sdl;
 
-import array : Array;
-import color : Color;
-import geom;
-import io;
+import au.array : Array;
+import au.color : Color;
+import au.geom;
+import au.io;
 
 const GLchar* vertex_shader = "#version 130
 in vec2 position;
@@ -37,7 +38,7 @@ struct Vertex
 
 	@nogc nothrow void print(Vertex vert)
 	{
-		io.print("Vertex(", vert.pos, ", ", vert.texPos, ", ", vert.col, ")");
+		au.io.print("Vertex(", vert.pos, ", ", vert.texPos, ", ", vert.col, ")");
 	}
 }
 

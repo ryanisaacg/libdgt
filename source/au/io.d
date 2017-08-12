@@ -1,3 +1,4 @@
+module au.io;
 import core.stdc.stdio;
 
 @nogc nothrow:

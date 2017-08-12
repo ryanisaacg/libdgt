@@ -1,6 +1,5 @@
 import std.stdio, std.file;
 import au;
-import gl_backend;
 
 void main()
 {

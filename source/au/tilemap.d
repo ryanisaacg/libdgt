@@ -1,4 +1,5 @@
-import array, geom;
+module au.tilemap;
+import au.array, au.geom;
 import std.math;
 
 struct Tile(T)

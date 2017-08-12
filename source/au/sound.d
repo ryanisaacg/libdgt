@@ -1,3 +1,4 @@
+module au.sound;
 import derelict.sdl2.mixer;
 
 struct SoundClip

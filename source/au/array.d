@@ -1,5 +1,6 @@
+module au.array;
 import core.stdc.stdlib : malloc, realloc, free;
-import io;
+import au.io;
 
 struct Array(T)
 {
@@ -51,16 +52,16 @@ struct Array(T)
 
 	void print()
 	{
-		io.print("Array!", T.stringof, "[");
+		au.io.print("Array!", T.stringof, "[");
 		for(size_t i = 0; i < length; i++)
 		{
-			io.print(this[i]);
+			au.io.print(this[i]);
 			if(i != length - 1)
 			{
-				io.print(", ");
+				au.io.print(", ");
 			}
 		}
-		io.print("]");
+		au.io.print("]");
 	}
 
 	pure:

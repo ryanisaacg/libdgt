@@ -1,3 +1,4 @@
+module au.color;
 import derelict.sdl2.sdl : SDL_Color;
 import core.stdc.stdio;
 

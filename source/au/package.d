@@ -1,2 +1,2 @@
 module au;
-public import array, color, geom, texture, tilemap, window;
+public import au.array, au.color, au.geom, au.texture, au.tilemap, au.window;

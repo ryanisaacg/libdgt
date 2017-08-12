@@ -1,5 +1,7 @@
+module au.texture;
+
 import derelict.opengl3.gl;
-import geom : Rectangle;
+import au.geom : Rectangle;
 
 struct Texture
 {

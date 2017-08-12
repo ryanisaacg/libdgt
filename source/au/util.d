@@ -1,21 +1,22 @@
+module au.util;
 import core.stdc.math, core.stdc.stdlib;
 
-import geom;
+import au.geom;
 
 @nogc nothrow:
 
 //A normalized random function
 float random()
 {
-	return cast(float) rand() / RAND_MAX;
+    return cast(float) rand() / RAND_MAX;
 }
 float randf_range(float min, float max)
 {
-	return (max - min) * random() + min;
+    return (max - min) * random() + min;
 }
 int randi_range(int min, int max)
 {
-	return cast(int)randf_range(min, max);
+    return cast(int)randf_range(min, max);
 }
 Vector!float randvectorf_range(Vector!float a, Vector!float b)
 {
