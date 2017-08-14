@@ -18,11 +18,24 @@ void main()
     auto buttonTex = engine.loadTexture("button.png");
     auto camera = Rectanglef(0, 0, 640, 480);
     float value = 0;
-	auto button = Button(engine, Rectanglei(300, 300, 32, 32), Vectori(300, 300),
+	auto button = Button(Rectanglei(300, 300, 32, 32), Vectori(300, 300),
 				buttonTex.getSlice(Rectanglei(0, 0, 32, 32)),
 				buttonTex.getSlice(Rectanglei(32, 0, 32, 32)),
 				buttonTex.getSlice(Rectanglei(64, 0, 32, 32)));
-	auto slider = Slider(engine, Rectanglei(0, 440, 640, 32), value, tex));
+	auto slider = Slider(Rectanglei(0, 440, 640, 32), value, tex);
+	auto carouselTex = engine.loadTexture("carousel.png");
+	auto leftButtonTex = carouselTex.getSlice(Rectanglei(0, 0, 32, 32));
+	auto rightButtonTex = carouselTex.getSlice(Rectanglei(128, 0, 32, 32));
+	Array!Texture carouselOptions;
+	carouselOptions = [
+	carouselTex.getSlice(Rectanglei(32, 0, 32, 32)),
+	carouselTex.getSlice(Rectanglei(64, 0, 32, 32)),
+	carouselTex.getSlice(Rectanglei(96, 0, 32, 32))
+	];
+	auto carousel = Carousel(
+		Button(Rectanglei(400, 0, 32, 32), Vectori(400, 0), leftButtonTex, leftButtonTex, leftButtonTex),
+		Button(Rectanglei(464, 0, 32, 32), Vectori(464, 0), rightButtonTex, rightButtonTex, rightButtonTex),
+		Vectori(432, 0), carouselOptions, 0);
 	while(engine.isOpen)
 	{
 		engine.begin(black, camera);
@@ -49,5 +62,6 @@ void main()
         }
         camera.x = camera.x + 50;
         writeln(value = slider.draw(engine));
+		carousel.draw(engine);
 	}
 }

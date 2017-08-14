@@ -1,5 +1,6 @@
 module au.ui;
 
+import au.array : Array;
 import au.geom : Rectangle, Vector;
 import au.texture : Texture;
 import au.window : Window;
@@ -8,7 +9,9 @@ struct Button
 {
     public @nogc nothrow:
 
-    Rectangle!int area, Vector!int position,  Texture tex,  Texture hover,  Texture press;
+    Rectangle!int area;
+    Vector!int position;
+    Texture tex, hover, press;
 
     bool draw(Window window)
     {
@@ -29,7 +32,9 @@ struct Button
 struct Slider
 {
     public @nogc nothrow:
-    Rectangle!int area, float current, Texture slider;
+    Rectangle!int area;
+    float current;
+    Texture slider;
 
     float draw(Window window)
     {
@@ -41,4 +46,24 @@ struct Slider
             return current;
     }
 
+}
+
+struct Carousel
+{
+    public @nogc nothrow:
+    Button left, right;
+    Vector!int position;
+    Array!Texture textures;
+    int current;
+
+    int draw(Window window)
+    {
+        if (left.draw(window))
+            current --;
+        if (right.draw(window))
+            current ++;
+        current = (current + textures.length) % textures.length;
+        window.draw(textures[current], position.x, position.y);
+        return current;
+    }
 }
