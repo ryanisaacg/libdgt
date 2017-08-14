@@ -64,6 +64,18 @@ struct Array(T)
 		au.io.print("]");
 	}
 
+	ref Array!T opAssign(size_t N)(T[N] data)
+	{
+		ensureCapacity(N);
+		clear();
+		*count = N;
+		for(size_t i = 0; i < N; i++)
+		{
+			this[i] = data[i];
+		}
+		return this;
+	}
+
 	pure:
 	void remove(size_t index)
 	{
@@ -81,17 +93,6 @@ struct Array(T)
 	{
 		assert(index < *count);
 		return buffer[index] = value;
-	}
-
-	ref Array!T opAssign(size_t N)(T[N] data)
-	{
-		ensureCapacity(N);
-		clear();
-		for(size_t i = 0; i < N; i++)
-		{
-			this[i] = data[i];
-		}
-		return this;
 	}
 
 	void clear()
