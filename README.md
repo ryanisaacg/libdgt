@@ -30,7 +30,6 @@ The project is written in D to take advantage of its ability for both low and hi
 
 - Featureset
 	- Letterboxing
-	- Add a function to wait for IO
     - Sprites and animated sprites
 	- Gamepad API
 	- User-created shaders
