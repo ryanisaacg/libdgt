@@ -18,6 +18,11 @@ void main()
     auto buttonTex = engine.loadTexture("button.png");
     auto camera = Rectanglef(0, 0, 640, 480);
     float value = 0;
+	auto button = Button(engine, Rectanglei(300, 300, 32, 32), Vectori(300, 300),
+				buttonTex.getSlice(Rectanglei(0, 0, 32, 32)),
+				buttonTex.getSlice(Rectanglei(32, 0, 32, 32)),
+				buttonTex.getSlice(Rectanglei(64, 0, 32, 32)));
+	auto slider = Slider(engine, Rectanglei(0, 440, 640, 32), value, tex));
 	while(engine.isOpen)
 	{
 		engine.begin(black, camera);
@@ -35,17 +40,14 @@ void main()
 		auto move = map.slideContact(x, y, 32, 32, Vector!int(1, 3));
 		x += move.x;
 		y += move.y;
-        
+
         engine.inUIMode = true;
         engine.draw(white, Rectanglef(50, 50, 100, 10));
-        if (button(engine, Rectanglei(300, 300, 32, 32), Vectori(300, 300), 
-                    buttonTex.getSlice(Rectanglei(0, 0, 32, 32)),
-                    buttonTex.getSlice(Rectanglei(32, 0, 32, 32)),
-                    buttonTex.getSlice(Rectanglei(64, 0, 32, 32))))
+        if (button.draw(engine))
         {
             x += 32;
         }
         camera.x = camera.x + 50;
-        writeln(value = slider(engine, Rectanglei(0, 440, 640, 32), value, tex));
+        writeln(value = slider.draw(engine));
 	}
 }
