@@ -21,25 +21,24 @@ The project is written in D to take advantage of its ability for both low and hi
 - Streaming music API
 - 2D tilemap for pixel-perfect geometry checking
 - Particle system
+- A basic Immediate Mode UI system
+	- A button with different hover and pressed states
+	- A slider that can allow for a non-discrete set of values
+	- A carousel with a set of rotating values
 
-## To-Do
+## Roadmap
 
-- [ ] Documentation
-	- [ ] Write documentation for each module
-	- [ ] Generate and host the documentation on a github page
-	- [ ] Link to the documentation from the README
-- [ ] Featureset
-	- [ ] Letterboxing
-	- [ ] Add a function to wait for IO
-    - [ ] Sprites and animated sprites
-	- [ ] Gamepad API
-	- [ ] User-created shaders
-	- [ ] Non-power-of-two textures
-	- [ ] Immediate-mode UI
-        - [x] Add an ability to switch to UI Mode
-        - [x] Add an immediate mode button
-        - [x] Add an immediate mode slider
-        - [ ] Add an immediate mode carousel
-	- [ ] Tiled file format support
-- [ ] Bugs
-	- [ ] The framerate dropped drastically when particles were adde
+- Featureset
+	- Letterboxing
+	- Add a function to wait for IO
+    - Sprites and animated sprites
+	- Gamepad API
+	- User-created shaders
+	- Non-power-of-two textures
+	- Tiled file format support
+- Documentation
+	- Write documentation for each module
+	- Generate and host the documentation on a github page
+	- Link to the documentation from the README
+- Improvements
+	- Do initial loading in parallel
