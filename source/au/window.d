@@ -19,11 +19,12 @@ class Window
     private:
     SDL_Window *window;
     GLBackend ctx;
-    bool should_continue = true;
+    bool shouldContinue = true;
     bool[SDL_NUM_KEYS] current_keys; //The total number of SDL keys
     bool[SDL_NUM_KEYS] previous_keys;
-    Vectori mouse;
-    bool mouse_left, mouse_right, mouse_middle;
+    Vectori mouse = Vectori(0, 0), previousMouse = Vectori(0, 0);
+    bool mouseLeft = false, mouseRight = false, mouseMiddle = false, 
+         mouseLeftPrevious = true, mouseRightPrevious = true, mouseMiddlePrevious = true;
     //TODO: Add a function to wait on IO
     Array!Particle particles;
     uint previous_ticks;
@@ -148,7 +149,7 @@ class Window
             switch (e.type)
             {
                 case SDL_QUIT:
-                    should_continue = false;
+                    shouldContinue = false;
                     break;
                 case SDL_KEYDOWN:
                     current_keys[e.key.keysym.scancode] = true;
@@ -174,10 +175,14 @@ class Window
         }
         int x, y;
         int button_mask = SDL_GetMouseState(&x, &y);
+        previousMouse = mouse;
         mouse = Vectori(x, y);
-        mouse_left = (button_mask & SDL_BUTTON(SDL_BUTTON_LEFT)) != 0;
-        mouse_right = (button_mask & SDL_BUTTON(SDL_BUTTON_RIGHT)) != 0;
-        mouse_middle = (button_mask & SDL_BUTTON(SDL_BUTTON_MIDDLE)) != 0;
+        mouseLeftPrevious = mouseLeft;
+        mouseRightPrevious = mouseRight;
+        mouseMiddlePrevious = mouseMiddlePrevious;
+        mouseLeft = (button_mask & SDL_BUTTON(SDL_BUTTON_LEFT)) != 0;
+        mouseRight = (button_mask & SDL_BUTTON(SDL_BUTTON_RIGHT)) != 0;
+        mouseMiddle = (button_mask & SDL_BUTTON(SDL_BUTTON_MIDDLE)) != 0;
         float left = camera.x, right = camera.x + camera.width, top = camera.y, bottom = camera.y + camera.height;
         ctx.transform = [
             2 / (right - left), 0, 0,
@@ -373,12 +378,16 @@ class Window
     bool wasKeyDown(string name) { return previous_keys[SDL_GetScancodeFromName(name.ptr)]; }
 
     pure:
+    Vector!int mousePos() { return mouse; }
     int mouseX() { return mouse.x; }
     int mouseY() { return mouse.y; }
-    bool mouseLeft() { return mouse_left; }
-    bool mouseRight() { return mouse_right; }
-    bool mouseMiddle() { return mouse_middle; }
-    bool isOpen() { return should_continue; }
+    bool mouseLeftPressed() { return mouseLeft; }
+    bool mouseRightPressed() { return mouseRight; }
+    bool mouseMiddlePressed() { return mouseMiddle; }
+    bool mouseLeftReleased() { return !mouseLeft && mouseLeftPrevious; }
+    bool mouseRightReleased() { return !mouseRight && mouseRightPrevious; }
+    bool mouseMiddleReleased() { return !mouseMiddle && mouseMiddlePrevious; }
+    bool isOpen() { return shouldContinue; }
 
 /*  static void au_draw_sprite_transformed(AU_Engine* eng, AU_TextureRegion region, AU_SpriteTransform* trans) {
         au_draw_texture_ex(eng, region, trans.color, trans.x, trans.y, trans.width, trans.height, trans.rotation,
