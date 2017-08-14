@@ -16,7 +16,7 @@ void main()
 	map[128, 100] = Tile!bool(true, true);
 	while(engine.isOpen)
 	{
-		engine.begin(black);
+		engine.begin(black, Rectangle!float(0, 0, 640, 480));
 		scope(exit) engine.end();
 
 		engine.draw(tex, 100, 0, 32, 32);

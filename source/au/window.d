@@ -29,9 +29,9 @@ class Window
     uint previous_ticks;
     int window_width, window_height;
     Texture white;
+    Rectangle!float camera;
     public:
     uint fps = 60;
-    Rectangle!float camera;
     float aspectRatio;
 
     this(string title, int width, int height, WindowConfig config)
@@ -133,8 +133,9 @@ class Window
         return Music(filename);
     }
 
-    void begin(Color bg)
+    void begin(Color bg, Rectangle!float cam)
     {
+        camera = cam;
         ctx.clear(bg);
         previous_ticks = SDL_GetTicks();
         previous_keys = current_keys;
