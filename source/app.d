@@ -15,6 +15,7 @@ void main()
 	map[96, 100] = Tile!bool(true, true);
 	map[128, 100] = Tile!bool(true, true);
     float n = 0;
+    auto buttonTex = engine.loadTexture("button.png");
 	while(engine.isOpen)
 	{
 		engine.begin(black, Rectangle!float(n, n, 640, 480));
@@ -35,7 +36,12 @@ void main()
         
         engine.inUIMode = true;
         engine.draw(white, Rectanglef(50, 50, 100, 10));
-
-        n ++;
+        if(button(engine, Rectanglei(300, 300, 32, 32), Vectori(300, 300), 
+                    buttonTex.getSlice(Rectanglei(0, 0, 32, 32)),
+                    buttonTex.getSlice(Rectanglei(32, 0, 32, 32)),
+                    buttonTex.getSlice(Rectanglei(64, 0, 32, 32))))
+        {
+            x += 32;
+        }
 	}
 }
