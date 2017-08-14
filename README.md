@@ -38,7 +38,7 @@ The project is written in D to take advantage of its ability for both low and hi
 	- [ ] Immediate-mode UI
         - [x] Add an ability to switch to UI Mode
         - [x] Add an immediate mode button
-        - [ ] Add an immediate mode slider
+        - [x] Add an immediate mode slider
         - [ ] Add an immediate mode carousel
 	- [ ] Tiled file format support
 - [ ] Bugs

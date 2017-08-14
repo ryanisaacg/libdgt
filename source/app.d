@@ -16,9 +16,11 @@ void main()
 	map[128, 100] = Tile!bool(true, true);
     float n = 0;
     auto buttonTex = engine.loadTexture("button.png");
+    auto camera = Rectanglef(0, 0, 640, 480);
+    float value = 0;
 	while(engine.isOpen)
 	{
-		engine.begin(black, Rectangle!float(n, n, 640, 480));
+		engine.begin(black, camera);
 		scope(exit) engine.end();
 
 		engine.draw(tex, 100, 0, 32, 32);
@@ -36,12 +38,14 @@ void main()
         
         engine.inUIMode = true;
         engine.draw(white, Rectanglef(50, 50, 100, 10));
-        if(button(engine, Rectanglei(300, 300, 32, 32), Vectori(300, 300), 
+        if (button(engine, Rectanglei(300, 300, 32, 32), Vectori(300, 300), 
                     buttonTex.getSlice(Rectanglei(0, 0, 32, 32)),
                     buttonTex.getSlice(Rectanglei(32, 0, 32, 32)),
                     buttonTex.getSlice(Rectanglei(64, 0, 32, 32))))
         {
             x += 32;
         }
+        camera.x = camera.x + 50;
+        writeln(value = slider(engine, Rectanglei(0, 440, 640, 32), value, tex));
 	}
 }
