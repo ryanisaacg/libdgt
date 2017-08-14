@@ -44,6 +44,26 @@ struct Vector(T)
         this.y = y;
     }
 
+    Vector!T opUnary(string op)()
+    {
+        static if (op == "-")
+        {
+            return Vector!T(-x, -y);
+        }
+    }
+
+    Vector!T opBinary(string op)(T scalar)
+    {
+        static if (op == "*")
+        {
+            return Vector!T(x * scalar, y * scalar);
+        }
+        static if (op == "/")
+        {
+            return Vector!T(x / scalar, y / scalar);
+        }
+    }
+
     Vector!T opBinary(string op)(Vector!T other)
     {
         static if (op == "+")

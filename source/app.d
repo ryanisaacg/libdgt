@@ -14,9 +14,10 @@ void main()
 	scope(exit) map.destroy();
 	map[96, 100] = Tile!bool(true, true);
 	map[128, 100] = Tile!bool(true, true);
+    float n = 0;
 	while(engine.isOpen)
 	{
-		engine.begin(black, Rectangle!float(0, 0, 640, 480));
+		engine.begin(black, Rectangle!float(n, n, 640, 480));
 		scope(exit) engine.end();
 
 		engine.draw(tex, 100, 0, 32, 32);
@@ -31,5 +32,10 @@ void main()
 		auto move = map.slideContact(x, y, 32, 32, Vector!int(1, 3));
 		x += move.x;
 		y += move.y;
+        
+        engine.inUIMode = true;
+        engine.draw(white, Rectanglef(50, 50, 100, 10));
+
+        n ++;
 	}
 }

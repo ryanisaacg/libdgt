@@ -31,6 +31,7 @@ class Window
     Texture white;
     Rectangle!float camera;
     public:
+    bool inUIMode;
     uint fps = 60;
     float aspectRatio;
 
@@ -68,6 +69,7 @@ class Window
         white = loadTexture(white_pixel.ptr, 1, 1, false);
         glViewport(0, 0, width, height);
         aspectRatio = cast(float)width / height;
+        inUIMode = false;
     }
 
     @nogc nothrow:
@@ -136,6 +138,7 @@ class Window
     void begin(Color bg, Rectangle!float cam)
     {
         camera = cam;
+        inUIMode = false;
         ctx.clear(bg);
         previous_ticks = SDL_GetTicks();
         previous_keys = current_keys;
@@ -237,9 +240,10 @@ class Window
         static assert ( Len >= 3 );
         Vertex[Len] vertices;
         GLuint[Indices] indices;
+        Vector!float offset = inUIMode ? camera.topLeft : Vector!float(0, 0);
         for (size_t i = 0; i < Len; i++)
         {
-            vertices[i].pos = points[i];
+            vertices[i].pos = points[i] + offset;
             vertices[i].col = color;
         }
         uint current = 1;
@@ -323,7 +327,7 @@ class Window
             src_bl = tmp;
         }
         //Add all of the vertices to the context
-        auto translate = Vectorf(x, y);
+        auto translate = Vectorf(x, y) + (inUIMode ? camera.topLeft : Vector!float(0, 0));
         Vertex[4] vertices = [ Vertex(tl + translate, src_tl, color),
             Vertex(tr + translate, src_tr, color),
             Vertex(br + translate, src_br, color),
