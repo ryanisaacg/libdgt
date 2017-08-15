@@ -33,7 +33,7 @@ The project is written in D to take advantage of its ability for both low and hi
         - [ ] Convert the window size to the aspect ratio
         - [ ] Construct the viewport with the given size
     - Sprites and animated sprites
-        - [ ] Animations 
+        - [x] Animations 
         - [ ] Animation managers
         - [ ] Sprites with transforms
         - [ ] Animated sprites
