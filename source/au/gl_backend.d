@@ -50,14 +50,14 @@ struct GLBackend
 	private Array!GLuint indices;
 
 	private SDL_GLContext ctx;
-	//OpenGL opbjects
+	//OpenGL objects
 	private GLuint shader, fragment, vertex, vbo, ebo, vao, texture_location;
 	private SDL_Window* window;
 	public Transform!float transform;
 
 	//The amount of floats per vertex
 	private static immutable size_t vertex_size = 8;
-    
+
     @disable this();
 
 	public this(SDL_Window* window)
