@@ -22,7 +22,7 @@ void main()
 				buttonTex.getSlice(Rectanglei(0, 0, 32, 32)),
 				buttonTex.getSlice(Rectanglei(32, 0, 32, 32)),
 				buttonTex.getSlice(Rectanglei(64, 0, 32, 32)));
-	auto slider = Slider(Rectanglei(0, 440, 640, 32), value, tex);
+	auto slider = Slider(Rectanglei(0, 440, 640, 32), tex);
 	auto carouselTex = engine.loadTexture("carousel.png");
 	auto leftButtonTex = carouselTex.getSlice(Rectanglei(0, 0, 32, 32));
 	auto rightButtonTex = carouselTex.getSlice(Rectanglei(128, 0, 32, 32));
@@ -34,7 +34,8 @@ void main()
 	auto carousel = Carousel(
 		Button(Rectanglei(400, 0, 32, 32), Vectori(400, 0), leftButtonTex, leftButtonTex, leftButtonTex),
 		Button(Rectanglei(464, 0, 32, 32), Vectori(464, 0), rightButtonTex, rightButtonTex, rightButtonTex),
-		Vectori(432, 0), carouselOptions, 0);
+		Vectori(432, 0), carouselOptions);
+    int carouselOption = 0;
 	while(engine.isOpen)
 	{
 		engine.begin(black, camera);
@@ -60,7 +61,7 @@ void main()
             x += 32;
         }
         camera.x = camera.x + 50;
-        writeln(value = slider.draw(engine));
-		carousel.draw(engine);
+        writeln(value = slider.draw(engine, value));
+		carouselOption = carousel.draw(engine, carouselOption);
 	}
 }
