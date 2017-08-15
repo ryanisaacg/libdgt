@@ -26,17 +26,10 @@ struct Button
 
     bool draw(Window window)
     {
-        if (area.contains(window.mousePos))
-        {
-            if (window.mouseLeftPressed)
-                window.draw(press, position.x, position.y);
-            else
-                window.draw(hover, position.x, position.y);
-            return window.mouseLeftReleased;
-        }
-        else
-            window.draw(tex, position.x, position.y);
-        return false;
+        bool mouseContained = area.contains(window.mousePos);
+        window.draw(mouseContained ? (window.mouseLeftPressed ? press : hover) : tex,
+                position.x, position.y);
+        return mouseContained && window.mouseLeftReleased;
     }
 }
 
