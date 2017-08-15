@@ -40,7 +40,7 @@ struct Font
         SDL_FreeSurface(full);
         //Add reference to the texture for each character
         position = 0;
-        characterTextures.ensureCapacity(FONT_MAX_CHARS);
+        characterTextures = Array!Texture(FONT_MAX_CHARS);
         for (int i = 0; i < FONT_MAX_CHARS; i++) {
             characterTextures[i] = texture.getSlice(Rectangle!int(position, 0, characters[i].w, characters[i].h));
             position += characterTextures[i].region.width;

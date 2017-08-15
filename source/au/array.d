@@ -8,7 +8,19 @@ struct Array(T)
 	private void* backingBuffer = null;
 	private static immutable initialSize = 16;
 
+    @disable this();
+
 	@nogc nothrow public:
+    this(size_t initialCapacity)
+    {
+        ensureCapacity(initialCapacity);
+    }
+
+    this(size_t N)(T[N] array)
+    {
+        this = array;
+    }
+
 	void ensureCapacity(size_t newCapacity)
 	{
 		void* old = backingBuffer;

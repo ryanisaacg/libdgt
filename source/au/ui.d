@@ -62,7 +62,7 @@ struct Carousel
             current --;
         if (right.draw(window))
             current ++;
-        current = (current + textures.length) % textures.length;
+        current = cast(int)((current + textures.length) % textures.length);
         window.draw(textures[current], position.x, position.y);
         return current;
     }

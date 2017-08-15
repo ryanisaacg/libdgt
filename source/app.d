@@ -26,12 +26,11 @@ void main()
 	auto carouselTex = engine.loadTexture("carousel.png");
 	auto leftButtonTex = carouselTex.getSlice(Rectanglei(0, 0, 32, 32));
 	auto rightButtonTex = carouselTex.getSlice(Rectanglei(128, 0, 32, 32));
-	Array!Texture carouselOptions;
-	carouselOptions = [
-	carouselTex.getSlice(Rectanglei(32, 0, 32, 32)),
-	carouselTex.getSlice(Rectanglei(64, 0, 32, 32)),
-	carouselTex.getSlice(Rectanglei(96, 0, 32, 32))
-	];
+	Array!Texture carouselOptions = Array!Texture([
+        carouselTex.getSlice(Rectanglei(32, 0, 32, 32)),
+        carouselTex.getSlice(Rectanglei(64, 0, 32, 32)),
+        carouselTex.getSlice(Rectanglei(96, 0, 32, 32))
+	]);
 	auto carousel = Carousel(
 		Button(Rectanglei(400, 0, 32, 32), Vectori(400, 0), leftButtonTex, leftButtonTex, leftButtonTex),
 		Button(Rectanglei(464, 0, 32, 32), Vectori(464, 0), rightButtonTex, rightButtonTex, rightButtonTex),
@@ -39,7 +38,7 @@ void main()
 	while(engine.isOpen)
 	{
 		engine.begin(black, camera);
-		scope(exit) engine.end();
+		scope(exit) engine.end(map);
 
 		engine.draw(tex, 100, 0, 32, 32);
 		engine.draw(tex, 200, 400, 32, 32);

@@ -53,8 +53,8 @@ class Window
             (config.maximized ? SDL_WINDOW_MAXIMIZED : 0) |
             (config.input_grabbed ? SDL_WINDOW_INPUT_GRABBED : 0) |
             (config.highdpi ? SDL_WINDOW_ALLOW_HIGHDPI : 0));
-        ctx.init(window);
-        particles.ensureCapacity(128);
+        ctx = GLBackend(window);
+        particles = Array!Particle(128);
         camera.set(0, 0, width, height);
         window_width = width;
         window_height = height;
@@ -191,24 +191,23 @@ class Window
         ];
     }
 
-    void stepParticles(T)(Nullable!(Tilemap!T) map = Nullable!(Tilemap!T)())
+    void stepParticles(T)(Tilemap!T map)
     {
-        if(!map.isNull)
-            for(size_t i = 0; i < particles.length; i++) {
-                switch (particles[i].behavior) {
-                case ParticleBehavior.Die:
-                    if (!map.empty(particles[i].position.x, particles[i].position.y))
-                        particles[i].lifetime = 0;
-                    break;
-                case ParticleBehavior.Bounce:
-                    if (!map.empty(particles[i].position.x + particles[i].velocity.x, particles[i].position.y))
-                        particles[i].velocity.x *= -1;
-                    if (!map.empty(particles[i].position.x, particles[i].position.y + particles[i].velocity.y))
-                        particles[i].velocity.y *= -1;
-                    break;
-                default: break;
-                }
+        for(size_t i = 0; i < particles.length; i++) {
+            switch (particles[i].behavior) {
+            case ParticleBehavior.Die:
+                if (!map.empty(particles[i].position.x, particles[i].position.y))
+                    particles[i].lifetime = 0;
+                break;
+            case ParticleBehavior.Bounce:
+                if (!map.empty(particles[i].position.x + particles[i].velocity.x, particles[i].position.y))
+                    particles[i].velocity.x *= -1;
+                if (!map.empty(particles[i].position.x, particles[i].position.y + particles[i].velocity.y))
+                    particles[i].velocity.y *= -1;
+                break;
+            default: break;
             }
+        }
 
         for (size_t i = 0; i < particles.length; i++) {
             particles[i].update();
@@ -221,12 +220,7 @@ class Window
         }
     }
 
-    void end()
-    {
-        end!bool(Nullable!(Tilemap!bool)());
-    }
-
-    void end(T)(Nullable!(Tilemap!T) map)
+    void end(T)(Tilemap!T map)
     {
         ctx.flip();
 

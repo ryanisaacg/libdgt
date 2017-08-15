@@ -57,8 +57,10 @@ struct GLBackend
 
 	//The amount of floats per vertex
 	private static immutable size_t vertex_size = 8;
+    
+    @disable this();
 
-	public void init(SDL_Window* window)
+	public this(SDL_Window* window)
 	{
 		import core.stdc.stdio;
 		DerelictGL3.load();
@@ -79,8 +81,7 @@ struct GLBackend
 		if (status != GL_TRUE)
 		{
 			printf("Vertex shader compilation failed\n");
-			Array!char buffer;
-			buffer.ensureCapacity(512);
+			Array!char buffer = Array!char(512);
 			glGetShaderInfoLog(vertex, 512, null, buffer.ptr);
 			printf("Error: %s\n", buffer.ptr);
 		}
@@ -91,8 +92,7 @@ struct GLBackend
 		if (status != GL_TRUE)
 		{
 			printf("Fragment shader compilation failed\n");
-			Array!char buffer;
-			buffer.ensureCapacity(512);
+			Array!char buffer = Array!char(512);
 			glGetShaderInfoLog(fragment, 512, null, buffer.ptr);
 			printf("Error: %s\n", buffer.ptr);
 		}
@@ -104,8 +104,8 @@ struct GLBackend
 		glUseProgram(shader);
 		glEnable (GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-		vertices.ensureCapacity(1024);
-		indices.ensureCapacity(1024);
+		vertices = Array!float(1024);
+		indices = Array!GLuint(1024);
 	}
 
 	@nogc nothrow:
