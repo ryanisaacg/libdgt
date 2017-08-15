@@ -30,14 +30,38 @@ The project is written in D to take advantage of its ability for both low and hi
 
 - Featureset
 	- Letterboxing
+        - [ ] Convert the window size to the aspect ratio
+        - [ ] Construct the viewport with the given size
     - Sprites and animated sprites
+        - [ ] Animations 
+        - [ ] Animation managers
+        - [ ] Sprites with transforms
+        - [ ] Animated sprites
 	- Gamepad API
+        - [ ] Initialize gamepads with SDL
+        - [ ] Add gamepad input polling to the window
 	- User-created shaders
+        - [ ] Add a function in the GL backend to switch the shader
+        - [ ] Add a function in the window to switch the shader
 	- Non-power-of-two textures
+        - [ ] Detect if a texture is not power of two
+        - [ ] Create the smallest power-of-two texture possible to hold it
+        - [ ] Blit the loaded texture onto the power-of-two surface
 	- Tiled file format support
+        - [ ] Load a tilemap from a file
+        - [ ] Convert Tiled tiles to libau tiles
+        - [ ] Mark all tiles in "background" layers as not solid
+        - [ ] Return a list of all-non-tile objects
 - Documentation
 	- Write documentation for each module
 	- Generate and host the documentation on a github page
 	- Link to the documentation from the README
 - Improvements
 	- Do initial loading in parallel
+        - [ ] Create a thread for each load
+        - [ ] Join all threads before continuing
+    - Remove all floating point from the user-facing code
+        - [ ] Add a scale to the window
+        - [ ] Convert dimensions using the scale
+        - [ ] Convert mouse using the scale
+        - [ ] Convert drawing using the scale
