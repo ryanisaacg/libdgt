@@ -25,13 +25,11 @@ The project is written in D to take advantage of its ability for both low and hi
 	- A button with different hover and pressed states
 	- A slider that can allow for a non-discrete set of values
 	- A carousel with a set of rotating values
+- Automatic letterboxing
 
 ## Roadmap
 
 - Featureset
-	- Letterboxing
-        - [ ] Convert the window size to the aspect ratio
-        - [ ] Construct the viewport with the given size
     - Sprites and animated sprites
         - [ ] Animations 
         - [ ] Animation managers

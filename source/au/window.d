@@ -163,7 +163,21 @@ class Window
                         case SDL_WINDOWEVENT_SIZE_CHANGED:
                             int w, h;
                             SDL_GetWindowSize(window, &w, &h);
-                            glViewport(0, 0, w, h); //TODO: Letterbox
+                            float windowRatio = cast(float)w / h;
+                            if(windowRatio > aspectRatio)
+                            {
+                                auto oldW = w;
+                                w = cast(int)(aspectRatio * h);
+                                glViewport((oldW - w) / 2, 0, w, h);
+                            }
+                            else if(windowRatio < aspectRatio)
+                            {
+                                auto oldH = h;
+                                h = cast(int)(w / aspectRatio);
+                                glViewport(0, (oldH - h) / 2, w, h);
+                            }
+                            else
+                                glViewport(0, 0, w, h); //TODO: Letterbox
                             break;
                         default:
                             break;
