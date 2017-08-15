@@ -41,10 +41,6 @@ The project is written in D to take advantage of its ability for both low and hi
 	- User-created shaders
         - [ ] Add a function in the GL backend to switch the shader
         - [ ] Add a function in the window to switch the shader
-	- Non-power-of-two textures
-        - [ ] Detect if a texture is not power of two
-        - [ ] Create the smallest power-of-two texture possible to hold it
-        - [ ] Blit the loaded texture onto the power-of-two surface
 	- Tiled file format support
         - [ ] Load a tilemap from a file
         - [ ] Convert Tiled tiles to libau tiles
@@ -55,6 +51,8 @@ The project is written in D to take advantage of its ability for both low and hi
 		- [ ] Add functions to access the global window
 - Documentation
 	- Write documentation for each module
+	- Document power-of-two textures
+	- Document SDL libraries
 	- Generate and host the documentation on a github page
 	- Link to the documentation from the README
 - Improvements
