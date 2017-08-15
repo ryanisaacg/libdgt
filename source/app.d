@@ -58,7 +58,7 @@ void main()
         engine.draw(white, Rectanglef(50, 50, 100, 10));
         if (button.draw(engine))
         {
-            x += 32;
+            writeln("Button pressed");
         }
         camera.x = camera.x + 50;
         writeln(value = slider.draw(engine, value));
