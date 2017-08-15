@@ -385,6 +385,11 @@ class Window
     bool isKeyDown(string name) { return current_keys[SDL_GetScancodeFromName(name.ptr)]; }
     bool wasKeyDown(string name) { return previous_keys[SDL_GetScancodeFromName(name.ptr)]; }
 
+    void setShader(string vertexShader, string fragmentShader)
+    {
+        ctx.setShader(vertexShader, fragmentShader);
+    }
+
     pure:
     Vector!int mousePos() { return mouse; }
     int mouseX() { return mouse.x; }

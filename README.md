@@ -26,6 +26,7 @@ The project is written in D to take advantage of its ability for both low and hi
 	- A slider that can allow for a non-discrete set of values
 	- A carousel with a set of rotating values
 - Automatic letterboxing
+- User-created shaders
 
 ## Roadmap
 
@@ -38,9 +39,6 @@ The project is written in D to take advantage of its ability for both low and hi
 	- Gamepad API
         - [ ] Initialize gamepads with SDL
         - [ ] Add gamepad input polling to the window
-	- User-created shaders
-        - [x] Add a function in the GL backend to switch the shader
-        - [ ] Add a function in the window to switch the shader
 	- Tiled file format support
         - [ ] Load a tilemap from a file
         - [ ] Convert Tiled tiles to libau tiles
