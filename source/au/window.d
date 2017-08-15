@@ -23,7 +23,7 @@ class Window
     bool[SDL_NUM_KEYS] current_keys; //The total number of SDL keys
     bool[SDL_NUM_KEYS] previous_keys;
     Vectori mouse = Vectori(0, 0), previousMouse = Vectori(0, 0);
-    bool mouseLeft = false, mouseRight = false, mouseMiddle = false, 
+    bool mouseLeft = false, mouseRight = false, mouseMiddle = false,
          mouseLeftPrevious = true, mouseRightPrevious = true, mouseMiddlePrevious = true;
     //TODO: Add a function to wait on IO
     Array!Particle particles;
@@ -79,7 +79,7 @@ class Window
         ctx.destroy();
         SDL_DestroyWindow(window);
         TTF_Quit();
-        //Mix_Quit();
+        Mix_Quit();
         IMG_Quit();
         SDL_Quit();
     }
