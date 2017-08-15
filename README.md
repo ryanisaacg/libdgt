@@ -39,7 +39,7 @@ The project is written in D to take advantage of its ability for both low and hi
         - [ ] Initialize gamepads with SDL
         - [ ] Add gamepad input polling to the window
 	- User-created shaders
-        - [ ] Add a function in the GL backend to switch the shader
+        - [x] Add a function in the GL backend to switch the shader
         - [ ] Add a function in the window to switch the shader
 	- Tiled file format support
         - [ ] Load a tilemap from a file

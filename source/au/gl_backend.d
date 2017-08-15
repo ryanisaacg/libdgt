@@ -7,7 +7,7 @@ import au.color : Color;
 import au.geom;
 import au.io;
 
-const GLchar* vertex_shader = "#version 130
+string vertex_shader = "#version 130
 in vec2 position;
 in vec2 tex_coord;
 in vec4 color;
@@ -21,7 +21,7 @@ void main() {
 	transformed.z = 0;
 	gl_Position = vec4(transformed, 1.0);
 }";
-const GLchar* fragment_shader = "#version 130
+string fragment_shader = "#version 130
 in vec4 Color;
 in vec2 Tex_coord;
 out vec4 outColor;
@@ -62,7 +62,6 @@ struct GLBackend
 
 	public this(SDL_Window* window)
 	{
-		import core.stdc.stdio;
 		DerelictGL3.load();
 		this.window = window;
 		SDL_GL_SetSwapInterval(1);
@@ -72,36 +71,7 @@ struct GLBackend
 		glBindVertexArray(vao);
 		glGenBuffers(1, &vbo);
 		glGenBuffers(1, &ebo);
-		//Create and compile shaders
-		vertex = glCreateShader(GL_VERTEX_SHADER);
-		glShaderSource(vertex, 1, &vertex_shader, null);
-		glCompileShader(vertex);
-		GLint status;
-		glGetShaderiv(vertex, GL_COMPILE_STATUS, &status);
-		if (status != GL_TRUE)
-		{
-			printf("Vertex shader compilation failed\n");
-			Array!char buffer = Array!char(512);
-			glGetShaderInfoLog(vertex, 512, null, buffer.ptr);
-			printf("Error: %s\n", buffer.ptr);
-		}
-		fragment = glCreateShader(GL_FRAGMENT_SHADER);
-		glShaderSource(fragment, 1, &fragment_shader, null);
-		glCompileShader(fragment);
-		glGetShaderiv(fragment, GL_COMPILE_STATUS, &status);
-		if (status != GL_TRUE)
-		{
-			printf("Fragment shader compilation failed\n");
-			Array!char buffer = Array!char(512);
-			glGetShaderInfoLog(fragment, 512, null, buffer.ptr);
-			printf("Error: %s\n", buffer.ptr);
-		}
-		shader = glCreateProgram();
-		glAttachShader(shader, vertex);
-		glAttachShader(shader, fragment);
-		glBindFragDataLocation(shader, 0, "outColor");
-		glLinkProgram(shader);
-		glUseProgram(shader);
+		setShader(vertex_shader, fragment_shader);
 		glEnable (GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		vertices = Array!float(1024);
@@ -109,6 +79,46 @@ struct GLBackend
 	}
 
 	@nogc nothrow:
+	public void setShader(string vertexShader, string fragmentShader)
+	{
+		if(shader != 0) glDeleteProgram(shader);
+		if(vertex != 0) glDeleteShader(vertex);
+		if(fragment != 0) glDeleteShader(fragment);
+		vertex = glCreateShader(GL_VERTEX_SHADER);
+		auto vertexShaderPtr = vertexShader.ptr;
+		glShaderSource(vertex, 1, cast(GLchar**)(&vertexShaderPtr), null);
+		glCompileShader(vertex);
+		GLint status;
+		glGetShaderiv(vertex, GL_COMPILE_STATUS, &status);
+		if (status != GL_TRUE)
+		{
+			println("Vertex shader compilation failed");
+			Array!char buffer = Array!char(512);
+			glGetShaderInfoLog(vertex, 512, null, buffer.ptr);
+			println("Error: ", buffer.ptr);
+			buffer.destroy();
+		}
+		fragment = glCreateShader(GL_FRAGMENT_SHADER);
+		auto fragmentShaderPtr = fragmentShader.ptr;
+		glShaderSource(fragment, 1, cast(GLchar**)(&fragmentShaderPtr), null);
+		glCompileShader(fragment);
+		glGetShaderiv(fragment, GL_COMPILE_STATUS, &status);
+		if (status != GL_TRUE)
+		{
+			println("Fragment shader compilation failed\n");
+			Array!char buffer = Array!char(512);
+			glGetShaderInfoLog(fragment, 512, null, buffer.ptr);
+			println("Error: ", buffer.ptr);
+			buffer.destroy();
+		}
+		shader = glCreateProgram();
+		glAttachShader(shader, vertex);
+		glAttachShader(shader, fragment);
+		glBindFragDataLocation(shader, 0, "outColor");
+		glLinkProgram(shader);
+		glUseProgram(shader);
+	}
+
 	public void destroy()
 	{
 		vertices.destroy();
