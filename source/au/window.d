@@ -1,7 +1,7 @@
 module au.window;
 import derelict.opengl3.gl;
 import derelict.sdl2.sdl, derelict.sdl2.image, derelict.sdl2.mixer, derelict.sdl2.ttf;
-import core.stdc.stdio, core.stdc.stdlib, core.stdc.time;
+import core.stdc.stdio, core.stdc.stdlib, core.stdc.time, core.thread;
 
 import std.typecons : Nullable;
 
@@ -10,6 +10,18 @@ import au.array, au.color, au.font, au.geom, au.gl_backend, au.io, au.sound, au.
 struct WindowConfig
 {
     bool fullscreen, resizable, borderless, minimized, maximized, input_grabbed, highdpi;
+
+    int getFlags()
+    {
+        return SDL_WINDOW_OPENGL |
+        (resizable ? SDL_WINDOW_RESIZABLE : 0) |
+        (fullscreen ? SDL_WINDOW_FULLSCREEN : 0) |
+        (borderless ? SDL_WINDOW_BORDERLESS : 0) |
+        (minimized ? SDL_WINDOW_MINIMIZED : 0) |
+        (maximized ? SDL_WINDOW_MAXIMIZED : 0) |
+        (input_grabbed ? SDL_WINDOW_INPUT_GRABBED : 0) |
+        (highdpi ? SDL_WINDOW_ALLOW_HIGHDPI : 0);
+    }
 }
 
 static immutable SDL_NUM_KEYS = 284;
@@ -32,35 +44,36 @@ class Window
     Texture white;
     Rectangle!float camera;
     public:
-    bool inUIMode;
+    bool inUIMode = false;
     uint fps = 60;
     float aspectRatio;
 
     this(string title, int width, int height, WindowConfig config)
     {
         DerelictSDL2.load(SharedLibVersion(2, 0, 3));
-        DerelictSDL2Image.load();
-        DerelictSDL2ttf.load();
-        DerelictSDL2Mixer.load();
         SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO);
+        new Thread(&DerelictSDL2Image.load).start();
+        new Thread(&DerelictSDL2ttf.load).start();
+        new Thread(&DerelictSDL2Mixer.load).start();
         window = SDL_CreateWindow(title.ptr,
             SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width, height,
-            SDL_WINDOW_OPENGL |
-            (config.resizable ? SDL_WINDOW_RESIZABLE : 0) |
-            (config.fullscreen ? SDL_WINDOW_FULLSCREEN : 0) |
-            (config.borderless ? SDL_WINDOW_BORDERLESS : 0) |
-            (config.minimized ? SDL_WINDOW_MINIMIZED : 0) |
-            (config.maximized ? SDL_WINDOW_MAXIMIZED : 0) |
-            (config.input_grabbed ? SDL_WINDOW_INPUT_GRABBED : 0) |
-            (config.highdpi ? SDL_WINDOW_ALLOW_HIGHDPI : 0));
+            config.getFlags());
         ctx = GLBackend(window);
         particles = Array!Particle(128);
         camera.set(0, 0, width, height);
         window_width = width;
         window_height = height;
-        IMG_Init(IMG_INIT_JPG | IMG_INIT_PNG);
-        TTF_Init(); //initialize the SDL font subsystem
-        Mix_Init(MIX_INIT_FLAC | MIX_INIT_MOD | MIX_INIT_MP3 | MIX_INIT_OGG); //Initialize the SDL mixer
+        thread_joinAll();
+        new Thread({
+            IMG_Init(IMG_INIT_JPG | IMG_INIT_PNG);
+        }).start();
+        new Thread({
+            TTF_Init();
+        }).start();
+        new Thread({
+            Mix_Init(MIX_INIT_FLAC | MIX_INIT_MOD | MIX_INIT_MP3 | MIX_INIT_OGG);
+        }).start();
+        thread_joinAll();
         Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 1024);
         Mix_AllocateChannels(512);
 
@@ -70,7 +83,6 @@ class Window
         white = loadTexture(white_pixel.ptr, 1, 1, false);
         glViewport(0, 0, width, height);
         aspectRatio = cast(float)width / height;
-        inUIMode = false;
     }
 
     @nogc nothrow:
