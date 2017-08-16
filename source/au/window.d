@@ -49,7 +49,7 @@ class Window
     float aspectRatio;
     int scale;
 
-    this(string title, int width, int height, WindowConfig config, int scale = 1)
+    this(string title, int width, int height, WindowConfig config, int scale = 1, bool bindToGlobal = true)
     {
         DerelictSDL2.load(SharedLibVersion(2, 0, 3));
         SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO);
@@ -85,6 +85,8 @@ class Window
         glViewport(0, 0, width, height);
         aspectRatio = cast(float)width / height;
         this.scale = scale;
+        if(bindToGlobal)
+            globalWindow = this;
     }
 
     @nogc nothrow:
@@ -429,4 +431,11 @@ class Window
     bool mouseMiddleReleased() { return !mouseMiddle && mouseMiddlePrevious; }
     bool isOpen() { return shouldContinue; }
     int getScale() { return scale; }
+}
+
+private Window globalWindow;
+
+public @nogc nothrow Window getWindow()
+{
+    return globalWindow;
 }
