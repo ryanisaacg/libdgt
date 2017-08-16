@@ -264,7 +264,7 @@ struct Transform(T)
     public Vector!U opBinary(string op, U)(Vector!U other)
     if (op == "*")
     {
-        auto converted = Vertex!T(cast(T)other.x, cast(T)other.y);
+        auto converted = Vector!T(cast(T)other.x, cast(T)other.y);
         auto transformed = this * converted;
         return Vector!U(cast(U)transformed.x, cast(U)transformed.y);
     }
