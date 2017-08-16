@@ -429,20 +429,4 @@ class Window
     bool mouseMiddleReleased() { return !mouseMiddle && mouseMiddlePrevious; }
     bool isOpen() { return shouldContinue; }
     int getScale() { return scale; }
-
-/*  static void au_draw_sprite_transformed(AU_Engine* eng, AU_TextureRegion region, AU_SpriteTransform* trans) {
-        au_draw_texture_ex(eng, region, trans.color, trans.x, trans.y, trans.width, trans.height, trans.rotation,
-                           trans.origin_x, trans.origin_y, trans.scale_x, trans.scale_y, trans.flip_x, trans.flip_y, trans.depth);
-    }
-
-    void au_draw_sprite(AU_Engine* eng, AU_Sprite* sprite) {
-        au_draw_sprite_transformed(eng, sprite.region, &(sprite.transform));
-    }
-
-    void au_draw_sprite_animated(AU_Engine* eng, AU_AnimatedSprite* sprite) {
-        au_anim_manager_update(&(sprite.animations));
-        AU_TextureRegion region = au_anim_manager_get_frame(&(sprite.animations));
-        au_draw_sprite_transformed(eng, region, &(sprite.transform));
-    }
-*/
 }
