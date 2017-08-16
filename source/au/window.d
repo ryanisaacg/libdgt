@@ -5,7 +5,7 @@ import core.stdc.stdio, core.stdc.stdlib, core.stdc.time, core.thread;
 
 import std.typecons : Nullable;
 
-import au.array, au.color, au.font, au.geom, au.gl_backend, au.io, au.sound, au.music, au.particle, au.texture, au.tilemap, au.util;
+import au.array, au.color, au.font, au.geom, au.gl_backend, au.io, au.sound, au.music, au.particle, au.sprite, au.texture, au.tilemap, au.util;
 
 struct WindowConfig
 {
@@ -361,6 +361,13 @@ class Window
         ctx.add!(4, 6)(tex.id, vertices, indices);
     }
 
+    void draw(ref Sprite sprite)
+    {
+        sprite.update();
+        draw(sprite.getTexture, sprite.x, sprite.y, sprite.width, sprite.height,
+                sprite.rotation, sprite.originX, sprite.originY,
+                sprite.scaleX, sprite.scaleY, sprite.flipX, sprite.flipY, sprite.color);
+    }
 
     int draw(ref Font font, char c, float x, float y) {
         Texture renderChar = font.render(c);

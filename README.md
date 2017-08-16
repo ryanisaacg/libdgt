@@ -27,15 +27,11 @@ The project is written in D to take advantage of its ability for both low and hi
 	- A carousel with a set of rotating values
 - Automatic letterboxing
 - User-created shaders
+- Sprites and animated sprites
 
 ## Roadmap
 
 - Featureset
-    - Sprites and animated sprites
-        - [ ] Animations
-        - [ ] Animation managers
-        - [ ] Sprites with transforms
-        - [ ] Animated sprites
 	- Gamepad API
         - [ ] Initialize gamepads with SDL
         - [ ] Add gamepad input polling to the window
