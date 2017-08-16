@@ -15,7 +15,7 @@ struct Animation
     Array!Frame frames;
     int currentFrame, currentTime;
 
-    @nogc nothrow public:
+    @nogc nothrow public pure:
     this(size_t N)(Frame[N] frames)
     {
         this(Array!Frame(frames));
@@ -39,4 +39,10 @@ struct Animation
         }
         return frames[currentFrame].image;
     }
+
+    ref Texture currentTexture()
+    {
+        return frames[currentFrame].image;
+    }
 }
+
