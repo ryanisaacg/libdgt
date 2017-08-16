@@ -39,9 +39,16 @@ struct Vector(T)
     public T x = 0, y = 0;
 
     @nogc nothrow pure public:
-    this(T x, T y) {
+    this(T x, T y)
+    {
         this.x = x;
         this.y = y;
+    }
+
+    this(U)(Vector!U vec)
+    {
+        this.x = cast(T)vec.x;
+        this.y = cast(T)vec.y;
     }
 
     Vector!T opUnary(string op)()
