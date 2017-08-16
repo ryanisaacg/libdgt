@@ -49,9 +49,3 @@ The project is written in D to take advantage of its ability for both low and hi
 	- Document SDL libraries
 	- Generate and host the documentation on a github page
 	- Link to the documentation from the README
-- Improvements
-    - Remove all floating point from the user-facing code
-        - [ ] Add a scale to the window
-        - [ ] Convert dimensions using the scale
-        - [ ] Convert mouse using the scale
-        - [ ] Convert drawing using the scale

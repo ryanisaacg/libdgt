@@ -47,8 +47,9 @@ class Window
     bool inUIMode = false;
     uint fps = 60;
     float aspectRatio;
+    int scale;
 
-    this(string title, int width, int height, WindowConfig config)
+    this(string title, int width, int height, WindowConfig config, int scale = 1)
     {
         DerelictSDL2.load(SharedLibVersion(2, 0, 3));
         SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO);
@@ -60,7 +61,7 @@ class Window
             config.getFlags());
         ctx = GLBackend(window);
         particles = Array!Particle(128);
-        camera.set(0, 0, width, height);
+        camera.set(0, 0, width * scale, height * scale);
         window_width = width;
         window_height = height;
         thread_joinAll();
@@ -83,11 +84,13 @@ class Window
         white = loadTexture(white_pixel.ptr, 1, 1, false);
         glViewport(0, 0, width, height);
         aspectRatio = cast(float)width / height;
+        this.scale = scale;
     }
 
     @nogc nothrow:
-    void destroy()
+    ~this()
     {
+        println("Destroy");
         ctx.destroy();
         SDL_DestroyWindow(window);
         TTF_Quit();
@@ -110,7 +113,8 @@ class Window
                      data);
         glGenerateMipmap(GL_TEXTURE_2D);
         glBindTexture(GL_TEXTURE_2D, 0);
-        Texture tex = { id: texture, width: w, height: h, region: Rectangle!int(0, 0, w, h)};
+        Texture tex = { id: texture, width: w, height: h,
+                region: Rectangle!int(0, 0, w, h)};
         return tex;
     }
 
@@ -202,14 +206,15 @@ class Window
         int x, y;
         int button_mask = SDL_GetMouseState(&x, &y);
         previousMouse = mouse;
-        mouse = Vectori(x, y);
+        mouse = Vectori(x * scale, y * scale);
         mouseLeftPrevious = mouseLeft;
         mouseRightPrevious = mouseRight;
         mouseMiddlePrevious = mouseMiddlePrevious;
         mouseLeft = (button_mask & SDL_BUTTON(SDL_BUTTON_LEFT)) != 0;
         mouseRight = (button_mask & SDL_BUTTON(SDL_BUTTON_RIGHT)) != 0;
         mouseMiddle = (button_mask & SDL_BUTTON(SDL_BUTTON_MIDDLE)) != 0;
-        float left = camera.x, right = camera.x + camera.width, top = camera.y, bottom = camera.y + camera.height;
+        float left = camera.x, right = left + camera.width,
+                top = camera.y, bottom = top + camera.height;
         ctx.transform = [
             2 / (right - left), 0, 0,
             0, 2 / (top - bottom), 0,
@@ -259,16 +264,18 @@ class Window
         previous_ticks = time;
     }
 
-    void draw(size_t Len)(Color color, Vectorf[Len] points)
+    void draw(size_t Len)(Color color, Vectori[Len] points)
     {
         static immutable Indices = (Len - 2) * 3;
         static assert ( Len >= 3 );
         Vertex[Len] vertices;
         GLuint[Indices] indices;
-        Vector!float offset = inUIMode ? camera.topLeft : Vector!float(0, 0);
+        Vectori offset = inUIMode ? Vectori(camera.topLeft) : Vectori(0, 0);
         for (size_t i = 0; i < Len; i++)
         {
-            vertices[i].pos = points[i] + offset;
+            auto point = (points[i] + offset) / scale;
+            vertices[i].pos.x = point.x;
+            vertices[i].pos.y = point.y;
             vertices[i].col = color;
         }
         uint current = 1;
@@ -281,21 +288,21 @@ class Window
     }
 
 
-    void draw(size_t NumPoints = 32)(Color color, Circlef circle) {
-        Vectorf[NumPoints] points; //A large array of points to simulate a circle
+    void draw(size_t NumPoints = 32)(Color color, Circlei circle) {
+        Vectori[NumPoints] points; //A large array of points to simulate a circle
         auto rotation = rotate(360 / NumPoints);
         auto pointer = Vectorf(0, -circle.radius);
         for (size_t i = 0; i < NumPoints; i++)
         {
-            points[i] = circle.center + pointer;
-            pointer  = rotation * pointer;
+            points[i] = circle.center + Vectori(pointer);
+            pointer = rotation * pointer;
         }
         draw(color, points);
     }
 
-    void draw(Color color, Rectanglef rect) {
-        Vectorf[4] points = [ rect.topLeft, Vectorf(rect.x + rect.width, rect.y),
-            rect.topLeft + rect.size, Vectorf(rect.x, rect.y + rect.height)];
+    void draw(Color color, Rectanglei rect) {
+        Vectori[4] points = [ rect.topLeft, Vectori(rect.x + rect.width, rect.y),
+            rect.topLeft + rect.size, Vectori(rect.x, rect.y + rect.height)];
         draw(color, points);
     }
 
@@ -310,7 +317,7 @@ class Window
                         bool flip_x = false, bool flip_y = false,
                         Color color = au.color.white) {
         auto trans = identity() * translate(-or_x, -or_y) * rotate(rot)
-            * scale(scale_x, scale_y);
+            * au.geom.scale(scale_x, scale_y);
         draw(tex, trans, x + or_x, y + or_y, w, h, flip_x, flip_y, color);
     }
 
@@ -318,10 +325,10 @@ class Window
                        float w, float h, bool flip_x = false, bool flip_y = false,
                        Color color = au.color.white) {
         //Calculate the destination points with the transformation
-        auto tl = trans * Vectorf(0, 0);
-        auto tr = trans * Vectorf(w, 0);
-        auto bl = trans * Vectorf(0, h);
-        auto br = trans * Vectorf(w, h);
+        auto tl = (trans * Vectorf(0, 0)) / scale;
+        auto tr = (trans * Vectorf(w, 0)) / scale;
+        auto bl = (trans * Vectorf(0, h)) / scale;
+        auto br = (trans * Vectorf(w, h)) / scale;
 
         //Calculate the source points normalized to [0, 1]
         //The conversion factor for normalizing vectors
@@ -329,8 +336,8 @@ class Window
         float conv_factor_y = 1.0f / tex.height;
         float norm_x = tex.region.x * conv_factor_x;
         float norm_y = tex.region.y * conv_factor_y;
-        float norm_w = tex.region.width * conv_factor_x;
-        float norm_h = tex.region.height * conv_factor_y;
+        float norm_w = tex.region.width * conv_factor_x / scale;
+        float norm_h = tex.region.height * conv_factor_y / scale;
         auto src_tl = Vectorf(norm_x, norm_y);
         auto src_tr = Vectorf(norm_x + norm_w, norm_y);
         auto src_br = Vectorf(norm_x + norm_w, norm_y + norm_h);
@@ -353,6 +360,7 @@ class Window
         }
         //Add all of the vertices to the context
         auto translate = Vectorf(x, y) + (inUIMode ? camera.topLeft : Vector!float(0, 0));
+        translate = translate / scale;
         Vertex[4] vertices = [ Vertex(tl + translate, src_tl, color),
             Vertex(tr + translate, src_tr, color),
             Vertex(br + translate, src_br, color),
@@ -420,6 +428,7 @@ class Window
     bool mouseRightReleased() { return !mouseRight && mouseRightPrevious; }
     bool mouseMiddleReleased() { return !mouseMiddle && mouseMiddlePrevious; }
     bool isOpen() { return shouldContinue; }
+    int getScale() { return scale; }
 
 /*  static void au_draw_sprite_transformed(AU_Engine* eng, AU_TextureRegion region, AU_SpriteTransform* trans) {
         au_draw_texture_ex(eng, region, trans.color, trans.x, trans.y, trans.width, trans.height, trans.rotation,
