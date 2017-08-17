@@ -90,7 +90,6 @@ class Window
     @nogc nothrow:
     ~this()
     {
-        println("Destroy");
         ctx.destroy();
         SDL_DestroyWindow(window);
         TTF_Quit();
