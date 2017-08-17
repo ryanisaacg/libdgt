@@ -6,7 +6,7 @@ void main()
 {
 	WindowConfig config;
 	config.resizable = true;
-	Window engine = new Window("Test title", 640, 480, config, 2);
+	Window engine = new Window("Test title", 640, 480, config);
 	auto tex = engine.loadTexture("test.png");
 	scope(exit) tex.destroy();
 	auto map = Tilemap!bool(640, 480, 32);
@@ -45,6 +45,10 @@ void main()
 		engine.draw(red, Rectanglei(30, 30, 40, 40));
 		engine.draw(blue, Rectanglei(100, 100, 40, 40));
 		engine.draw(Color(0, 1, 0, 0.5), Circlei(100, 100, 32));
+
+        if(engine.getGamepads.length)
+            if(engine.getGamepads[0].faceDown)
+                writeln("Face button down");
 
         engine.inUIMode = true;
         engine.draw(white, Rectanglei(50, 50, 100, 10));

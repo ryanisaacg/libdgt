@@ -5,7 +5,7 @@ import core.stdc.stdio, core.stdc.stdlib, core.stdc.time, core.thread;
 
 import std.typecons : Nullable;
 
-import au.array, au.color, au.font, au.geom, au.gl_backend, au.io, au.sound, au.music, au.particle, au.sprite, au.texture, au.tilemap, au.util;
+import au.array, au.color, au.font, au.gamepad, au.geom, au.gl_backend, au.io, au.sound, au.music, au.particle, au.sprite, au.texture, au.tilemap, au.util;
 
 struct WindowConfig
 {
@@ -43,6 +43,8 @@ class Window
     int window_width, window_height;
     Texture white;
     Rectangle!float camera;
+    Array!Gamepad gamepads;
+
     public:
     bool inUIMode = false;
     uint fps = 60;
@@ -53,6 +55,7 @@ class Window
     {
         DerelictSDL2.load(SharedLibVersion(2, 0, 3));
         SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO);
+        SDL_InitSubSystem(SDL_INIT_GAMECONTROLLER);
         new Thread(&DerelictSDL2Image.load).start();
         new Thread(&DerelictSDL2ttf.load).start();
         new Thread(&DerelictSDL2Mixer.load).start();
@@ -85,6 +88,11 @@ class Window
         glViewport(0, 0, width, height);
         aspectRatio = cast(float)width / height;
         this.scale = scale;
+        
+        gamepads = Array!Gamepad(SDL_NumJoysticks());
+        for(int i = 0; i < SDL_NumJoysticks(); i++)
+            if(SDL_IsGameController(i))
+                gamepads.add(Gamepad(SDL_GameControllerOpen(i)));
     }
 
     @nogc nothrow:
@@ -428,4 +436,5 @@ class Window
     bool mouseMiddleReleased() { return !mouseMiddle && mouseMiddlePrevious; }
     bool isOpen() { return shouldContinue; }
     int getScale() { return scale; }
+    Array!Gamepad getGamepads() { return gamepads; }
 }

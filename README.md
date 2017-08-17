@@ -28,13 +28,11 @@ The project is written in D to take advantage of its ability for both low and hi
 - Automatic letterboxing
 - User-created shaders
 - Sprites and animated sprites
+- Gamepad API
 
 ## Roadmap
 
 - Featureset
-	- Gamepad API
-        - [ ] Initialize gamepads with SDL
-        - [ ] Add gamepad input polling to the window
 	- Tiled file format support
         - [ ] Load a tilemap from a file
         - [ ] Convert Tiled tiles to libau tiles
