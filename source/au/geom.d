@@ -2,37 +2,6 @@ module au.geom;
 import std.math : sqrt, cos, sin, PI;
 import au.io;
 
-unittest
-{
-    Transform!int m, n;
-    n[0, 0] = 5;
-    auto result = m * n;
-    assert(result[0, 0] == 5);
-    m[0, 0] = 2;
-    result = m * n;
-    assert(result[0, 0] = 10);
-}
-unittest
-{
-    import std.stdio;
-    auto trans = scale(2, 2);
-    auto vec = Vectorf(2, 5);
-    auto scaled = trans * vec;
-    assert(scaled.x == 4 && scaled.y == 10);
-}
-unittest
-{
-    auto trans = translate(3, 4);
-    auto vec = Vectorf(1, 1);
-    vec = trans * vec;
-    assert(vec.x == 4 && vec.y == 5);
-}
-unittest
-{
-    auto trans = identity() * translate(-0, -0) * rotate(0) * scale(1, 1);
-    auto vec = trans * Vectorf(15, 12);
-    assert(vec.x == 15);
-}
 
 struct Vector(T)
 {
@@ -293,6 +262,7 @@ struct Transform(T)
     }
 }
 
+
 @nogc nothrow pure:
 
 Transformf identity()
@@ -374,3 +344,77 @@ alias Rectanglef = Rectangle!float;
 alias Circlei = Circle!int;
 alias Circlef = Circle!float;
 alias Transformf = Transform!float;
+
+unittest
+{
+    Transform!int m, n;
+    n[0, 0] = 5;
+    assert(n.ptr[0] == 5);
+    auto result = m * n;
+    assert(result[0, 0] == 5);
+    m[0, 0] = 2;
+    result = m * n;
+    assert(result[0, 0] = 10);
+}
+unittest
+{
+    auto trans = scale(2, 2);
+    auto vec = Vectorf(2, 5);
+    auto scaled = trans * vec;
+    assert(scaled.x == 4 && scaled.y == 10);
+}
+unittest
+{
+    auto trans = translate(3, 4);
+    auto vec = Vectorf(1, 1);
+    vec = trans * vec;
+    assert(vec.x == 4 && vec.y == 5);
+}
+unittest
+{
+    auto trans = identity() * translate(-0, -0) * rotate(0) * scale(1, 1);
+    auto vec = trans * Vectorf(15, 12);
+    assert(vec.x == 15);
+}
+unittest
+{
+    auto vec = Vectorf(1.5, 2.5);
+    auto ivec = Vectori(vec);
+    assert(ivec.x == 1 && ivec.y == 2);
+}
+unittest
+{
+    auto vec = Vectori(5, 0);
+    assert(vec.len2 == 25);
+    assert(vec.len == 5);
+}
+unittest
+{
+    auto vec = Vectorf(10, 10);
+    vec = vec / 2;
+    assert(vec.x == 5 && vec.y == 5);
+}
+unittest
+{
+    auto circ = Circlef(0, 0, 10);
+    auto vec1 = Vectorf(0, 0);
+    auto vec2 = Vectorf(11, 11);
+    assert(circ.contains(vec1));
+    assert(!circ.contains(vec2));
+}
+unittest
+{
+    auto rect = Rectanglei(0, 0, 32, 32);
+    auto vec1 = Vectori(5, 5);
+    auto vec2 = Vectori(33, 1);
+    assert(rect.contains(vec1));
+    assert(!rect.contains(vec2));
+}
+unittest 
+{
+    auto circ = Circlei(0, 0, 5);
+    auto rec1 = Rectanglei(0, 0, 2, 2);
+    auto rec2 = Rectanglei(5, 5, 4, 4);
+    assert(circ.overlaps(rec1) && rec1.overlaps(circ));
+    assert(!circ.overlaps(rec2) && !rec2.overlaps(circ));
+}

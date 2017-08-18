@@ -31,11 +31,6 @@ struct Array(T)
 
 	void add(T val)
 	{
-		if (backingBuffer == null)
-		{
-			ensureCapacity(16);
-			*count = 0;
-		}
 		if (*count >= *capacity)
 			ensureCapacity(*capacity * 2);
 		buffer[*count] = val;
@@ -55,14 +50,14 @@ struct Array(T)
 		free(backingBuffer);
 	}
 
-	int opApply(int delegate(T) @nogc nothrow dg) {
-		for(size_t i = 0; i < length; i++) {
+	int opApply(int delegate(T) @nogc nothrow dg) const
+    {
+		for(size_t i = 0; i < length; i++) 
 			dg(buffer[i]);
-		}
         return 0;
     }
 
-	void print()
+	void print() const
 	{
 		au.io.print("Array!", T.stringof, "[");
 		for(size_t i = 0; i < length; i++)
@@ -95,7 +90,7 @@ struct Array(T)
 		*count -= 1;
 	}
 
-	ref T opIndex(size_t index)
+	ref T opIndex(size_t index) const
 	{
 		assert(index < *count);
 		return buffer[index];
@@ -112,23 +107,43 @@ struct Array(T)
 		*count = 0;
 	}
 
-	T* ptr() { return buffer; }
-	size_t length() { return *count; }
+	T* ptr() const { return buffer; }
+	size_t length() const { return *count; }
 
 	private:
-	private size_t* count() { return cast(size_t*) backingBuffer; }
-	private size_t* capacity() {	return count + 1; }
-	private T* buffer() { return cast(T*)(capacity + 1); }
+	private size_t* count() const { return cast(size_t*) backingBuffer; }
+	private size_t* capacity() const {	return count + 1; }
+	private T* buffer() const { return cast(T*)(capacity + 1); }
 }
 
-@nogc nothrow unittest
+@nogc nothrow:
+unittest
 {
-	Array!int x;
+	auto x = Array!int(4);
 	for(int i = 0; i < 17; i++)
 	{
 		x.add(i);
 	}
 	assert(x[0] == 0);
 	assert(x[16] == 16);
+    x.addAll(1, 2, 3, 4);
+    assert(x[x.length - 1] == 4);
+    assert(x.ptr[0] == 0);
+    x[0] = 5;
+    assert(x[0] == 5);
+    size_t length = x.length;
+    x.remove(0);
+    assert(x.length == length - 1);
+    int first = x[0];
+    auto other = Array!int(1);
+    foreach(val; x) 
+    {
+        other.add(val);
+    }
+    assert(x.length == other.length);
+    assert(other[5] == x[5]);
+    println(x);
+    x.clear();
+    assert(x.length == 0);
 	x.destroy();
 }

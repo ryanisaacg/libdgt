@@ -57,6 +57,7 @@ struct Tilemap(T)
 		return empty(x + width, y) && empty(x, y + height) && empty(x + width, y + height);
 	}
 
+    //TODO: Increase resolution of slideContact
 	Vector!int slideContact(int x, int y, int width, int height, Vector!int v) {
 		if (empty(x + v.x, y + v.y, width, height)) {
 			return v;
@@ -70,4 +71,21 @@ struct Tilemap(T)
 			return v;
 		}
 	}
+}
+
+unittest
+{
+    Tilemap!int map = Tilemap!int(640, 480, 32);
+    map[35, 35] = Tile!int(5, true);
+    assert(map[-1, 0].solid);
+    assert(!map[35, 0].solid);
+    assert(map[35, 35].value == 5);
+    auto moved = map.slideContact(300, 5, 32, 32, Vectori(0, -10));
+    assert(moved.x == 0 && moved.y == -5);
+    moved = map.slideContact(80, 10, 16, 16, Vectori(1, -20));
+    assert(moved.x == 1 && moved.y == -10);
+    moved = map.slideContact(50, 50, 10, 10, Vectori(20, 30));
+    assert(moved.x == 20 && moved.y == 30);
+    moved = map.slideContact(600, 10, 30, 10, Vectori(15, 10));
+    assert(moved.x == 7 && moved.y == 10);
 }
