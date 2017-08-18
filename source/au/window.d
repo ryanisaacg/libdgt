@@ -51,7 +51,7 @@ class Window
     float aspectRatio;
     int scale;
 
-    this(string title, int width, int height, WindowConfig config, int scale = 1)
+    this(string title, int width, int height, WindowConfig config, int scale = 1, bool bindToGlobal = true)
     {
         DerelictSDL2.load(SharedLibVersion(2, 0, 3));
         SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO);
@@ -87,12 +87,13 @@ class Window
         white = loadTexture(white_pixel.ptr, 1, 1, false);
         glViewport(0, 0, width, height);
         aspectRatio = cast(float)width / height;
-        this.scale = scale;
-        
+        this.scale = scale        
         gamepads = Array!Gamepad(SDL_NumJoysticks());
         for(int i = 0; i < SDL_NumJoysticks(); i++)
             if(SDL_IsGameController(i))
                 gamepads.add(Gamepad(SDL_GameControllerOpen(i)));
+        if(bindToGlobal)
+            globalWindow = this;
     }
 
     @nogc nothrow:
@@ -437,4 +438,11 @@ class Window
     bool isOpen() { return shouldContinue; }
     int getScale() { return scale; }
     Array!Gamepad getGamepads() { return gamepads; }
+}
+
+private Window globalWindow;
+
+public @nogc nothrow Window getWindow()
+{
+    return globalWindow;
 }
