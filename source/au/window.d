@@ -84,10 +84,10 @@ class Window
         srand(cast(uint)time(null));
 
         ubyte[3] white_pixel = [ 255, 255, 255 ];
-        white = loadTexture(white_pixel.ptr, 1, 1, false);
+        white = Texture(white_pixel.ptr, 1, 1, false);
         glViewport(0, 0, width, height);
         aspectRatio = cast(float)width / height;
-        this.scale = scale        
+        this.scale = scale;
         gamepads = Array!Gamepad(SDL_NumJoysticks());
         for(int i = 0; i < SDL_NumJoysticks(); i++)
             if(SDL_IsGameController(i))
@@ -108,57 +108,6 @@ class Window
     }
 
     @nogc nothrow:
-    Texture loadTexture(ubyte* data, int w, int h, bool has_alpha)
-    {
-        GLuint texture;
-        glGenTextures(1, &texture);
-        glBindTexture(GL_TEXTURE_2D, texture);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        glTexImage2D(GL_TEXTURE_2D, 0, has_alpha ? GL_RGBA : GL_RGB, w, h, 0, has_alpha ? GL_RGBA : GL_RGB, GL_UNSIGNED_BYTE,
-                     data);
-        glGenerateMipmap(GL_TEXTURE_2D);
-        glBindTexture(GL_TEXTURE_2D, 0);
-        Texture tex = { id: texture, width: w, height: h,
-                region: Rectangle!int(0, 0, w, h)};
-        return tex;
-    }
-
-    Texture loadTexture(string name)
-    {
-        SDL_Surface* surface = IMG_Load(name.ptr);
-        Texture tex = loadTexture(surface);
-        SDL_FreeSurface(surface);
-        return tex;
-    }
-
-    Texture loadTexture(SDL_Surface* sur)
-    {
-        return loadTexture(cast(ubyte*)sur.pixels, sur.w, sur.h, sur.format.BytesPerPixel == 4);
-    }
-
-    Font loadFont(int size, Color col, string filename)
-    {
-        TTF_Font* font = TTF_OpenFont(filename.ptr, size);
-        if (font == null) {
-            fprintf(stderr, "Font with filename %s not found\n", filename.ptr);
-        }
-        Font bitmap_font = Font(this, font, col);
-        TTF_CloseFont(font);
-        return bitmap_font;
-    }
-
-    SoundClip loadSound(string filename)
-    {
-        return SoundClip(filename);
-    }
-
-    Music loadMusic(string filename)
-    {
-        return Music(filename);
-    }
 
     void begin(Color bg, Rectangle!float cam)
     {
@@ -316,7 +265,7 @@ class Window
 
     void draw(ref Texture tex, float x, float y)
     {
-        draw(tex, x, y, tex.region.width, tex.region.height);
+        draw(tex, x, y, tex.getRegion.width, tex.getRegion.height);
     }
 
     void draw(ref Texture tex, float x, float y, float w, float h,
@@ -340,12 +289,12 @@ class Window
 
         //Calculate the source points normalized to [0, 1]
         //The conversion factor for normalizing vectors
-        float conv_factor_x = 1.0f / tex.width;
-        float conv_factor_y = 1.0f / tex.height;
-        float norm_x = tex.region.x * conv_factor_x;
-        float norm_y = tex.region.y * conv_factor_y;
-        float norm_w = tex.region.width * conv_factor_x / scale;
-        float norm_h = tex.region.height * conv_factor_y / scale;
+        float conv_factor_x = 1.0f / tex.getSourceWidth;
+        float conv_factor_y = 1.0f / tex.getSourceHeight;
+        float norm_x = tex.getRegion.x * conv_factor_x;
+        float norm_y = tex.getRegion.y * conv_factor_y;
+        float norm_w = tex.getRegion.width * conv_factor_x / scale;
+        float norm_h = tex.getRegion.height * conv_factor_y / scale;
         auto src_tl = Vectorf(norm_x, norm_y);
         auto src_tr = Vectorf(norm_x + norm_w, norm_y);
         auto src_br = Vectorf(norm_x + norm_w, norm_y + norm_h);
@@ -388,7 +337,7 @@ class Window
     int draw(ref Font font, char c, float x, float y) {
         Texture renderChar = font.render(c);
         draw(renderChar, x, y);
-        return renderChar.region.width;
+        return renderChar.getRegion.width;
     }
 
     void draw(ref Font font, string str, float x, float y) {

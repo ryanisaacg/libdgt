@@ -22,8 +22,8 @@ struct Sprite
     SpriteType type;
 
     public @nogc nothrow pure:
-    
-    float x = 0, y = 0, width = 0, height = 0, 
+
+    float x = 0, y = 0, width = 0, height = 0,
           originX = 0, originY = 0, scaleX = 1, scaleY = 1, rotation = 0;
     bool flipX = false, flipY = false;
     Color color = white;
@@ -32,32 +32,32 @@ struct Sprite
     {
         data.tex = tex;
         type = SpriteType.Static;
-        width = tex.region.width;
-        height = tex.region.height;
+        width = tex.getRegion.width;
+        height = tex.getRegion.height;
     }
 
     this(ref Animation anim)
     {
         data.anim = anim;
         type = SpriteType.Animated;
-        width = anim.currentTexture.region.width;
-        height = anim.currentTexture.region.height;
+        width = anim.currentTexture.getRegion.width;
+        height = anim.currentTexture.getRegion.height;
     }
 
     void setDrawable(Texture tex)
     {
         data.tex = tex;
         type = SpriteType.Static;
-        width = tex.region.width;
-        height = tex.region.height;
+        width = tex.getRegion.width;
+        height = tex.getRegion.height;
     }
 
     void setDrawable(Animation anim)
     {
         data.anim = anim;
         type = SpriteType.Animated;
-        width = anim.currentTexture.region.width;
-        height = anim.currentTexture.region.height;
+        width = anim.currentTexture.getRegion.width;
+        height = anim.currentTexture.getRegion.height;
     }
 
     void update()

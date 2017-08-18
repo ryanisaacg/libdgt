@@ -7,12 +7,12 @@ void main()
 	WindowConfig config;
 	config.resizable = true;
 	Window engine = new Window("Test title", 640, 480, config);
-	auto tex = engine.loadTexture("test.png");
+	auto tex = Texture("test.png");
 	scope(exit) tex.destroy();
 	auto map = Tilemap!bool(640, 480, 32);
 	scope(exit) map.destroy();
     float n = 0;
-    auto buttonTex = engine.loadTexture("button.png");
+    auto buttonTex = Texture("button.png");
     auto camera = Rectanglef(0, 0, 640, 480);
     float value = 0;
 	auto button = Button(Rectanglei(300, 300, 32, 32), Vectori(300, 300),
@@ -20,7 +20,7 @@ void main()
 				buttonTex.getSlice(Rectanglei(32, 0, 32, 32)),
 				buttonTex.getSlice(Rectanglei(64, 0, 32, 32)));
 	auto slider = Slider(Rectanglei(0, 440, 640, 32), tex);
-	auto carouselTex = engine.loadTexture("carousel.png");
+	auto carouselTex = Texture("carousel.png");
 	auto leftButtonTex = carouselTex.getSlice(Rectanglei(0, 0, 32, 32));
 	auto rightButtonTex = carouselTex.getSlice(Rectanglei(128, 0, 32, 32));
 	Array!Texture carouselOptions = Array!Texture([
