@@ -38,9 +38,6 @@ The project is written in D to take advantage of its ability for both low and hi
         - [ ] Convert Tiled tiles to libau tiles
         - [ ] Mark all tiles in "background" layers as not solid
         - [ ] Return a list of all-non-tile objects
-	- Binding windows to global
-		- [ ] Add a compile-time-flag to Window to bind it as global
-		- [ ] Add functions to access the global window
 - Documentation
 	- Write documentation for each module
 	- Document power-of-two textures
