@@ -1,4 +1,4 @@
-module au.gamepad;
+module dgt.gamepad;
 
 import derelict.sdl2.sdl;
 

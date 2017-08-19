@@ -1,4 +1,4 @@
-module au.music;
+module dgt.music;
 import derelict.sdl2.mixer;
 
 struct Music

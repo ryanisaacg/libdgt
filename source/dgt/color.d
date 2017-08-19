@@ -1,4 +1,4 @@
-module au.color;
+module dgt.color;
 import derelict.sdl2.sdl : SDL_Color;
 
 struct Color
@@ -36,7 +36,7 @@ static immutable indigo = Color(0.5, 0, 1, 1);
 
 unittest
 {
-    import au.io : println;
+    import dgt.io : println;
     println("Should print a color equivalent to white: ", white);
     SDL_Color orangeSDL = cast(SDL_Color)orange;
     assert(orangeSDL.r == 255 && orangeSDL.g == 127 && orangeSDL.b == 0 && orangeSDL.a == 255);

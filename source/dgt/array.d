@@ -1,6 +1,6 @@
-module au.array;
+module dgt.array;
 import core.stdc.stdlib : malloc, realloc, free;
-import au.io;
+import dgt.io;
 
 struct Array(T)
 {
@@ -59,16 +59,16 @@ struct Array(T)
 
 	void print() const
 	{
-		au.io.print("Array!", T.stringof, "[");
+		dgt.io.print("Array!", T.stringof, "[");
 		for(size_t i = 0; i < length; i++)
 		{
-			au.io.print(this[i]);
+			dgt.io.print(this[i]);
 			if(i != length - 1)
 			{
-				au.io.print(", ");
+				dgt.io.print(", ");
 			}
 		}
-		au.io.print("]");
+		dgt.io.print("]");
 	}
 
 	ref Array!T opAssign(size_t N)(T[N] data)
@@ -119,7 +119,7 @@ struct Array(T)
 @nogc nothrow:
 unittest
 {
-	auto x = Array!int(4);
+	dgtto x = Array!int(4);
 	for(int i = 0; i < 17; i++)
 	{
 		x.add(i);
@@ -135,7 +135,7 @@ unittest
     x.remove(0);
     assert(x.length == length - 1);
     int first = x[0];
-    auto other = Array!int(1);
+    dgtto other = Array!int(1);
     foreach(val; x) 
     {
         other.add(val);

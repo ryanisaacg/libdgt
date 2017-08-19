@@ -1,5 +1,5 @@
-module au.particle;
-import au.array, au.geom, au.texture, au.util;
+module dgt.particle;
+import dgt.array, dgt.geom, dgt.texture, dgt.util;
 
 enum ParticleBehavior
 {

@@ -1,6 +1,6 @@
-module au.geom;
+module dgt.geom;
 import std.math : sqrt, cos, sin, PI;
-import au.io;
+import dgt.io;
 
 
 struct Vector(T)

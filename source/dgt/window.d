@@ -1,11 +1,11 @@
-module au.window;
+module dgt.window;
 import derelict.opengl3.gl;
 import derelict.sdl2.sdl, derelict.sdl2.image, derelict.sdl2.mixer, derelict.sdl2.ttf;
 import core.stdc.stdio, core.stdc.stdlib, core.stdc.time, core.thread;
 
 import std.typecons : Nullable;
 
-import au.array, au.color, au.font, au.gamepad, au.geom, au.gl_backend, au.io, au.sound, au.music, au.particle, au.sprite, au.texture, au.tilemap, au.util;
+import dgt.array, dgt.color, dgt.font, dgt.gamepad, dgt.geom, dgt.gl_backend, dgt.io, dgt.sound, dgt.music, dgt.particle, dgt.sprite, dgt.texture, dgt.tilemap, dgt.util;
 
 struct WindowConfig
 {
@@ -272,15 +272,15 @@ class Window
                         float rot = 0, float or_x = 0, float or_y = 0,
                         float scale_x = 1, float scale_y = 1,
                         bool flip_x = false, bool flip_y = false,
-                        Color color = au.color.white) {
+                        Color color = dgt.color.white) {
         auto trans = identity() * translate(-or_x, -or_y) * rotate(rot)
-            * au.geom.scale(scale_x, scale_y);
+            * dgt.geom.scale(scale_x, scale_y);
         draw(tex, trans, x + or_x, y + or_y, w, h, flip_x, flip_y, color);
     }
 
     void draw(ref Texture tex, ref Transform!float trans, float x, float y,
                        float w, float h, bool flip_x = false, bool flip_y = false,
-                       Color color = au.color.white) {
+                       Color color = dgt.color.white) {
         //Calculate the destination points with the transformation
         auto tl = (trans * Vectorf(0, 0)) / scale;
         auto tr = (trans * Vectorf(w, 0)) / scale;

@@ -1,6 +1,6 @@
-module au.font;
+module dgt.font;
 import derelict.sdl2.sdl, derelict.sdl2.ttf;
-import au.array, au.color, au.geom, au.io, au.texture, au.window;
+import dgt.array, dgt.color, dgt.geom, dgt.io, dgt.texture, dgt.window;
 
 struct Font
 {

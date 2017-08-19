@@ -1,5 +1,5 @@
 import std.stdio, std.file;
-import au;
+import dgt;
 import std.datetime;
 
 void main()

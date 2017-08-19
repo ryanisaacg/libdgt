@@ -1,8 +1,8 @@
-module au.sprite;
+module dgt.sprite;
 
-import au.animation;
-import au.color;
-import au.texture;
+import dgt.animation;
+import dgt.color;
+import dgt.texture;
 
 struct Sprite
 {

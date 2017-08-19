@@ -1,8 +1,8 @@
-module au.texture;
+module dgt.texture;
 import derelict.sdl2.sdl, derelict.sdl2.image;
 import derelict.opengl3.gl;
-import au.io;
-import au.geom : Rectangle;
+import dgt.io;
+import dgt.geom : Rectangle;
 
 struct Texture
 {

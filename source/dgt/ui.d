@@ -1,9 +1,9 @@
-module au.ui;
+module dgt.ui;
 
-import au.array : Array;
-import au.geom : Rectanglei, Vectori;
-import au.texture : Texture;
-import au.window : Window;
+import dgt.array : Array;
+import dgt.geom : Rectanglei, Vectori;
+import dgt.texture : Texture;
+import dgt.window : Window;
 
 struct Button
 {

@@ -1,6 +1,6 @@
-module au.animation;
+module dgt.animation;
 
-import au.array, au.texture;
+import dgt.array, dgt.texture;
 
 struct Frame
 {

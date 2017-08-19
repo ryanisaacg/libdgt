@@ -1,4 +1,4 @@
-module au.io;
+module dgt.io;
 import core.stdc.stdio;
 
 @nogc nothrow:

@@ -1,7 +1,7 @@
-module au.util;
+module dgt.util;
 import core.stdc.math, core.stdc.stdlib;
 
-import au.geom;
+import dgt.geom;
 
 @nogc nothrow:
 
