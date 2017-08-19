@@ -40,6 +40,23 @@ The project is written in D to take advantage of its ability for both low and hi
         - [ ] Return a list of all-non-tile objects
 - Documentation
 	- Write documentation for each module
+        - [ ] Animation
+        - [ ] Array
+        - [ ] Color
+        - [ ] Font
+        - [ ] Gamepad
+        - [ ] Geometry
+        - [ ] OpenGL Backend
+        - [ ] IO
+        - [ ] Music
+        - [ ] Particles
+        - [ ] Sound
+        - [ ] Sprite
+        - [ ] Texture
+        - [ ] Tilemap
+        - [ ] UI
+        - [ ] Util
+        - [ ] Window
 	- Document power-of-two textures
 	- Document SDL libraries
 	- Generate and host the documentation on a github page
