@@ -50,14 +50,14 @@ struct Array(T)
 		free(backingBuffer);
 	}
 
-	int opApply(int delegate(T) @nogc nothrow dg) {
-		for(size_t i = 0; i < length; i++) {
+	int opApply(int delegate(T) @nogc nothrow dg) const
+    {
+		for(size_t i = 0; i < length; i++) 
 			dg(buffer[i]);
-		}
         return 0;
     }
 
-	void print()
+	void print() const
 	{
 		au.io.print("Array!", T.stringof, "[");
 		for(size_t i = 0; i < length; i++)
@@ -90,7 +90,7 @@ struct Array(T)
 		*count -= 1;
 	}
 
-	ref T opIndex(size_t index)
+	ref T opIndex(size_t index) const
 	{
 		assert(index < *count);
 		return buffer[index];
@@ -107,13 +107,13 @@ struct Array(T)
 		*count = 0;
 	}
 
-	T* ptr() { return buffer; }
-	size_t length() { return *count; }
+	T* ptr() const { return buffer; }
+	size_t length() const { return *count; }
 
 	private:
-	private size_t* count() { return cast(size_t*) backingBuffer; }
-	private size_t* capacity() {	return count + 1; }
-	private T* buffer() { return cast(T*)(capacity + 1); }
+	private size_t* count() const { return cast(size_t*) backingBuffer; }
+	private size_t* capacity() const {	return count + 1; }
+	private T* buffer() const { return cast(T*)(capacity + 1); }
 }
 
 @nogc nothrow:
