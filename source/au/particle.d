@@ -44,15 +44,15 @@ struct ParticleEmitter
 
     Particle emit()
     {
-        return Particle(regions[randi_range(0, cast(int)regions.length)],
-             randvectori_range(top_left, bottom_right),
-             randvectori_range(velocity_min, velocity_max),
-             randvectori_range(acceleration_min, acceleration_max),
-             randvectori_range(scale_min, scale_max),
-             randvectori_range(scale_velocity_min, scale_velocity_max),
-             randf_range(rotation_min, rotation_max),
-             randf_range(rotational_velocity_min, rotational_velocity_max),
-             randi_range(lifetime_min, lifetime_max),
+        return Particle(regions[randomRange(0, cast(int)regions.length)],
+             randomRange(top_left, bottom_right),
+             randomRange(velocity_min, velocity_max),
+             randomRange(acceleration_min, acceleration_max),
+             randomRange(scale_min, scale_max),
+             randomRange(scale_velocity_min, scale_velocity_max),
+             randomRange(rotation_min, rotation_max),
+             randomRange(rotational_velocity_min, rotational_velocity_max),
+             randomRange(lifetime_min, lifetime_max),
              behavior);
     }
 }

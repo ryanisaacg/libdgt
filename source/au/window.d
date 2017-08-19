@@ -361,7 +361,7 @@ class Window
 
     void addParticleBurst(ref ParticleEmitter emitter)
     {
-        int parts = randi_range(emitter.particle_min, emitter.particle_max);
+        int parts = randomRange(emitter.particle_min, emitter.particle_max);
         for (int i = 0; i < parts; i++)
             particles.add(emitter.emit());
     }
