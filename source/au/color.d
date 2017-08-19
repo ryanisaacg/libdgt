@@ -1,19 +1,19 @@
 module au.color;
 import derelict.sdl2.sdl : SDL_Color;
-import core.stdc.stdio;
 
 struct Color
 {
 	float r, g, b, a;
 
 	@nogc nothrow:
-	void print()
+	void print() const
 	{
+        import core.stdc.stdio;
 		printf("Color(%f, %f, %f, %f)", r, g, b, a);
 	}
 
 	pure:
-	public SDL_Color opCast()
+	public SDL_Color opCast() const
 	{
 		SDL_Color c = SDL_Color(
 			cast(ubyte)(255 * r), cast(ubyte)(255 * g), cast(ubyte)(255 * b), cast(ubyte)(255 * a)
@@ -33,3 +33,11 @@ static immutable cyan = Color(0, 1, 1, 1);
 static immutable blue = Color(0, 0, 1, 1);
 static immutable purple = Color(1, 0, 1, 1);
 static immutable indigo = Color(0.5, 0, 1, 1);
+
+unittest
+{
+    import au.io : println;
+    println("Should print a color equivalent to white: ", white);
+    SDL_Color orangeSDL = cast(SDL_Color)orange;
+    assert(orangeSDL.r == 255 && orangeSDL.g == 127 && orangeSDL.b == 0 && orangeSDL.a == 255);
+}
