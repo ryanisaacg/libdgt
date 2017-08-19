@@ -18,17 +18,17 @@ void print(string value)
     printf("%s", value.ptr);
 }
 
-void print(char* value)
+void print(const(char)* value)
 {
     printf("%s", value);
 }
 
-void print(T)(T obj)
+void print(T)(const(T) obj)
 {
     obj.print();
 }
 
-void print(T)(T[] items)
+void print(T)(const(T[]) items)
 {
     print(T.stringof, "[");
     for(size_t i = 0; i < items.length; i++)
@@ -40,14 +40,14 @@ void print(T)(T[] items)
     print("]");
 }
 
-void print(T, A...)(T obj, A a)
+void print(T, A...)(const(T) obj, const(A) a)
 {
     print(obj);
     foreach(val; a)
         print(val);
 }
 
-void println(A...)(A values)
+void println(A...)(const(A) values)
 {
     foreach(val; values)
     {
