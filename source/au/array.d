@@ -31,11 +31,6 @@ struct Array(T)
 
 	void add(T val)
 	{
-		if (backingBuffer == null)
-		{
-			ensureCapacity(16);
-			*count = 0;
-		}
 		if (*count >= *capacity)
 			ensureCapacity(*capacity * 2);
 		buffer[*count] = val;
@@ -121,14 +116,34 @@ struct Array(T)
 	private T* buffer() { return cast(T*)(capacity + 1); }
 }
 
-@nogc nothrow unittest
+@nogc nothrow:
+unittest
 {
-	Array!int x;
+	auto x = Array!int(4);
 	for(int i = 0; i < 17; i++)
 	{
 		x.add(i);
 	}
 	assert(x[0] == 0);
 	assert(x[16] == 16);
+    x.addAll(1, 2, 3, 4);
+    assert(x[x.length - 1] == 4);
+    assert(x.ptr[0] == 0);
+    x[0] = 5;
+    assert(x[0] == 5);
+    size_t length = x.length;
+    x.remove(0);
+    assert(x.length == length - 1);
+    int first = x[0];
+    auto other = Array!int(1);
+    foreach(val; x) 
+    {
+        other.add(val);
+    }
+    assert(x.length == other.length);
+    assert(other[5] == x[5]);
+    println(x);
+    x.clear();
+    assert(x.length == 0);
 	x.destroy();
 }
