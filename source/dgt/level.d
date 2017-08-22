@@ -1,0 +1,155 @@
+module dgt.level;
+
+import std.file : readText;
+import std.json;
+
+import dgt.array, dgt.color, dgt.geom, dgt.texture, dgt.tilemap;
+
+struct TileLayer
+{
+    string name;
+    Array!int tiles;
+    int offsetX, offsetY, widthInTiles, heightInTiles;
+    float opacity;
+    bool visible;
+
+    @nogc nothrow:
+    pure int opIndex(int x, int y)
+    {
+        return tiles[x + y * widthInTiles];
+    }
+
+    void destroy()
+    {
+        tiles.destroy();
+    }
+}
+
+struct EntityLayer
+{
+    string name;
+    Array!Entity entities;
+    int offsetX, offsetY;
+    float opacity;
+    bool visible;
+
+    @nogc nothrow void destroy()
+    {
+        entities.destroy();
+    }
+}
+
+struct Entity
+{
+    string name, type;
+    int x, y, width, height, rotation;
+    bool flipX, flipY;
+    Texture tex;
+    bool visible;
+}
+
+struct Map
+{
+    static immutable FLIPPED_HORIZONTALLY_FLAG = 0x80000000;
+    static immutable FLIPPED_VERTICALLY_FLAG = 0x40000000;
+    static immutable FLIPPED_DIAGONALLY_FLAG = 0x20000000;
+
+
+    Array!Texture sourceImages;
+    Array!Texture tileImages;
+    Array!TileLayer tileLayers;
+    Array!EntityLayer entityLayers;
+
+    int tileWidth, tileHeight, widthInTiles, heightInTiles;
+
+    private uint stripGID(uint gid, ref bool outFlipX, ref bool outFlipY)
+    {
+        outFlipX = outFlipY = (gid & FLIPPED_DIAGONALLY_FLAG) != 0;
+        outFlipX = outFlipX != ((gid & FLIPPED_HORIZONTALLY_FLAG) != 0);
+        outFlipY = outFlipY != ((gid & FLIPPED_VERTICALLY_FLAG) != 0);
+        return gid & ~(FLIPPED_HORIZONTALLY_FLAG | FLIPPED_VERTICALLY_FLAG | FLIPPED_DIAGONALLY_FLAG);
+    }
+
+    this(string path, int scale = 1)
+    {
+        sourceImages = Array!Texture(4);
+        tileImages = Array!Texture(16);
+        tileLayers = Array!TileLayer(4);
+        entityLayers = Array!EntityLayer(4);
+
+        auto contents = parseJSON(readText(path));
+        widthInTiles = cast(int)contents["width"].integer;
+        heightInTiles = cast(int)contents["height"].integer;
+        tileWidth = cast(int)contents["tilewidth"].integer;
+        tileHeight = cast(int)contents["tileheight"].integer;
+
+        foreach(tileset; contents["tilesets"].array)
+        {
+            auto image = Texture(tileset["image"].str);
+            sourceImages.add(image);
+            int margin = cast(int)tileset["margin"].integer;
+            int spacing = cast(int)tileset["spacing"].integer;
+            int width = cast(int)tileset["tilewidth"].integer;
+            int height = cast(int)tileset["tileheight"].integer;
+            for(int y = margin; y < image.getSourceWidth - margin; y += height + spacing)
+                for(int x = margin; x < image.getSourceWidth - margin; x += width + spacing)
+                    tileImages.add(image.getSlice(Rectanglei(x, y, width, height)));
+        }
+
+        foreach(layer; contents["layers"].array)
+        {
+            string name = layer["name"].str;
+            int offsetX = layer["offsetx"].isNull ? 0 : cast(int)layer["offsetx"].integer;
+            int offsetY = layer["offsety"].isNull ? 0 : cast(int)layer["offsety"].integer;
+            float opacity = layer["opacity"].type == JSON_TYPE.FLOAT ? layer["opacity"].floating : layer["opacity"].integer;
+            bool visible = layer["visible"].type == JSON_TYPE.TRUE;
+            if(layer["type"].str == "tilelayer")
+            {
+                TileLayer tlayer = TileLayer(name, Array!int(layer["data"].array.length),
+                    offsetX, offsetY,
+                    cast(int)layer["width"].integer,
+                    cast(int)layer["height"].integer,
+                    opacity, visible);
+                foreach(tile; layer["data"].array)
+                    tlayer.tiles.add(cast(int)tile.integer);
+                tileLayers.add(tlayer);
+            }
+            else if(layer["type"].str == "objectgroup")
+            {
+                EntityLayer elayer = EntityLayer(name, Array!Entity(layer["objects"].array.length),
+                    offsetX, offsetY, opacity, visible);
+                foreach(object; layer["objects"].array)
+                {
+                    bool flipX, flipY;
+                    uint gid = stripGID(object["gid"].integer, flipX, flipY);
+                    elayer.entities.add(Entity(
+                        object["name"].str,
+                        object["type"].str,
+                        scale * cast(int)object["x"].integer,
+                        scale * cast(int)object["y"].integer,
+                        scale * cast(int)object["width"].integer,
+                        scale * cast(int)object["height"].integer,
+                        cast(int)object["rotation"].integer,
+                        flipX, flipY,
+                        tileImages[gid], object["visible"].type == JSON_TYPE.TRUE
+                    ));
+                }
+                entityLayers.add(elayer);
+            }
+        }
+    }
+
+    @nogc nothrow void destroy()
+    {
+        for(tex; sourceImages)
+            tex.destroy();
+        for(layer; tileLayers)
+            layer.destroy();
+        for(layer; entityLayers)
+            layer.destroy();
+        sourceImages.destroy();
+        tileImages.destroy();
+        tileLayers.destroy();
+        entityLayers.destroy();
+    }
+}

@@ -29,15 +29,10 @@ The project is written in D to take advantage of its ability for both low and hi
 - User-created shaders
 - Sprites and animated sprites
 - Gamepad API
+- Tiled JSON format support
 
 ## Roadmap
 
-- Featureset
-	- Tiled file format support
-        - [ ] Load a tilemap from a file
-        - [ ] Convert Tiled tiles to libau tiles
-        - [ ] Mark all tiles in "background" layers as not solid
-        - [ ] Return a list of all-non-tile objects
 - Documentation
 	- Write documentation for each module
         - [ ] Animation
@@ -48,6 +43,7 @@ The project is written in D to take advantage of its ability for both low and hi
         - [ ] Geometry
         - [ ] OpenGL Backend
         - [ ] IO
+		- [ ] Level
         - [ ] Music
         - [ ] Particles
         - [ ] Sound

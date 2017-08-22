@@ -7,7 +7,9 @@ void main()
 	WindowConfig config;
 	config.resizable = true;
 	Window engine = new Window("Test title", 640, 480, config);
-	auto tex = Texture("test.png");
+	auto map = Map("example.json");
+	println(map.tileLayers[0].tiles);
+/*	auto tex = Texture("test.png");
 	scope(exit) tex.destroy();
 	auto map = Tilemap!bool(640, 480, 32);
 	scope(exit) map.destroy();
@@ -56,5 +58,5 @@ void main()
             writeln("Button pressed");
 		n = slider.draw(engine, n);
 		carouselOption = carousel.draw(engine, carouselOption);
-	}
+	}*/
 }
