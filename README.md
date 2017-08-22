@@ -57,3 +57,22 @@ The project is written in D to take advantage of its ability for both low and hi
 	- Document SDL libraries
 	- Generate and host the documentation on a github page
 	- Link to the documentation from the README
+- Testing
+	- [ ] Animation
+	- [x] Array
+	- [x] Color
+	- [ ] Font
+	- [ ] Gamepad
+	- [x] Geometry
+	- [x] OpenGL Backend
+	- [x] IO
+	- [ ] Level
+	- [ ] Music
+	- [ ] Particles
+	- [ ] Sound
+	- [ ] Sprite
+	- [ ] Texture
+	- [x] Tilemap
+	- [ ] UI
+	- [x] Util
+	- [ ] Window

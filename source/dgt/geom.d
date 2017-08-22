@@ -5,9 +5,14 @@ import dgt.io;
 
 struct Vector(T)
 {
-    public T x = 0, y = 0;
+    T x = 0, y = 0;
 
-    @nogc nothrow pure public:
+    @nogc nothrow void print() const
+    {
+        dgt.io.print("Vector(", x, ", ", y, ")");
+    }
+
+    @nogc nothrow pure:
     this(T x, T y)
     {
         this.x = x;
@@ -76,6 +81,11 @@ struct Rectangle(T)
 {
     public Vector!T topLeft = Vector!T(0, 0), size = Vector!T(0, 0);
 
+    @nogc nothrow void print() const
+    {
+        dgt.io.print("Rectangle(", x, ", ", y, ", ", width, ", ", height, ")");
+    }
+
     @nogc nothrow pure public:
     this(T x, T y, T width, T height)
     {
@@ -83,13 +93,13 @@ struct Rectangle(T)
         size = Vector!T(width, height);
     }
 
-    @property T x() { return topLeft.x; }
+    @property T x() const { return topLeft.x; }
     @property T x(T val) { return topLeft.x = val; }
-    @property T y() { return topLeft.y; }
+    @property T y() const { return topLeft.y; }
     @property T y(T val) { return topLeft.y = val; }
-    @property T width() { return size.x; }
+    @property T width() const { return size.x; }
     @property T width(T val) { return size.x = val; }
-    @property T height() { return size.y; }
+    @property T height() const { return size.y; }
     @property T height(T val) { return size.y = val; }
 
     bool contains(Vector!T v)
@@ -148,15 +158,20 @@ struct Circle(T)
     public Vector!T center = Vector!T(0, 0);
     public T radius = 0;
 
+    @nogc nothrow void print() const
+    {
+        dgt.io.print("Circle(", x, ", ", y, ", ", radius, ")");
+    }
+
     @nogc nothrow pure public:
     this(T x, T y, T radius)
     {
         center = Vector!T(x, y);
         this.radius = radius;
     }
-    @property T x() { return center.x; }
+    @property T x() const { return center.x; }
     @property T x(T val) { return center.x = val; }
-    @property T y() { return center.y; }
+    @property T y() const { return center.y; }
     @property T y(T val) { return center.y = val; }
 
     bool contains(Vector!T v)
@@ -208,6 +223,23 @@ struct Transform(T)
         0, 0, 1
     ];
 
+    @nogc nothrow void print() const
+    {
+        dgt.io.print("Transform[");
+        for(size_t x = 0; x < 3; x++)
+        {
+            dgt.io.print("[");
+            for(size_t y = 0; y < 3; y++)
+            {
+                dgt.io.print(this[x, y]);
+                if(y != 2) dgt.io.print(", ");
+            }
+            dgt.io.print("]");
+            if(x != 2) dgt.io.print(", ");
+        }
+        dgt.io.print("]");
+    }
+
     @nogc nothrow pure:
 
     public T* ptr()
@@ -245,7 +277,7 @@ struct Transform(T)
         return Vector!U(cast(U)transformed.x, cast(U)transformed.y);
     }
 
-    public T opIndex(size_t i, size_t j)
+    public T opIndex(size_t i, size_t j) const
     {
         return data[i * 3 + j];
     }
@@ -263,14 +295,14 @@ struct Transform(T)
 }
 
 
-@nogc nothrow pure:
+@nogc nothrow:
 
-Transformf identity()
+pure Transformf identity()
 {
     return Transform!float();
 }
 
-Transformf rotate(float angle)
+pure Transformf rotate(float angle)
 {
     float c = cos(angle * PI / 180);
     float s = sin(angle * PI / 180);
@@ -283,7 +315,7 @@ Transformf rotate(float angle)
     return transform;
 }
 
-Transformf translate(float x, float y)
+pure Transformf translate(float x, float y)
 {
     Transform!float transform;
     transform = [
@@ -294,7 +326,7 @@ Transformf translate(float x, float y)
     return transform;
 }
 
-Transformf scale(float x, float y)
+pure Transformf scale(float x, float y)
 {
     Transform!float transform;
     transform = [
@@ -303,38 +335,6 @@ Transformf scale(float x, float y)
         0, 0, 1
     ];
     return transform;
-}
-
-void print(T)(Vector!T vec)
-{
-    print("Vector(", vec.x, ", ", vec.y, ")");
-}
-
-void print(T)(Rectangle!T rect)
-{
-    print("Rectangle(", rect.x, ", ", rect.y, ", ", rect.width, ", ", rect.height, ")");
-}
-
-void print(T)(Circle!T vec)
-{
-    print("Circle(", rect.x, ", ", rect.y, ", ", rect.radius, ")");
-}
-
-void print(T)(Transform!T transform)
-{
-    print("Matrix[");
-    for(size_t x = 0; x < 3; x++)
-    {
-        print("[");
-        for(size_t y = 0; y < 3; y++)
-        {
-            print(transform[x, y]);
-            if(y != 2) print(", ");
-        }
-        print("]");
-        if(x != 2) print(", ");
-    }
-    print("]");
 }
 
 alias Vectori = Vector!int;
@@ -410,11 +410,18 @@ unittest
     assert(rect.contains(vec1));
     assert(!rect.contains(vec2));
 }
-unittest 
+unittest
 {
     auto circ = Circlei(0, 0, 5);
     auto rec1 = Rectanglei(0, 0, 2, 2);
     auto rec2 = Rectanglei(5, 5, 4, 4);
     assert(circ.overlaps(rec1) && rec1.overlaps(circ));
     assert(!circ.overlaps(rec2) && !rec2.overlaps(circ));
+}
+unittest
+{
+    println("Should print a vector at 0, 0: ", Vectori(0, 0));
+    println("Should print a circle at 0, 0 with a radius of 10: ", Circlei(0, 0, 10));
+    println("Should print a rectangle at 0, 0, with a side of 5", Rectanglei(0, 0, 5, 5));
+    println("Should print an identity matrix: ", identity());
 }

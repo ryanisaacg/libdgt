@@ -7,7 +7,7 @@ import dgt.color : Color;
 import dgt.geom;
 import dgt.io;
 
-string vertex_shader = "#version 130
+string DEFAULT_VERTEX_SHADER = "#version 130
 in vec2 position;
 in vec2 tex_coord;
 in vec4 color;
@@ -21,7 +21,7 @@ void main() {
 	transformed.z = 0;
 	gl_Position = vec4(transformed, 1.0);
 }";
-string fragment_shader = "#version 130
+string DEFAULT_FRAGMENT_SHADER = "#version 130
 in vec4 Color;
 in vec2 Tex_coord;
 out vec4 outColor;
@@ -36,9 +36,11 @@ struct Vertex
 	Vectorf pos, texPos;
 	Color col;
 
-	@nogc nothrow void print(Vertex vert)
+	@nogc nothrow:
+
+	void print() const
 	{
-		dgt.io.print("Vertex(", vert.pos, ", ", vert.texPos, ", ", vert.col, ")");
+		dgt.io.print("Vertex(", pos, ", ", texPos, ", ", col, ")");
 	}
 }
 
@@ -71,7 +73,7 @@ struct GLBackend
 		glBindVertexArray(vao);
 		glGenBuffers(1, &vbo);
 		glGenBuffers(1, &ebo);
-		setShader(vertex_shader, fragment_shader);
+		setShader(DEFAULT_VERTEX_SHADER, DEFAULT_FRAGMENT_SHADER);
 		glEnable (GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		vertices = Array!float(1024);
@@ -93,10 +95,11 @@ struct GLBackend
 		if (status != GL_TRUE)
 		{
 			println("Vertex shader compilation failed");
-			Array!char buffer = Array!char(512);
-			glGetShaderInfoLog(vertex, 512, null, buffer.ptr);
-			println("Error: ", buffer.ptr);
-			buffer.destroy();
+			char[512] buffer;
+			GLsizei length;
+			glGetShaderInfoLog(vertex, 512, &length, buffer.ptr);
+			println("Error: ", buffer[0..length]);
+			setShader(DEFAULT_VERTEX_SHADER, fragmentShader);
 		}
 		fragment = glCreateShader(GL_FRAGMENT_SHADER);
 		auto fragmentShaderPtr = fragmentShader.ptr;
@@ -106,10 +109,11 @@ struct GLBackend
 		if (status != GL_TRUE)
 		{
 			println("Fragment shader compilation failed\n");
-			Array!char buffer = Array!char(512);
-			glGetShaderInfoLog(fragment, 512, null, buffer.ptr);
-			println("Error: ", buffer.ptr);
-			buffer.destroy();
+			char[512] buffer;
+			GLsizei length;
+			glGetShaderInfoLog(vertex, 512, &length, buffer.ptr);
+			println("Error: ", buffer[0..length]);
+			setShader(vertexShader, DEFAULT_FRAGMENT_SHADER);
 		}
 		shader = glCreateProgram();
 		glAttachShader(shader, vertex);
@@ -198,4 +202,17 @@ struct GLBackend
 		foreach(i; newIndices)
 			indices.add(cast(uint)(i + offset));
 	}
+}
+unittest
+{
+	auto vert = Vertex(Vectorf(0, 0), Vectorf(1, 1), Color(1, 1, 1, 1));
+	println("Should print a white vertex at 0, 0 from 1, 1: ", vert);
+}
+unittest
+{
+	import dgt;
+    WindowConfig config;
+	config.resizable = true;
+	Window window = new Window("Test title", 640, 480, config);
+    window.setShader("broken", "broken");
 }
