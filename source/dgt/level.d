@@ -99,8 +99,8 @@ struct Map
         foreach(layer; contents["layers"].array)
         {
             string name = layer["name"].str;
-            int offsetX = layer["offsetx"].isNull ? 0 : cast(int)layer["offsetx"].integer;
-            int offsetY = layer["offsety"].isNull ? 0 : cast(int)layer["offsety"].integer;
+            int offsetX = "offsetx" in layer ? cast(int)layer["offsetx"].integer : 0;
+            int offsetY = "offsety" in layer ? cast(int)layer["offsety"].integer : 0;
             float opacity = layer["opacity"].type == JSON_TYPE.FLOAT ? layer["opacity"].floating : layer["opacity"].integer;
             bool visible = layer["visible"].type == JSON_TYPE.TRUE;
             if(layer["type"].str == "tilelayer")
@@ -121,7 +121,7 @@ struct Map
                 foreach(object; layer["objects"].array)
                 {
                     bool flipX, flipY;
-                    uint gid = stripGID(object["gid"].integer, flipX, flipY);
+                    uint gid = stripGID(cast(uint)object["gid"].integer, flipX, flipY);
                     elayer.entities.add(Entity(
                         object["name"].str,
                         object["type"].str,
@@ -141,11 +141,11 @@ struct Map
 
     @nogc nothrow void destroy()
     {
-        for(tex; sourceImages)
+        foreach(tex; sourceImages)
             tex.destroy();
-        for(layer; tileLayers)
+        foreach(layer; tileLayers)
             layer.destroy();
-        for(layer; entityLayers)
+        foreach(layer; entityLayers)
             layer.destroy();
         sourceImages.destroy();
         tileImages.destroy();
