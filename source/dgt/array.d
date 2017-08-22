@@ -52,7 +52,7 @@ struct Array(T)
 
 	int opApply(int delegate(T) @nogc nothrow dg) const
     {
-		for(size_t i = 0; i < length; i++) 
+		for(size_t i = 0; i < length; i++)
 			dg(buffer[i]);
         return 0;
     }
@@ -119,7 +119,7 @@ struct Array(T)
 @nogc nothrow:
 unittest
 {
-	dgtto x = Array!int(4);
+	auto x = Array!int(4);
 	for(int i = 0; i < 17; i++)
 	{
 		x.add(i);
@@ -135,8 +135,8 @@ unittest
     x.remove(0);
     assert(x.length == length - 1);
     int first = x[0];
-    dgtto other = Array!int(1);
-    foreach(val; x) 
+    auto other = Array!int(1);
+    foreach(val; x)
     {
         other.add(val);
     }
