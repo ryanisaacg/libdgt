@@ -75,7 +75,7 @@ class Window
         thread_joinAll();
         Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 1024);
         Mix_AllocateChannels(512);
-        
+
         srand(cast(uint)time(null));
 
         ubyte[3] white_pixel = [ 255, 255, 255 ];
@@ -136,7 +136,7 @@ class Window
                         case SDL_WINDOWEVENT_RESIZED:
                         case SDL_WINDOWEVENT_SIZE_CHANGED:
                             int w, h;
-                            SDL_GetWindowSize(window, &w, &h);
+                            SDL_GL_GetDrawableSize(window, &w, &h);
                             float windowRatio = cast(float)w / h;
                             if(windowRatio > aspectRatio)
                             {
