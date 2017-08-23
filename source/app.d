@@ -6,16 +6,15 @@ void main()
 {
 	WindowConfig config;
 	config.resizable = true;
+	config.highdpi = true;
 	Window engine = new Window("Test title", 640, 480, config);
-	auto map = Map("example.json");
-	println(map.tileLayers[0].tiles);
-/*	auto tex = Texture("test.png");
+	auto tex = Texture("test.png");
 	scope(exit) tex.destroy();
 	auto map = Tilemap!bool(640, 480, 32);
 	scope(exit) map.destroy();
     float n = 0;
     auto buttonTex = Texture("button.png");
-    auto camera = Rectanglef(0, 0, 640, 480);
+    auto camera = Rectanglei(0, 0, 640, 480);
     float value = 0;
 	auto button = Button(Rectanglei(300, 300, 32, 32), Vectori(300, 300),
 				buttonTex.getSlice(Rectanglei(0, 0, 32, 32)),
@@ -58,5 +57,5 @@ void main()
             writeln("Button pressed");
 		n = slider.draw(engine, n);
 		carouselOption = carousel.draw(engine, carouselOption);
-	}*/
+	}
 }

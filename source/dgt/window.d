@@ -42,7 +42,7 @@ class Window
     uint previous_ticks;
     int windowWidth, windowHeight;
     Texture white;
-    Rectangle!float camera;
+    Rectangle!int camera;
     Array!Gamepad gamepads;
 
     public:
@@ -110,7 +110,7 @@ class Window
 
     @nogc nothrow:
 
-    void begin(Color bg, Rectangle!float cam)
+    void begin(Color bg, Rectangle!int cam)
     {
         camera = cam;
         inUIMode = false;
@@ -171,8 +171,8 @@ class Window
         mouseLeft = (button_mask & SDL_BUTTON(SDL_BUTTON_LEFT)) != 0;
         mouseRight = (button_mask & SDL_BUTTON(SDL_BUTTON_RIGHT)) != 0;
         mouseMiddle = (button_mask & SDL_BUTTON(SDL_BUTTON_MIDDLE)) != 0;
-        float left = camera.x, right = left + camera.width,
-                top = camera.y, bottom = top + camera.height;
+        float left = camera.x / scale, right = left + camera.width / scale,
+                top = camera.y / scale, bottom = top + camera.height / scale;
         ctx.transform = [
             2 / (right - left), 0, 0,
             0, 2 / (top - bottom), 0,
@@ -228,7 +228,7 @@ class Window
         static assert ( Len >= 3 );
         Vertex[Len] vertices;
         GLuint[Indices] indices;
-        Vectori offset = inUIMode ? Vectori(camera.topLeft) : Vectori(0, 0);
+        Vectori offset = inUIMode ? camera.topLeft : Vectori(0, 0);
         for (size_t i = 0; i < Len; i++)
         {
             auto point = (points[i] + offset) / scale;
@@ -317,7 +317,7 @@ class Window
             src_bl = tmp;
         }
         //Add all of the vertices to the context
-        auto translate = Vectorf(x, y) + (inUIMode ? camera.topLeft : Vector!float(0, 0));
+        auto translate = Vectorf(x, y) + (inUIMode ? Vectorf(camera.topLeft) : Vector!float(0, 0));
         translate = translate / scale;
         Vertex[4] vertices = [ Vertex(tl + translate, src_tl, color),
             Vertex(tr + translate, src_tr, color),
@@ -407,7 +407,7 @@ unittest
 	Window window = new Window("Test title", 640, 480, config);
     auto tex = Texture("test.png");
     scope(exit) tex.destroy();
-    auto camera = Rectanglef(0, 0, 640, 480);
+    auto camera = Rectanglei(0, 0, 640, 480);
     auto map = Tilemap!bool(640, 480, 32);
     while(window.isOpen)
     {
