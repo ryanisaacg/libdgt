@@ -13,13 +13,13 @@ struct Tilemap(T)
 	static immutable INVALID_TILE = Tile!T(T(), true);
 
 	private Array!(Tile!T) buffer;
-	private int size = 0, width = 0, height = 0;
+	private int size, _width, _height;
 
 	@nogc nothrow public:
-	this(int width, int height, int size)
+	this(int mapWidth, int mapHeight, int size)
 	{
-		this.width = width;
-		this.height = height;
+		this._width = mapWidth;
+		this._height = mapHeight;
 		this.size = size;
         buffer = Array!(Tile!T)((width / size) * (height / size));
 		for(size_t i = 0; i < width; i++)
@@ -58,19 +58,23 @@ struct Tilemap(T)
 	}
 
     //TODO: Increase resolution of slideContact
-	Vector!int slideContact(int x, int y, int width, int height, Vector!int v) {
-		if (empty(x + v.x, y + v.y, width, height)) {
+	Vector!int slideContact(int x, int y, int width, int height, Vector!int v)
+	{
+		if (empty(x + v.x, y + v.y, width, height))
 			return v;
-		} else {
-			while (!empty(x + v.x, y, width, height)) {
+		else
+		{
+			while (!empty(x + v.x, y, width, height))
 				v.x /= 2;
-			}
-			while (!empty(x + v.x, y + v.y, width, height)) {
+			while (!empty(x + v.x, y + v.y, width, height))
 				v.y /= 2;
-			}
 			return v;
 		}
 	}
+
+	@property int width() { return _width; }
+	@property int height() { return _height; }
+	@property int tileSize() { return size; }
 }
 
 unittest
