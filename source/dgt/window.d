@@ -390,6 +390,7 @@ class Window
     Array!Gamepad getGamepads() { return gamepads; }
     @property int width() { return width; }
     @property int height() { return height; }
+    @property int unitsPerPixel() { return scale; }
 }
 
 private Window globalWindow;
