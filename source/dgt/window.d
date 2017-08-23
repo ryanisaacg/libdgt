@@ -40,7 +40,7 @@ class Window
     //TODO: Add a function to wait on IO
     Array!Particle particles;
     uint previous_ticks;
-    int window_width, window_height;
+    int windowWidth, windowHeight;
     Texture white;
     Rectangle!float camera;
     Array!Gamepad gamepads;
@@ -70,8 +70,8 @@ class Window
         ctx = GLBackend(window);
         particles = Array!Particle(128);
         camera.set(0, 0, width * scale, height * scale);
-        window_width = width;
-        window_height = height;
+        windowWidth = width;
+        windowHeight = height;
         thread_joinAll();
         Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 1024);
         Mix_AllocateChannels(512);
@@ -388,6 +388,8 @@ class Window
     bool isOpen() { return shouldContinue; }
     int getScale() { return scale; }
     Array!Gamepad getGamepads() { return gamepads; }
+    @property int width() { return width; }
+    @property int height() { return height; }
 }
 
 private Window globalWindow;
