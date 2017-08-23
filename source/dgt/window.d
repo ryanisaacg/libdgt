@@ -56,9 +56,14 @@ class Window
         DerelictSDL2.load(SharedLibVersion(2, 0, 3));
         SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO);
         SDL_InitSubSystem(SDL_INIT_GAMECONTROLLER);
-        new Thread(&DerelictSDL2Image.load).start();
-        new Thread(&DerelictSDL2ttf.load).start();
-        new Thread(&DerelictSDL2Mixer.load).start();
+        new Thread({
+            DerelictSDL2Image.load();
+            DerelictSDL2ttf.load();
+            DerelictSDL2Mixer.load();
+            IMG_Init(IMG_INIT_JPG | IMG_INIT_PNG);
+            TTF_Init();
+            Mix_Init(MIX_INIT_FLAC | MIX_INIT_MOD | MIX_INIT_MP3 | MIX_INIT_OGG);
+        }).start();
         window = SDL_CreateWindow(title.ptr,
             SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width, height,
             config.getFlags());
@@ -68,19 +73,9 @@ class Window
         window_width = width;
         window_height = height;
         thread_joinAll();
-        new Thread({
-            IMG_Init(IMG_INIT_JPG | IMG_INIT_PNG);
-        }).start();
-        new Thread({
-            TTF_Init();
-        }).start();
-        new Thread({
-            Mix_Init(MIX_INIT_FLAC | MIX_INIT_MOD | MIX_INIT_MP3 | MIX_INIT_OGG);
-        }).start();
-        thread_joinAll();
         Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 1024);
         Mix_AllocateChannels(512);
-
+        
         srand(cast(uint)time(null));
 
         ubyte[3] white_pixel = [ 255, 255, 255 ];
