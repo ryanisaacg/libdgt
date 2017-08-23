@@ -266,7 +266,7 @@ class Window
 
     void draw(ref Texture tex, float x, float y)
     {
-        draw(tex, x, y, tex.getRegion.width, tex.getRegion.height);
+        draw(tex, x, y, tex.getRegion.width * scale, tex.getRegion.height * scale);
     }
 
     void draw(ref Texture tex, float x, float y, float w, float h,
