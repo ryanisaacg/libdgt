@@ -40,7 +40,7 @@ class Window
     //TODO: Add a function to wait on IO
     Array!Particle particles;
     uint previous_ticks;
-    int windowWidth, windowHeight;
+    int offsetX, offsetY, windowWidth, windowHeight;
     Texture white;
     Rectangle!int camera;
     Array!Gamepad gamepads;
@@ -138,20 +138,21 @@ class Window
                             int w, h;
                             SDL_GL_GetDrawableSize(window, &w, &h);
                             float windowRatio = cast(float)w / h;
+                            offsetX = offsetY = 0;
                             if(windowRatio > aspectRatio)
                             {
                                 auto oldW = w;
                                 w = cast(int)(aspectRatio * h);
-                                glViewport((oldW - w) / 2, 0, w, h);
                             }
                             else if(windowRatio < aspectRatio)
                             {
                                 auto oldH = h;
                                 h = cast(int)(w / aspectRatio);
-                                glViewport(0, (oldH - h) / 2, w, h);
+                                offsetY = (oldH - h) / 2;
                             }
-                            else
-                                glViewport(0, 0, w, h); //TODO: Letterbox
+                            glViewport(offsetX, offsetY, w, h);
+                            windowWidth = w;
+                            windowHeight = h;
                             break;
                         default:
                             break;
@@ -376,9 +377,14 @@ class Window
     }
 
     pure:
-    Vector!int mousePos() { return mouse; }
-    int mouseX() { return mouse.x; }
-    int mouseY() { return mouse.y; }
+    @property Vector!int mouseScreen()
+    {
+        return mouse * camera.width / windowWidth - Vectori(offsetX, offsetY);
+    }
+    @property Vector!int mouseGame()
+    {
+        return mouseScreen + camera.topLeft;
+    }
     bool mouseLeftPressed() { return mouseLeft; }
     bool mouseRightPressed() { return mouseRight; }
     bool mouseMiddlePressed() { return mouseMiddle; }

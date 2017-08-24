@@ -26,7 +26,7 @@ struct Button
 
     bool draw(Window window)
     {
-        bool mouseContained = area.contains(window.mousePos);
+        bool mouseContained = area.contains(window.mouseScreen);
         window.draw(mouseContained ? (window.mouseLeftPressed ? press : hover) : tex,
                 position.x, position.y);
         return mouseContained && window.mouseLeftReleased;
@@ -51,8 +51,8 @@ struct Slider
     {
         window.draw(slider, -slider.getRegion.width / 2 + area.x + current * area.width,
                 -slider.getRegion.height / 2 + area.y + area.height / 2);
-        if (window.mouseLeftPressed && area.contains(window.mousePos))
-            return (window.mouseX - area.x) / cast(float)(area.width);
+        if (window.mouseLeftPressed && area.contains(window.mouseScreen))
+            return (window.mouseScreen.x - area.x) / cast(float)(area.width);
         else
             return current;
     }
