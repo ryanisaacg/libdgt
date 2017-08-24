@@ -408,8 +408,8 @@ class Window
     bool isOpen() const { return shouldContinue; }
     int getScale() const { return scale; }
     Array!Gamepad getGamepads() { return gamepads; }
-    @property int width() const { return width; }
-    @property int height() const { return height; }
+    @property int width() const { return windowWidth; }
+    @property int height() const { return windowHeight; }
     @property int unitsPerPixel() const { return scale; }
 }
 
