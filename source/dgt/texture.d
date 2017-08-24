@@ -69,7 +69,8 @@ struct Texture
     Texture getSlice(Rectangle!int region)
     {
         Texture tex = this;
-        tex.region = region;
+        tex.region = Rectangle!int(this.region.x + region.x, 
+                this.region.y + region.y, region.width, region.height);
         return tex;
     }
     int getSourceWidth() { return width; }
@@ -88,6 +89,8 @@ unittest
     auto slice = texture.getSlice(region);
     assert(slice.getRegion.x == 2 && slice.getRegion.y == 2
         && slice.getRegion.width == 16 && slice.getRegion.height == 16);
+    auto sliceOfSlice = slice.getSlice(Rectanglei(1, 1, 4, 4));
+    assert(sliceOfSlice.getRegion.x == 3 && sliceOfSlice.getRegion.y == 3);
 }
 
 unittest
