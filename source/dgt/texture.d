@@ -13,13 +13,8 @@ struct Texture
 
     @disable this();
 
-    @nogc nothrow:
-    void loadFrom(SDL_Surface* sur)
-    {
-        loadFrom(cast(ubyte*)sur.pixels, sur.w, sur.h, sur.format.BytesPerPixel == 4);
-    }
-
-    void loadFrom(ubyte* data, int w, int h, bool has_alpha)
+    @nogc nothrow public:
+    this(ubyte* data, int w, int h, bool has_alpha)
     {
         GLuint texture;
         glGenTextures(1, &texture);
@@ -37,27 +32,24 @@ struct Texture
         region = Rectangle!int(0, 0, w, h);
     }
 
-    public:
-    this(ubyte* data, int w, int h, bool has_alpha)
-    {
-        loadFrom(data, w, h, has_alpha);
-    }
-
     this(string name)
     {
         SDL_Surface* surface = IMG_Load(name.ptr);
         if (surface == null)
+        {
             println("Texture with filename ", name, " not found");
+            this(null, 0, 0, false);
+        }
         else
         {
-            loadFrom(surface);
+            this(surface);
             SDL_FreeSurface(surface);
         }
     }
 
     this(SDL_Surface* sur)
     {
-        loadFrom(sur);
+        this(cast(ubyte*)sur.pixels, sur.w, sur.h, sur.format.BytesPerPixel == 4);
     }
 
     void destroy()
