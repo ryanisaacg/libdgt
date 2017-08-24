@@ -87,10 +87,10 @@ unittest
     auto texture = Texture("test.png");
     auto region = Rectanglei(2, 2, 16, 16);
     auto slice = texture.getSlice(region);
-    assert(slice.getRegion.x == 2 && slice.getRegion.y == 2
-        && slice.getRegion.width == 16 && slice.getRegion.height == 16);
+    assert(slice.size.x == 2 && slice.size.y == 2
+        && slice.size.width == 16 && slice.size.height == 16);
     auto sliceOfSlice = slice.getSlice(Rectanglei(1, 1, 4, 4));
-    assert(sliceOfSlice.getRegion.x == 3 && sliceOfSlice.getRegion.y == 3);
+    assert(sliceOfSlice.size.x == 3 && sliceOfSlice.size.y == 3);
 }
 
 unittest
