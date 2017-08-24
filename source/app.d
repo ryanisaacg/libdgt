@@ -47,8 +47,8 @@ void main()
 		engine.draw(blue, Rectanglei(100, 100, 40, 40));
 		engine.draw(Color(0, 1, 0, 0.5), Circlei(100, 100, 32));
 
-        if(engine.getGamepads.length)
-            if(engine.getGamepads[0].faceDown)
+        if(engine.gamepads.length)
+            if(engine.gamepads[0].faceDown)
                 writeln("Face button down");
 
         engine.inUIMode = true;

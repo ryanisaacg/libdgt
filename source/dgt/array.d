@@ -107,13 +107,13 @@ struct Array(T)
 		*count = 0;
 	}
 
-	T* ptr() const { return buffer; }
-	size_t length() const { return *count; }
+	 @property T* ptr() const { return buffer; }
+	 @property size_t length() const { return *count; }
 
 	private:
-	private size_t* count() const { return cast(size_t*) backingBuffer; }
-	private size_t* capacity() const {	return count + 1; }
-	private T* buffer() const { return cast(T*)(capacity + 1); }
+	private @property size_t* count() const { return cast(size_t*) backingBuffer; }
+	private @property size_t* capacity() const {	return count + 1; }
+	private @property T* buffer() const { return cast(T*)(capacity + 1); }
 }
 
 @nogc nothrow:

@@ -36,6 +36,6 @@ struct SoundInstance
     void resume() { Mix_Resume(id); }
     void stop() { Mix_HaltChannel(id); }
     void fadeOut(in int ms) { Mix_FadeOutChannel(id, ms); }
-    bool isPlaying() const { return Mix_Playing(id) != 0; }
-    bool isPaused() const { return Mix_Paused(id) != 0; }
+    @property bool isPlaying() const { return Mix_Playing(id) != 0; }
+    @property bool isPaused() const { return Mix_Paused(id) != 0; }
 }

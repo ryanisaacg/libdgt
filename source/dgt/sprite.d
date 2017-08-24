@@ -32,32 +32,32 @@ struct Sprite
     {
         data.tex = tex;
         type = SpriteType.Static;
-        width = tex.getRegion.width;
-        height = tex.getRegion.height;
+        width = tex.size.width;
+        height = tex.size.height;
     }
 
     this(Animation anim)
     {
         data.anim = anim;
         type = SpriteType.Animated;
-        width = anim.currentTexture.getRegion.width;
-        height = anim.currentTexture.getRegion.height;
+        width = anim.texture.size.width;
+        height = anim.texture.size.height;
     }
 
     void setDrawable(Texture tex)
     {
         data.tex = tex;
         type = SpriteType.Static;
-        width = tex.getRegion.width;
-        height = tex.getRegion.height;
+        width = tex.size.width;
+        height = tex.size.height;
     }
 
     void setDrawable(Animation anim)
     {
         data.anim = anim;
         type = SpriteType.Animated;
-        width = anim.currentTexture.getRegion.width;
-        height = anim.currentTexture.getRegion.height;
+        width = anim.texture.size.width;
+        height = anim.texture.size.height;
     }
 
     void update()
@@ -66,10 +66,10 @@ struct Sprite
             data.anim.update();
     }
 
-    ref const(Texture) getTexture() const
+    @property ref const(Texture) texture() const
     {
         if(type == SpriteType.Animated)
-            return data.anim.currentTexture();
+            return data.anim.texture;
         else
             return data.tex;
     }

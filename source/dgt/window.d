@@ -34,7 +34,7 @@ class Window
     bool shouldContinue = true;
     bool[SDL_NUM_KEYS] current_keys; //The total number of SDL keys
     bool[SDL_NUM_KEYS] previous_keys;
-    Vectori mouse = Vectori(0, 0), previousMouse = Vectori(0, 0);
+    Vectori mousePos = Vectori(0, 0), previousMouse = Vectori(0, 0);
     bool mouseLeft = false, mouseRight = false, mouseMiddle = false,
          mouseLeftPrevious = true, mouseRightPrevious = true, mouseMiddlePrevious = true;
     //TODO: Add a function to wait on IO
@@ -43,13 +43,13 @@ class Window
     int offsetX, offsetY, windowWidth, windowHeight;
     Texture white;
     Rectangle!int camera;
-    Array!Gamepad gamepads;
+    Array!Gamepad connectedGamepads;
+    int scale;
 
     public:
     bool inUIMode = false;
     uint fps = 60;
     float aspectRatio;
-    int scale;
 
     this(in string title, in int width, in int height, in WindowConfig config, in int scale = 1, in bool bindToGlobal = true)
     {
@@ -83,10 +83,10 @@ class Window
         glViewport(0, 0, width, height);
         aspectRatio = cast(float)width / height;
         this.scale = scale;
-        gamepads = Array!Gamepad(SDL_NumJoysticks());
+        connectedGamepads = Array!Gamepad(SDL_NumJoysticks());
         for(int i = 0; i < SDL_NumJoysticks(); i++)
             if(SDL_IsGameController(i))
-                gamepads.add(Gamepad(SDL_GameControllerOpen(i)));
+                connectedGamepads.add(Gamepad(SDL_GameControllerOpen(i)));
         if(bindToGlobal)
             globalWindow = this;
     }
@@ -164,8 +164,8 @@ class Window
         }
         int x, y;
         int button_mask = SDL_GetMouseState(&x, &y);
-        previousMouse = mouse;
-        mouse = Vectori(x * scale, y * scale);
+        previousMouse = mousePos;
+        mousePos = Vectori(x * scale, y * scale);
         mouseLeftPrevious = mouseLeft;
         mouseRightPrevious = mouseRight;
         mouseMiddlePrevious = mouseMiddlePrevious;
@@ -269,7 +269,7 @@ class Window
 
     void draw(in Texture tex, in float x, in float y)
     {
-        draw(tex, x, y, tex.getRegion.width * scale, tex.getRegion.height * scale);
+        draw(tex, x, y, tex.size.width * scale, tex.size.height * scale);
     }
 
     void draw(in Texture tex, in float x, in float y, in float w, in float h,
@@ -295,12 +295,12 @@ class Window
 
         //Calculate the source points normalized to [0, 1]
         //The conversion factor for normalizing vectors
-        float conv_factor_x = 1.0f / tex.getSourceWidth;
-        float conv_factor_y = 1.0f / tex.getSourceHeight;
-        float norm_x = tex.getRegion.x * conv_factor_x;
-        float norm_y = tex.getRegion.y * conv_factor_y;
-        float norm_w = tex.getRegion.width * conv_factor_x / scale;
-        float norm_h = tex.getRegion.height * conv_factor_y / scale;
+        float conv_factor_x = 1.0f / tex.sourceWidth;
+        float conv_factor_y = 1.0f / tex.sourceHeight;
+        float norm_x = tex.size.x * conv_factor_x;
+        float norm_y = tex.size.y * conv_factor_y;
+        float norm_w = tex.size.width * conv_factor_x / scale;
+        float norm_h = tex.size.height * conv_factor_y / scale;
         auto src_tl = Vectorf(norm_x, norm_y);
         auto src_tr = Vectorf(norm_x + norm_w, norm_y);
         auto src_br = Vectorf(norm_x + norm_w, norm_y + norm_h);
@@ -335,7 +335,7 @@ class Window
     void draw(ref scope Sprite sprite)
     {
         sprite.update();
-        draw(sprite.getTexture, sprite.x, sprite.y, sprite.width, sprite.height,
+        draw(sprite.texture, sprite.x, sprite.y, sprite.width, sprite.height,
                 sprite.rotation, sprite.originX, sprite.originY,
                 sprite.scaleX, sprite.scaleY, sprite.flipX, sprite.flipY, sprite.color);
     }
@@ -344,7 +344,7 @@ class Window
     {
         Texture renderChar = font.render(c);
         draw(renderChar, x, y);
-        return renderChar.getRegion.width;
+        return renderChar.size.width;
     }
 
     void draw(in Font font, in string str, in float x, in float y)
@@ -380,7 +380,7 @@ class Window
         return current_keys[SDL_GetScancodeFromName(name.ptr)];
     }
 
-    bool wasKeyDown(in string name) const 
+    bool wasKeyDown(in string name) const
     {
         return previous_keys[SDL_GetScancodeFromName(name.ptr)];
     }
@@ -391,23 +391,19 @@ class Window
     }
 
     pure:
-    @property Vector!int mouseScreen() const
+    @property Vector!int mouse() const
     {
-        return mouse * camera.width / windowWidth - Vectori(offsetX, offsetY);
+        return mousePos * camera.width / windowWidth - Vectori(offsetX, offsetY)
+            + (inUIMode ? Vectori(0, 0) : camera.topLeft);
     }
-    @property Vector!int mouseGame() const
-    {
-        return mouseScreen + camera.topLeft;
-    }
-    bool mouseLeftPressed() const { return mouseLeft; }
-    bool mouseRightPressed() const { return mouseRight; }
-    bool mouseMiddlePressed() const { return mouseMiddle; }
-    bool mouseLeftReleased() const { return !mouseLeft && mouseLeftPrevious; }
-    bool mouseRightReleased() const { return !mouseRight && mouseRightPrevious; }
-    bool mouseMiddleReleased() const { return !mouseMiddle && mouseMiddlePrevious; }
-    bool isOpen() const { return shouldContinue; }
-    int getScale() const { return scale; }
-    Array!Gamepad getGamepads() { return gamepads; }
+    @property bool mouseLeftPressed() const { return mouseLeft; }
+    @property bool mouseRightPressed() const { return mouseRight; }
+    @property bool mouseMiddlePressed() const { return mouseMiddle; }
+    @property bool mouseLeftReleased() const { return !mouseLeft && mouseLeftPrevious; }
+    @property bool mouseRightReleased() const { return !mouseRight && mouseRightPrevious; }
+    @property bool mouseMiddleReleased() const { return !mouseMiddle && mouseMiddlePrevious; }
+    @property bool isOpen() const { return shouldContinue; }
+    @property Array!Gamepad gamepads() { return connectedGamepads; }
     @property int width() const { return windowWidth; }
     @property int height() const { return windowHeight; }
     @property int unitsPerPixel() const { return scale; }

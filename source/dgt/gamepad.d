@@ -4,7 +4,7 @@ import derelict.sdl2.sdl;
 
 static immutable TRIGGER_MAX = 32767.0;
 
-struct Gamepad 
+struct Gamepad
 {
     private SDL_GameController* controller;
 
@@ -26,107 +26,107 @@ struct Gamepad
     }
 
     public:
-    float leftX()
+    @property float leftX()
     {
         return getTrigger(SDL_CONTROLLER_AXIS_LEFTX);
     }
 
-    float leftY()
+    @property float leftY()
     {
         return getTrigger(SDL_CONTROLLER_AXIS_LEFTY);
     }
 
-    float rightX()
+    @property float rightX()
     {
         return getTrigger(SDL_CONTROLLER_AXIS_RIGHTX);
     }
 
-    float rightY()
+    @property float rightY()
     {
         return getTrigger(SDL_CONTROLLER_AXIS_RIGHTY);
     }
 
-    float triggerLeft()
+    @property float triggerLeft()
     {
         return getTrigger(SDL_CONTROLLER_AXIS_TRIGGERLEFT);
     }
 
-    float triggerRight()
+    @property float triggerRight()
     {
         return getTrigger(SDL_CONTROLLER_AXIS_TRIGGERRIGHT);
     }
 
-    bool faceDown()
+    @property bool faceDown()
     {
         return getButton(SDL_CONTROLLER_BUTTON_A);
-    }   
+    }
 
-    bool faceRight()
+    @property bool faceRight()
     {
         return getButton(SDL_CONTROLLER_BUTTON_B);
     }
 
-    bool faceLeft()
+    @property bool faceLeft()
     {
         return getButton(SDL_CONTROLLER_BUTTON_X);
     }
-        
-    bool faceUp()
+
+    @property bool faceUp()
     {
         return getButton(SDL_CONTROLLER_BUTTON_Y);
     }
-        
-    bool select()
+
+    @property bool select()
     {
         return getButton(SDL_CONTROLLER_BUTTON_BACK);
     }
-        
-    bool main()
+
+    @property bool main()
     {
         return getButton(SDL_CONTROLLER_BUTTON_GUIDE);
     }
-        
-    bool start()
+
+    @property bool start()
     {
         return getButton(SDL_CONTROLLER_BUTTON_START);
     }
-        
-    bool leftStick()
+
+    @property bool leftStick()
     {
         return getButton(SDL_CONTROLLER_BUTTON_LEFTSTICK);
     }
-        
-    bool rightStick()
+
+    @property bool rightStick()
     {
         return getButton(SDL_CONTROLLER_BUTTON_RIGHTSTICK);
     }
-        
-    bool leftShoulder()
+
+    @property bool leftShoulder()
     {
         return getButton(SDL_CONTROLLER_BUTTON_LEFTSHOULDER);
     }
 
-    bool rightShoulder()
+    @property bool rightShoulder()
     {
         return getButton(SDL_CONTROLLER_BUTTON_RIGHTSHOULDER);
     }
-        
-    bool dpadUp()
+
+    @property bool dpadUp()
     {
         return getButton(SDL_CONTROLLER_BUTTON_DPAD_UP);
     }
 
-    bool dpadDown()
+    @property bool dpadDown()
     {
         return getButton(SDL_CONTROLLER_BUTTON_DPAD_DOWN);
     }
-    
-    bool dpadLeft()
+
+    @property bool dpadLeft()
     {
         return getButton(SDL_CONTROLLER_BUTTON_DPAD_LEFT);
     }
 
-    bool dpadRight()
+    @property bool dpadRight()
     {
         return getButton(SDL_CONTROLLER_BUTTON_DPAD_RIGHT);
     }

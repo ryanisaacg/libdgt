@@ -48,7 +48,7 @@ struct Font
         for (int i = 0; i < FONT_MAX_CHARS; i++)
 		{
             characterTextures[i] = texture.getSlice(Rectanglei(position, 0, characters[i].w, characters[i].h));
-            position += characterTextures[i].getRegion.width;
+            position += characterTextures[i].size.width;
             SDL_FreeSurface(characters[i]);
         }
     }
@@ -74,14 +74,14 @@ struct Font
     		if (position > width)
     			width = position;
     		if (c == '\t')
-    			position += 4 * render(' ').getRegion.width;
+    			position += 4 * render(' ').size.width;
             else if (c == '\n')
             {
-    			height += render('\n').getRegion.height;
+    			height += render('\n').size.height;
     			position = 0;
     		}
             else if (c != '\r')
-    			position += render(c).getRegion.width;
+    			position += render(c).size.width;
     	}
     	return Rectanglei(0, 0, width, height);
     }

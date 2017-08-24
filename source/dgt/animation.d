@@ -40,9 +40,8 @@ struct Animation
         return frames[currentFrame].image;
     }
 
-    ref const(Texture) currentTexture() const
+    @property ref const(Texture) texture() const
     {
         return frames[currentFrame].image;
     }
 }
-

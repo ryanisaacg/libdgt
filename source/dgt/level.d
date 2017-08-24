@@ -91,8 +91,8 @@ struct Map
             int spacing = cast(int)tileset["spacing"].integer;
             int width = cast(int)tileset["tilewidth"].integer;
             int height = cast(int)tileset["tileheight"].integer;
-            for(int y = margin; y < image.getSourceWidth - margin; y += height + spacing)
-                for(int x = margin; x < image.getSourceWidth - margin; x += width + spacing)
+            for(int y = margin; y < image.sourceHeight - margin; y += height + spacing)
+                for(int x = margin; x < image.sourceWidth - margin; x += width + spacing)
                     tileImages.add(image.getSlice(Rectanglei(x, y, width, height)));
         }
 

@@ -69,13 +69,13 @@ struct Texture
     Texture getSlice(Rectangle!int region)
     {
         Texture tex = this;
-        tex.region = Rectangle!int(this.region.x + region.x, 
+        tex.region = Rectangle!int(this.region.x + region.x,
                 this.region.y + region.y, region.width, region.height);
         return tex;
     }
-    int getSourceWidth() const { return width; }
-    int getSourceHeight() const { return height; }
-    Rectangle!int getRegion() const { return region; }
+    @property int sourceWidth() const { return width; }
+    @property int sourceHeight() const { return height; }
+    @property Rectangle!int size() const { return region; }
 }
 
 unittest
