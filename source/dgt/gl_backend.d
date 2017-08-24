@@ -81,7 +81,7 @@ struct GLBackend
 	}
 
 	@nogc nothrow:
-	public void setShader(string vertexShader, string fragmentShader)
+	public void setShader(in string vertexShader, in string fragmentShader)
 	{
 		if(shader != 0) glDeleteProgram(shader);
 		if(vertex != 0) glDeleteShader(vertex);
@@ -138,7 +138,7 @@ struct GLBackend
 		SDL_GL_DeleteContext(ctx);
 	}
 
-	public void clear(Color col)
+	public void clear(in Color col)
 	{
 		vertices.clear();
 		indices.clear();
@@ -183,15 +183,15 @@ struct GLBackend
 		SDL_GL_SwapWindow(window);
 	}
 
-	private void switchTexture(GLuint texture)
+	private void switchTexture(in GLuint texture)
 	{
 		if (this.texture != 0)
 			flush();
 		this.texture = texture;
 	}
 
-	public void add(size_t Vertices, size_t Indices)(GLuint texture,
-					ref Vertex[Vertices] newVertices, ref GLuint[Indices] newIndices)
+	public void add(size_t Vertices, size_t Indices)(in GLuint texture,
+					in Vertex[Vertices] newVertices, in GLuint[Indices] newIndices)
 	{
 		if(this.texture != texture)
 			switchTexture(texture);

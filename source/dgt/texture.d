@@ -73,9 +73,9 @@ struct Texture
                 this.region.y + region.y, region.width, region.height);
         return tex;
     }
-    int getSourceWidth() { return width; }
-    int getSourceHeight() { return height; }
-    Rectangle!int getRegion() { return region; }
+    int getSourceWidth() const { return width; }
+    int getSourceHeight() const { return height; }
+    Rectangle!int getRegion() const { return region; }
 }
 
 unittest

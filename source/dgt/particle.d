@@ -26,7 +26,7 @@ struct Particle
 
 struct ParticleEmitter
 {
-    Array!Texture regions;
+    const(Array!Texture) regions;
     Vector!int top_left, bottom_right, velocity_min, velocity_max,
         acceleration_min, acceleration_max, scale_min, scale_max,
         scale_velocity_min, scale_velocity_max;
@@ -37,12 +37,12 @@ struct ParticleEmitter
     ParticleBehavior behavior = ParticleBehavior.Ignore;
 
     @nogc nothrow public:
-    this(Array!Texture regions)
+    this(in Array!Texture regions)
     {
         this.regions = regions;
     }
 
-    Particle emit()
+    Particle emit() const
     {
         return Particle(regions[randomRange(0, cast(int)regions.length)],
              randomRange(top_left, bottom_right),

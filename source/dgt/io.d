@@ -3,22 +3,22 @@ import core.stdc.stdio;
 
 @nogc nothrow:
 
-void print(int value)
+void print(in int value)
 {
     printf("%d", value);
 }
 
-void print(double value)
+void print(in double value)
 {
     printf("%f", value);
 }
 
-void print(T)(const(T) obj)
+void print(T)(in T obj)
 {
     obj.print();
 }
 
-void print(T)(const(T[]) items)
+void print(T)(in T[] items)
 {
     print(T.stringof, "[");
     for(size_t i = 0; i < items.length; i++)
@@ -30,19 +30,19 @@ void print(T)(const(T[]) items)
     print("]");
 }
 
-void print(T:char)(const(T[]) items)
+void print(T:char)(in T[] items)
 {
     printf("%s", items.ptr);
 }
 
-void print(T, A...)(const(T) obj, const(A) a)
+void print(T, A...)(in T obj, in A a)
 {
     print(obj);
     foreach(val; a)
         print(val);
 }
 
-void println(A...)(const(A) values)
+void println(A...)(in A values)
 {
     foreach(val; values)
     {

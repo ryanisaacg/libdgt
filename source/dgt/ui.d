@@ -15,7 +15,7 @@ struct Button
     Vectori position;
     Texture tex, hover, press;
 
-    this(Rectanglei area, Vectori position, Texture tex, Texture hover, Texture press)
+    this(in Rectanglei area, in Vectori position, in Texture tex, in Texture hover, in Texture press)
     {
         this.area = area;
         this.position = position;
@@ -24,7 +24,7 @@ struct Button
         this.press = press;
     }
 
-    bool draw(Window window)
+    bool draw(scope Window window) const
     {
         bool mouseContained = area.contains(window.mouseScreen);
         window.draw(mouseContained ? (window.mouseLeftPressed ? press : hover) : tex,
@@ -41,13 +41,13 @@ struct Slider
 
     @disable this();
 
-    this(Rectanglei area, Texture sliderHead)
+    this(in Rectanglei area, in Texture sliderHead)
     {
         this.area = area;
         this.slider = sliderHead;
     }
 
-    float draw(Window window, float current)
+    float draw(scope Window window, in float current) const
     {
         window.draw(slider, -slider.getRegion.width / 2 + area.x + current * area.width,
                 -slider.getRegion.height / 2 + area.y + area.height / 2);
@@ -65,9 +65,9 @@ struct Carousel
     public @nogc nothrow:
     Button left, right;
     Vectori position;
-    Array!Texture textures;
+    const(Array!Texture) textures;
 
-    this(Button left, Button right, Vectori currentItemPosition, Array!Texture textures)
+    this(in Button left, in Button right, in Vectori currentItemPosition, in Array!Texture textures)
     {
         this.left = left;
         this.right = right;
@@ -75,14 +75,15 @@ struct Carousel
         this.textures = textures;
     }
 
-    int draw(Window window, int current)
+    int draw(scope Window window, in int current) const
     {
+        int next = current;
         if (left.draw(window))
-            current --;
+            next --;
         if (right.draw(window))
-            current ++;
-        current = cast(int)((current + textures.length) % textures.length);
-        window.draw(textures[current], position.x, position.y);
-        return current;
+            next ++;
+        next = cast(int)((next + textures.length) % textures.length);
+        window.draw(textures[next], position.x, position.y);
+        return next;
     }
 }

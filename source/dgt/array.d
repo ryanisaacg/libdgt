@@ -11,17 +11,17 @@ struct Array(T)
     @disable this();
 
 	@nogc nothrow public:
-    this(size_t initialCapacity)
+    this(in size_t initialCapacity)
     {
         ensureCapacity(initialCapacity);
     }
 
-    this(size_t N)(T[N] array)
+    this(size_t N)(in T[N] array)
     {
         this = array;
     }
 
-	void ensureCapacity(size_t newCapacity)
+	void ensureCapacity(in size_t newCapacity)
 	{
 		void* old = backingBuffer;
 		backingBuffer = realloc(backingBuffer, size_t.sizeof * 2 + T.sizeof * newCapacity);
@@ -29,7 +29,7 @@ struct Array(T)
 		if (old == null) *count = 0;
 	}
 
-	void add(T val)
+	void add(scope T val)
 	{
 		if (*count >= *capacity)
 			ensureCapacity(*capacity * 2);
@@ -37,7 +37,7 @@ struct Array(T)
 		*count += 1;
 	}
 
-	void addAll(A...)(A a)
+	void addAll(A...)(scope A a)
 	{
 		foreach(val; a)
 		{
@@ -71,7 +71,7 @@ struct Array(T)
 		dgt.io.print("]");
 	}
 
-	ref Array!T opAssign(size_t N)(T[N] data)
+	ref Array!T opAssign(size_t N)(in T[N] data)
 	{
 		ensureCapacity(N);
 		clear();
@@ -84,19 +84,19 @@ struct Array(T)
 	}
 
 	pure:
-	void remove(size_t index)
+	void remove(in size_t index)
 	{
 		buffer[index] = buffer[*count];
 		*count -= 1;
 	}
 
-	ref T opIndex(size_t index) const
+	ref T opIndex(in size_t index) const
 	{
 		assert(index < *count);
 		return buffer[index];
 	}
 
-	ref T opIndexAssign(T value, size_t index)
+	ref T opIndexAssign(scope T value, in size_t index)
 	{
 		assert(index < *count);
 		return buffer[index] = value;

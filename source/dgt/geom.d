@@ -19,13 +19,13 @@ struct Vector(T)
         this.y = y;
     }
 
-    this(U)(Vector!U vec)
+    this(U)(in Vector!U vec)
     {
         this.x = cast(T)vec.x;
         this.y = cast(T)vec.y;
     }
 
-    Vector!T opUnary(string op)()
+    Vector!T opUnary(string op)() const
     {
         static if (op == "-")
         {
@@ -33,7 +33,7 @@ struct Vector(T)
         }
     }
 
-    Vector!T opBinary(string op)(T scalar)
+    Vector!T opBinary(string op)(in T scalar) const
     {
         static if (op == "*")
         {
@@ -45,7 +45,7 @@ struct Vector(T)
         }
     }
 
-    Vector!T opBinary(string op)(Vector!T other)
+    Vector!T opBinary(string op)(in Vector!T other) const
     {
         static if (op == "+")
         {
@@ -57,12 +57,12 @@ struct Vector(T)
         }
     }
 
-    float len2()
+    float len2() const
     {
         return x * x + y * y;
     }
 
-    float len()
+    float len() const
     {
         return sqrt(len2());
     }
@@ -102,17 +102,17 @@ struct Rectangle(T)
     @property T height() const { return size.y; }
     @property T height(T val) { return size.y = val; }
 
-    bool contains(Vector!T v)
+    bool contains(in Vector!T v) const
     {
         return v.x >= x && v.y >= y && v.x < x + width && v.y < y + height;
     }
 
-    bool overlaps(Rectangle!T b)
+    bool overlaps(in Rectangle!T b) const
     {
         return x < b.x + b.width && x + width > b.x && y < b.y + b.height && y + height > b.y;
     }
 
-    bool overlaps(Circle!T c)
+    bool overlaps(in Circle!T c) const
     {
         Vector!T closest;
         if (c.x < x) {
@@ -174,18 +174,18 @@ struct Circle(T)
     @property T y() const { return center.y; }
     @property T y(T val) { return center.y = val; }
 
-    bool contains(Vector!T v)
+    bool contains(in Vector!T v) const
     {
         Vector!T dist = v - center;
         return dist.len2 < radius * radius;
     }
 
-    bool overlaps(Rectangle!T r)
+    bool overlaps(in Rectangle!T r) const
     {
         return r.overlaps(this);
     }
 
-    bool overlaps(Circle!T c)
+    bool overlaps(in Circle!T c) const
     {
         float xDiff = x - c.x;
         float yDiff = y - c.y;
@@ -247,7 +247,7 @@ struct Transform(T)
         return data.ptr;
     }
 
-    public Transform!T opBinary(string op)(Transform!T other)
+    public Transform!T opBinary(string op)(Transform!T other) const
     if (op == "*")
     {
         Transform!T ret;
@@ -262,14 +262,14 @@ struct Transform(T)
         return ret;
     }
 
-    public Vector!T opBinary(string op)(Vector!T other)
+    public Vector!T opBinary(string op)(Vector!T other) const
     if (op == "*")
     {
         return Vector!T(other.x * this[0, 0] + other.y * this[0, 1] + this[0, 2],
             other.x * this[1, 0] + other.y * this[1, 1] + this[1, 2]);
     }
 
-    public Vector!U opBinary(string op, U)(Vector!U other)
+    public Vector!U opBinary(string op, U)(Vector!U other) const
     if (op == "*")
     {
         auto converted = Vector!T(cast(T)other.x, cast(T)other.y);

@@ -14,7 +14,7 @@ struct TileLayer
     bool visible;
 
     @nogc nothrow:
-    pure int opIndex(int x, int y)
+    pure int opIndex(in int x, in int y) const
     {
         return tiles[x + y * widthInTiles];
     }
@@ -62,7 +62,7 @@ struct Map
 
     int tileWidth, tileHeight, widthInTiles, heightInTiles;
 
-    private uint stripGID(uint gid, ref bool outFlipX, ref bool outFlipY)
+    private uint stripGID(uint gid, ref bool outFlipX, ref bool outFlipY) const
     {
         outFlipX = outFlipY = (gid & FLIPPED_DIAGONALLY_FLAG) != 0;
         outFlipX = outFlipX != ((gid & FLIPPED_HORIZONTALLY_FLAG) != 0);
@@ -70,7 +70,7 @@ struct Map
         return gid & ~(FLIPPED_HORIZONTALLY_FLAG | FLIPPED_VERTICALLY_FLAG | FLIPPED_DIAGONALLY_FLAG);
     }
 
-    this(string path, int scale = 1)
+    this(in string path, in int scale = 1)
     {
         sourceImages = Array!Texture(4);
         tileImages = Array!Texture(16);

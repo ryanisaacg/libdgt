@@ -11,7 +11,7 @@ struct WindowConfig
 {
     bool fullscreen, resizable, borderless, minimized, maximized, input_grabbed, highdpi;
 
-    int getFlags()
+    int getFlags() const
     {
         return SDL_WINDOW_OPENGL |
         (resizable ? SDL_WINDOW_RESIZABLE : 0) |
@@ -51,7 +51,7 @@ class Window
     float aspectRatio;
     int scale;
 
-    this(string title, int width, int height, WindowConfig config, int scale = 1, bool bindToGlobal = true)
+    this(in string title, in int width, in int height, in WindowConfig config, in int scale = 1, in bool bindToGlobal = true)
     {
         DerelictSDL2.load(SharedLibVersion(2, 0, 3));
         SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO);
@@ -110,7 +110,7 @@ class Window
 
     @nogc nothrow:
 
-    void begin(Color bg, Rectangle!int cam)
+    void begin(in Color bg, in Rectangle!int cam)
     {
         camera = cam;
         inUIMode = false;
@@ -181,7 +181,7 @@ class Window
         ];
     }
 
-    void stepParticles(T)(Tilemap!T map)
+    void stepParticles(T)(in Tilemap!T map)
     {
         for(size_t i = 0; i < particles.length; i++) {
             switch (particles[i].behavior) {
@@ -210,7 +210,7 @@ class Window
         }
     }
 
-    void end(T)(Tilemap!T map)
+    void end(T)(in Tilemap!T map)
     {
         ctx.flip();
 
@@ -223,7 +223,7 @@ class Window
         previous_ticks = time;
     }
 
-    void draw(size_t Len)(Color color, Vectori[Len] points)
+    void draw(size_t Len)(in Color color, in Vectori[Len] points)
     {
         static immutable Indices = (Len - 2) * 3;
         static assert ( Len >= 3 );
@@ -247,7 +247,8 @@ class Window
     }
 
 
-    void draw(size_t NumPoints = 32)(Color color, Circlei circle) {
+    void draw(size_t NumPoints = 32)(in Color color, in Circlei circle)
+    {
         Vectori[NumPoints] points; //A large array of points to simulate a circle
         auto rotation = rotate(360 / NumPoints);
         auto pointer = Vectorf(0, -circle.radius);
@@ -259,30 +260,33 @@ class Window
         draw(color, points);
     }
 
-    void draw(Color color, Rectanglei rect) {
+    void draw(in Color color, in Rectanglei rect)
+    {
         Vectori[4] points = [ rect.topLeft, Vectori(rect.x + rect.width, rect.y),
             rect.topLeft + rect.size, Vectori(rect.x, rect.y + rect.height)];
         draw(color, points);
     }
 
-    void draw(ref Texture tex, float x, float y)
+    void draw(in Texture tex, in float x, in float y)
     {
         draw(tex, x, y, tex.getRegion.width * scale, tex.getRegion.height * scale);
     }
 
-    void draw(ref Texture tex, float x, float y, float w, float h,
-                        float rot = 0, float or_x = 0, float or_y = 0,
-                        float scale_x = 1, float scale_y = 1,
-                        bool flip_x = false, bool flip_y = false,
-                        Color color = dgt.color.white) {
+    void draw(in Texture tex, in float x, in float y, in float w, in float h,
+                        in float rot = 0, in float or_x = 0, in float or_y = 0,
+                        in float scale_x = 1, in float scale_y = 1,
+                        in bool flip_x = false, in bool flip_y = false,
+                        in Color color = dgt.color.white)
+    {
         auto trans = identity() * translate(-or_x, -or_y) * rotate(rot)
             * dgt.geom.scale(scale_x, scale_y);
         draw(tex, trans, x + or_x, y + or_y, w, h, flip_x, flip_y, color);
     }
 
-    void draw(ref Texture tex, ref Transform!float trans, float x, float y,
-                       float w, float h, bool flip_x = false, bool flip_y = false,
-                       Color color = dgt.color.white) {
+    void draw(in Texture tex, in Transform!float trans, in float x, in float y,
+                       in float w, in float h, in bool flip_x = false, in bool flip_y = false,
+                       in Color color = dgt.color.white)
+    {
         //Calculate the destination points with the transformation
         auto tl = (trans * Vectorf(0, 0)) / scale;
         auto tr = (trans * Vectorf(w, 0)) / scale;
@@ -328,7 +332,7 @@ class Window
         ctx.add!(4, 6)(tex.id, vertices, indices);
     }
 
-    void draw(ref Sprite sprite)
+    void draw(ref scope Sprite sprite)
     {
         sprite.update();
         draw(sprite.getTexture, sprite.x, sprite.y, sprite.width, sprite.height,
@@ -336,14 +340,17 @@ class Window
                 sprite.scaleX, sprite.scaleY, sprite.flipX, sprite.flipY, sprite.color);
     }
 
-    int draw(ref Font font, char c, float x, float y) {
+    int draw(in Font font, in char c, in float x, in float y)
+    {
         Texture renderChar = font.render(c);
         draw(renderChar, x, y);
         return renderChar.getRegion.width;
     }
 
-    void draw(ref Font font, string str, float x, float y) {
+    void draw(in Font font, in string str, in float x, in float y)
+    {
         int position = 0;
+        float cursor = y;
         //Loop from the beginning to end of the string
         for(size_t i = 0; i < str.length; i++)
         {
@@ -352,51 +359,58 @@ class Window
             {
                 for (int j = 0; j < 4; i++)
                 {
-                    position += draw(font, ' ', position + x, y);
+                    position += draw(font, ' ', position + x, cursor);
                 }
             } else if (c == '\n')
-                y += font.height;
+                cursor += font.height;
             else if (c != '\r')
-                position += draw(font, c, position + x, y);
+                position += draw(font, c, position + x, cursor);
         }
     }
 
-    void addParticleBurst(ref ParticleEmitter emitter)
+    void addParticleBurst(in ParticleEmitter emitter)
     {
         int parts = randomRange(emitter.particle_min, emitter.particle_max);
         for (int i = 0; i < parts; i++)
             particles.add(emitter.emit());
     }
 
-    bool isKeyDown(string name) { return current_keys[SDL_GetScancodeFromName(name.ptr)]; }
-    bool wasKeyDown(string name) { return previous_keys[SDL_GetScancodeFromName(name.ptr)]; }
+    bool isKeyDown(in string name) const
+    {
+        return current_keys[SDL_GetScancodeFromName(name.ptr)];
+    }
 
-    void setShader(string vertexShader, string fragmentShader)
+    bool wasKeyDown(in string name) const 
+    {
+        return previous_keys[SDL_GetScancodeFromName(name.ptr)];
+    }
+
+    void setShader(in string vertexShader, in string fragmentShader)
     {
         ctx.setShader(vertexShader, fragmentShader);
     }
 
     pure:
-    @property Vector!int mouseScreen()
+    @property Vector!int mouseScreen() const
     {
         return mouse * camera.width / windowWidth - Vectori(offsetX, offsetY);
     }
-    @property Vector!int mouseGame()
+    @property Vector!int mouseGame() const
     {
         return mouseScreen + camera.topLeft;
     }
-    bool mouseLeftPressed() { return mouseLeft; }
-    bool mouseRightPressed() { return mouseRight; }
-    bool mouseMiddlePressed() { return mouseMiddle; }
-    bool mouseLeftReleased() { return !mouseLeft && mouseLeftPrevious; }
-    bool mouseRightReleased() { return !mouseRight && mouseRightPrevious; }
-    bool mouseMiddleReleased() { return !mouseMiddle && mouseMiddlePrevious; }
-    bool isOpen() { return shouldContinue; }
-    int getScale() { return scale; }
+    bool mouseLeftPressed() const { return mouseLeft; }
+    bool mouseRightPressed() const { return mouseRight; }
+    bool mouseMiddlePressed() const { return mouseMiddle; }
+    bool mouseLeftReleased() const { return !mouseLeft && mouseLeftPrevious; }
+    bool mouseRightReleased() const { return !mouseRight && mouseRightPrevious; }
+    bool mouseMiddleReleased() const { return !mouseMiddle && mouseMiddlePrevious; }
+    bool isOpen() const { return shouldContinue; }
+    int getScale() const { return scale; }
     Array!Gamepad getGamepads() { return gamepads; }
-    @property int width() { return width; }
-    @property int height() { return height; }
-    @property int unitsPerPixel() { return scale; }
+    @property int width() const { return width; }
+    @property int height() const { return height; }
+    @property int unitsPerPixel() const { return scale; }
 }
 
 private Window globalWindow;

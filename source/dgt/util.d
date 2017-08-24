@@ -10,19 +10,19 @@ float random()
 {
     return cast(float) rand() / RAND_MAX;
 }
-float randomRange(float min, float max)
+float randomRange(in float min, in float max)
 {
     return (max - min) * random() + min;
 }
-int randomRange(int min, int max)
+int randomRange(in int min, in int max)
 {
     return cast(int)randomRange(cast(float)min, cast(float)max);
 }
-Vector!float randomRange(Vector!float a, Vector!float b)
+Vector!float randomRange(in Vector!float a, in Vector!float b)
 {
     return Vector!float(randomRange(a.x, b.x), randomRange(a.y, b.y));
 }
-Vector!int randomRange(Vector!int a, Vector!int b)
+Vector!int randomRange(in Vector!int a, in Vector!int b)
 {
     return Vector!int(randomRange(a.x, b.x), randomRange(a.y, b.y));
 }

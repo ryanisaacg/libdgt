@@ -16,7 +16,7 @@ struct Tilemap(T)
 	private int size, _width, _height;
 
 	@nogc nothrow public:
-	this(int mapWidth, int mapHeight, int size)
+	this(in int mapWidth, in int mapHeight, in int size)
 	{
 		this._width = mapWidth;
 		this._height = mapHeight;
@@ -28,27 +28,27 @@ struct Tilemap(T)
 	}
 
 	pure:
-	Tile!T opIndex(int x, int y)
+	Tile!T opIndex(in int x, in int y) const
 	{
 		return valid(x, y) ? buffer[(x / size) * height / size + (y / size)] : INVALID_TILE;
 	}
 
-	ref Tile!T opIndexAssign(Tile!T tile, int x, int y)
+	ref Tile!T opIndexAssign(in Tile!T tile, in int x, in int y)
 	{
 		return buffer[(x / size) * height / size + (y / size)] = tile;
 	}
 
-	bool valid(int x, int y)
+	bool valid(in int x, in int y) const
 	{
 		return x >= 0 && y >= 0 && x < width && y < height;
 	}
 
-	bool empty(int x, int y)
+	bool empty(in int x, in int y) const
 	{
 		return !this[x, y].solid;
 	}
 
-	bool empty(int x, int y, int width, int height)
+	bool empty(in int x, in int y, in int width, in int height) const
 	{
 		for(int i = x; i < x + width; i += size)
 			for(int j = y; j < y + height; j += size)
@@ -58,23 +58,24 @@ struct Tilemap(T)
 	}
 
     //TODO: Increase resolution of slideContact
-	Vector!int slideContact(int x, int y, int width, int height, Vector!int v)
+	Vector!int slideContact(in int x, in int y, in int width, in int height, in Vector!int v) const
 	{
 		if (empty(x + v.x, y + v.y, width, height))
 			return v;
 		else
 		{
+            Vector!int attempt = v;
 			while (!empty(x + v.x, y, width, height))
-				v.x /= 2;
+				attempt.x /= 2;
 			while (!empty(x + v.x, y + v.y, width, height))
-				v.y /= 2;
-			return v;
+				attempt.y /= 2;
+			return attempt;
 		}
 	}
 
-	@property int width() { return _width; }
-	@property int height() { return _height; }
-	@property int tileSize() { return size; }
+	@property int width() const { return _width; }
+	@property int height() const { return _height; }
+	@property int tileSize() const { return size; }
 }
 
 unittest

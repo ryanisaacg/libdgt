@@ -36,7 +36,7 @@ struct Sprite
         height = tex.getRegion.height;
     }
 
-    this(ref Animation anim)
+    this(Animation anim)
     {
         data.anim = anim;
         type = SpriteType.Animated;
@@ -66,7 +66,7 @@ struct Sprite
             data.anim.update();
     }
 
-    ref Texture getTexture()
+    ref const(Texture) getTexture() const
     {
         if(type == SpriteType.Animated)
             return data.anim.currentTexture();

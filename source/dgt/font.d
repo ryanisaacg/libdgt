@@ -10,7 +10,7 @@ struct Font
 	int height;
 
     @nogc nothrow public:
-	this(string filename, int size, Color col)
+	this(in string filename, in int size, in Color col)
     {
         TTF_Font* font = TTF_OpenFont(filename.ptr, size);
         if (font == null)
@@ -59,12 +59,12 @@ struct Font
     }
 
     pure:
-    Texture render(char c)
+    Texture render(in char c) const
     {
         return characterTextures[getIndexFromChar(c)];
     }
 
-    Rectangle!int getSizeOfString(string str)
+    Rectangle!int getSizeOfString(in string str) const
     {
     	int position = 0;
     	int width = 0, height = this.height;
@@ -86,12 +86,12 @@ struct Font
     	return Rectanglei(0, 0, width, height);
     }
 
-    private int getIndexFromChar(char c)
+    private int getIndexFromChar(in char c) const
     {
         return c - FONT_CHAR_OFFSET;
     }
 
-    private char getCharFromIndex(int index)
+    private char getCharFromIndex(in int index) const
     {
         return cast(char)(index + FONT_CHAR_OFFSET);
     }

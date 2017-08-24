@@ -16,7 +16,7 @@ struct Animation
     int currentFrame, currentTime;
 
     @nogc nothrow public pure:
-    this(size_t N)(Frame[N] frames)
+    this(size_t N)(in Frame[N] frames)
     {
         this(Array!Frame(frames));
     }
@@ -29,7 +29,7 @@ struct Animation
         assert(frames.length > 0);
     }
 
-    ref Texture update()
+    ref const(Texture) update()
     {
         currentTime++;
         if (currentTime >= frames[currentFrame].delay)
@@ -40,7 +40,7 @@ struct Animation
         return frames[currentFrame].image;
     }
 
-    ref Texture currentTexture()
+    ref const(Texture) currentTexture() const
     {
         return frames[currentFrame].image;
     }

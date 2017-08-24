@@ -11,9 +11,9 @@ struct Music
         source = Mix_LoadMUS(path.ptr);
     }
 
-    @property int volume() { return Mix_VolumeMusic(-1); }
-    @property int volume(int value) { return Mix_VolumeMusic(value); }
-    void play(int times = 1)
+    @property int volume() const { return Mix_VolumeMusic(-1); }
+    @property int volume(in int value) { return Mix_VolumeMusic(value); }
+    void play(in int times = 1)
     {
         Mix_PlayMusic(source, times - 1);
     }
