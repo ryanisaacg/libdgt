@@ -53,10 +53,11 @@ class Window
 
     this(in string title, in int width, in int height, in WindowConfig config, in int scale = 1, in bool bindToGlobal = true)
     {
+        //Initialize libraries
         DerelictSDL2.load(SharedLibVersion(2, 0, 3));
-        SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO);
-        SDL_InitSubSystem(SDL_INIT_GAMECONTROLLER);
+        SDL_Init(SDL_INIT_VIDEO);
         new Thread({
+            SDL_Init(SDL_INIT_AUDIO | SDL_INIT_GAMECONTROLLER);
             DerelictSDL2Image.load();
             DerelictSDL2ttf.load();
             DerelictSDL2Mixer.load();
@@ -72,23 +73,26 @@ class Window
         camera.set(0, 0, width * scale, height * scale);
         windowWidth = width;
         windowHeight = height;
-        thread_joinAll();
-        Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 1024);
-        Mix_AllocateChannels(512);
-
-        srand(cast(uint)time(null));
 
         ubyte[3] white_pixel = [ 255, 255, 255 ];
         white = Texture(white_pixel.ptr, 1, 1, false);
         glViewport(0, 0, width, height);
         aspectRatio = cast(float)width / height;
         this.scale = scale;
+
+        srand(cast(uint)time(null));
+
+        if(bindToGlobal)
+            globalWindow = this;
+
+        thread_joinAll();
+        Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 1024);
+        Mix_AllocateChannels(512);
+
         connectedGamepads = Array!Gamepad(SDL_NumJoysticks());
         for(int i = 0; i < SDL_NumJoysticks(); i++)
             if(SDL_IsGameController(i))
                 connectedGamepads.add(Gamepad(SDL_GameControllerOpen(i)));
-        if(bindToGlobal)
-            globalWindow = this;
     }
 
     @nogc nothrow:
@@ -107,8 +111,6 @@ class Window
         IMG_Quit();
         SDL_Quit();
     }
-
-    @nogc nothrow:
 
     void begin(in Color bg, in Rectangle!int cam)
     {
