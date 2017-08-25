@@ -27,7 +27,7 @@ struct Font
     	for (int i = 0; i < FONT_MAX_CHARS; i++)
 		{
     		buffer[0] = getCharFromIndex(i);
-    		characters[i] = TTF_RenderText_Solid(font, buffer.ptr, color);
+    		characters[i] = TTF_RenderText_Blended(font, buffer.ptr, color);
     		total_width += characters[i].w;
     		if (characters[i].h > height)
     			height = characters[i].h;
