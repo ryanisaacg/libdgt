@@ -26,7 +26,7 @@ struct WindowConfig
 
 static immutable SDL_NUM_KEYS = 284;
 
-class Window
+struct Window
 {
     private:
     SDL_Window *window;
@@ -45,6 +45,9 @@ class Window
     Rectangle!int camera;
     Array!Gamepad connectedGamepads;
     int scale;
+
+    @disable this();
+    @disable this(this);
 
     public:
     bool inUIMode = false;
@@ -83,7 +86,7 @@ class Window
         srand(cast(uint)time(null));
 
         if(bindToGlobal)
-            globalWindow = this;
+            globalWindow = &this;
 
         thread_joinAll();
         Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 1024);
@@ -104,7 +107,8 @@ class Window
 
     ~this()
     {
-        ctx.destroy();
+        foreach(gamepad; gamepads)
+            gamepad.destroy();
         SDL_DestroyWindow(window);
         TTF_Quit();
         Mix_Quit();
@@ -342,14 +346,14 @@ class Window
                 sprite.scaleX, sprite.scaleY, sprite.flipX, sprite.flipY, sprite.color);
     }
 
-    int draw(in Font font, in char c, in float x, in float y)
+    int draw(ref in Font font, in char c, in float x, in float y)
     {
         Texture renderChar = font.render(c);
         draw(renderChar, x, y);
         return renderChar.size.width;
     }
 
-    void draw(in Font font, in string str, in float x, in float y)
+    void draw(ref in Font font, in string str, in float x, in float y)
     {
         int position = 0;
         float cursor = y;
@@ -411,11 +415,11 @@ class Window
     @property int unitsPerPixel() const { return scale; }
 }
 
-private Window globalWindow;
+private Window* globalWindow;
 
-public @nogc nothrow Window getWindow()
+public @nogc nothrow ref Window getWindow()
 {
-    return globalWindow;
+    return *globalWindow;
 }
 
 unittest

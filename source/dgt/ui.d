@@ -24,7 +24,7 @@ struct Button
         this.press = press;
     }
 
-    bool draw(scope Window window) const
+    bool draw(ref scope Window window) const
     {
         bool mouseContained = area.contains(window.mouse);
         window.draw(mouseContained ? (window.mouseLeftPressed ? press : hover) : tex,
@@ -47,7 +47,7 @@ struct Slider
         this.slider = sliderHead;
     }
 
-    float draw(scope Window window, in float current) const
+    float draw(ref scope Window window, in float current) const
     {
         window.draw(slider, -slider.size.width / 2 + area.x + current * area.width,
                 -slider.size.height / 2 + area.y + area.height / 2);
@@ -75,7 +75,7 @@ struct Carousel
         this.textures = textures;
     }
 
-    int draw(scope Window window, in int current) const
+    int draw(ref scope Window window, in int current) const
     {
         int next = current;
         if (left.draw(window))

@@ -9,6 +9,9 @@ struct Font
 	Array!Texture characterTextures;
 	int height;
 
+    @disable this();
+    @disable this(this);
+
     @nogc nothrow public:
 	this(in string filename, in int size, in Color col)
     {
@@ -53,7 +56,7 @@ struct Font
         }
     }
 
-    void destroy()
+    ~this()
     {
         characterTextures.destroy();
     }

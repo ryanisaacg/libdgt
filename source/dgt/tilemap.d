@@ -27,6 +27,11 @@ struct Tilemap(T)
 				buffer.add(Tile!T(T(), false));
 	}
 
+	void destroy()
+	{
+		buffer.destroy();
+	}
+
 	pure:
 	Tile!T opIndex(in int x, in int y) const
 	{

@@ -5,11 +5,19 @@ struct Music
 {
 	private Mix_Music* source;
 
+	@disable this();
+	@disable this(this);
+
     @nogc nothrow:
     this(string path)
     {
         source = Mix_LoadMUS(path.ptr);
     }
+
+	~this()
+	{
+		Mix_FreeMusic(source);
+	}
 
     @property int volume() const { return Mix_VolumeMusic(-1); }
     @property int volume(in int value) { return Mix_VolumeMusic(value); }
@@ -32,9 +40,5 @@ struct Music
     void fadeOut(int ms)
     {
         Mix_FadeOutMusic(ms);
-    }
-    void destroy()
-    {
-        Mix_FreeMusic(source);
     }
 }

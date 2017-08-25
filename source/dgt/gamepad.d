@@ -9,10 +9,16 @@ struct Gamepad
     private SDL_GameController* controller;
 
     @nogc nothrow:
+    @disable this();
 
     package this(SDL_GameController* controller)
     {
         this.controller = controller;
+    }
+
+    package void destroy()
+    {
+        SDL_GameControllerClose(controller);
     }
 
     private float getTrigger(SDL_GameControllerAxis axis)

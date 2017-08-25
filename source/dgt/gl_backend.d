@@ -61,6 +61,7 @@ struct GLBackend
 	private static immutable size_t vertex_size = 8;
 
     @disable this();
+	@disable this(this);
 
 	@trusted:
 	public this(SDL_Window* window)
@@ -82,6 +83,22 @@ struct GLBackend
 	}
 
 	@nogc nothrow:
+
+	~this()
+	{
+		vertices.destroy();
+		indices.destroy();
+		glDeleteProgram(shader);
+		glDeleteShader(fragment);
+		glDeleteShader(vertex);
+
+		glDeleteBuffers(1, &vbo);
+		glDeleteBuffers(1, &ebo);
+
+		glDeleteVertexArrays(1, &vao);
+		SDL_GL_DeleteContext(ctx);
+	}
+
 	public void setShader(in string vertexShader, in string fragmentShader)
 	{
 		if(shader != 0) glDeleteProgram(shader);
@@ -122,21 +139,6 @@ struct GLBackend
 		glBindFragDataLocation(shader, 0, "outColor");
 		glLinkProgram(shader);
 		glUseProgram(shader);
-	}
-
-	public void destroy()
-	{
-		vertices.destroy();
-		indices.destroy();
-		glDeleteProgram(shader);
-		glDeleteShader(fragment);
-		glDeleteShader(vertex);
-
-		glDeleteBuffers(1, &vbo);
-		glDeleteBuffers(1, &ebo);
-
-		glDeleteVertexArrays(1, &vao);
-		SDL_GL_DeleteContext(ctx);
 	}
 
 	public void clear(in Color col)

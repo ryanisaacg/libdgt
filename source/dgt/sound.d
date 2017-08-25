@@ -5,11 +5,18 @@ struct SoundClip
 {
 	private Mix_Chunk* source;
 
+	@disable this();
+	@disable this(this);
+
     @nogc nothrow:
     this(in string path)
     {
         source = Mix_LoadWAV(path.ptr);
     }
+	~this()
+	{
+		Mix_FreeChunk(source);
+	}
 
     @property int volume() { return Mix_VolumeChunk(source, -1); }
     @property int volume(in int value) { return Mix_VolumeChunk(source, value); }
@@ -17,11 +24,6 @@ struct SoundClip
     SoundInstance play(in int times = 1)
     {
         return SoundInstance(Mix_PlayChannel(-1, source, times - 1));
-    }
-
-    void destroy()
-    {
-        Mix_FreeChunk(source);
     }
 }
 
