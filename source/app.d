@@ -4,9 +4,7 @@ import std.datetime;
 
 void main()
 {
-	WindowConfig config;
-	config.resizable = true;
-	config.highdpi = true;
+	WindowConfig config = { resizable : true, highdpi : true };
 	Window engine = new Window("Test title", 640, 480, config);
 	auto tex = Texture("test.png");
 	scope(exit) tex.destroy();
