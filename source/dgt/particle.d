@@ -14,7 +14,7 @@ struct Particle
     int lifetime = 0;
     ParticleBehavior behavior = ParticleBehavior.Ignore;
 
-    @nogc nothrow pure public void update()
+    @safe @nogc nothrow pure public void update()
     {
         velocity = velocity + acceleration;
         position = position + velocity;

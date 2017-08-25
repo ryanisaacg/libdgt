@@ -2,6 +2,7 @@ module dgt.geom;
 import std.math : sqrt, cos, sin, PI;
 import dgt.io;
 
+@safe:
 
 struct Vector(T)
 {
@@ -244,7 +245,7 @@ struct Transform(T)
 
     public T* ptr()
     {
-        return data.ptr;
+        return &data[0];
     }
 
     public Transform!T opBinary(string op)(Transform!T other) const

@@ -62,6 +62,7 @@ struct GLBackend
 
     @disable this();
 
+	@trusted:
 	public this(SDL_Window* window)
 	{
 		DerelictGL3.load();

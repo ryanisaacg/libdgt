@@ -10,7 +10,7 @@ struct Array(T)
 
     @disable this();
 
-	@nogc nothrow public:
+	@nogc @trusted nothrow public:
     this(in size_t initialCapacity)
     {
         ensureCapacity(initialCapacity);
@@ -112,7 +112,7 @@ struct Array(T)
 
 	private:
 	private @property size_t* count() const { return cast(size_t*) backingBuffer; }
-	private @property size_t* capacity() const {	return count + 1; }
+	private @property size_t* capacity() const { return count + 1; }
 	private @property T* buffer() const { return cast(T*)(capacity + 1); }
 }
 

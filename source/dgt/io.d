@@ -1,7 +1,7 @@
 module dgt.io;
 import core.stdc.stdio;
 
-@nogc nothrow:
+@nogc nothrow @trusted:
 
 void print(in int value)
 {

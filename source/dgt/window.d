@@ -95,7 +95,7 @@ class Window
                 connectedGamepads.add(Gamepad(SDL_GameControllerOpen(i)));
     }
 
-    @nogc nothrow:
+    @nogc nothrow @trusted:
 
     void close()
     {
