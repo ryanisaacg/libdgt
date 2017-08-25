@@ -1,5 +1,5 @@
 module dgt.gl_backend;
-import derelict.opengl3.gl;
+import derelict.opengl;
 import derelict.sdl2.sdl;
 
 import dgt.array : Array;

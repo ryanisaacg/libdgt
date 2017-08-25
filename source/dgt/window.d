@@ -1,5 +1,5 @@
 module dgt.window;
-import derelict.opengl3.gl;
+import derelict.opengl;
 import derelict.sdl2.sdl, derelict.sdl2.image, derelict.sdl2.mixer, derelict.sdl2.ttf;
 import core.stdc.stdio, core.stdc.stdlib, core.stdc.time, core.thread;
 
@@ -11,16 +11,16 @@ struct WindowConfig
 {
     bool fullscreen, resizable, borderless, minimized, maximized, input_grabbed, highdpi;
 
-    int getFlags() const
+    @property SDL_WindowFlags flags() const
     {
         return SDL_WINDOW_OPENGL |
-        (resizable ? SDL_WINDOW_RESIZABLE : 0) |
-        (fullscreen ? SDL_WINDOW_FULLSCREEN : 0) |
-        (borderless ? SDL_WINDOW_BORDERLESS : 0) |
-        (minimized ? SDL_WINDOW_MINIMIZED : 0) |
-        (maximized ? SDL_WINDOW_MAXIMIZED : 0) |
-        (input_grabbed ? SDL_WINDOW_INPUT_GRABBED : 0) |
-        (highdpi ? SDL_WINDOW_ALLOW_HIGHDPI : 0);
+        (resizable ? SDL_WINDOW_RESIZABLE : cast(SDL_WindowFlags)0) |
+        (fullscreen ? SDL_WINDOW_FULLSCREEN : cast(SDL_WindowFlags)0) |
+        (borderless ? SDL_WINDOW_BORDERLESS : cast(SDL_WindowFlags)0) |
+        (minimized ? SDL_WINDOW_MINIMIZED : cast(SDL_WindowFlags)0) |
+        (maximized ? SDL_WINDOW_MAXIMIZED : cast(SDL_WindowFlags)0) |
+        (input_grabbed ? SDL_WINDOW_INPUT_GRABBED : cast(SDL_WindowFlags)0) |
+        (highdpi ? SDL_WINDOW_ALLOW_HIGHDPI : cast(SDL_WindowFlags)0);
     }
 }
 
@@ -66,7 +66,7 @@ class Window
         }).start();
         window = SDL_CreateWindow(title.ptr,
             SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width, height,
-            config.getFlags());
+            config.flags);
         ctx = GLBackend(window);
         particles = Array!Particle(128);
         camera.set(0, 0, width * scale, height * scale);

@@ -1,6 +1,6 @@
 module dgt.texture;
 import derelict.sdl2.sdl, derelict.sdl2.image;
-import derelict.opengl3.gl;
+import derelict.opengl;
 import dgt.io;
 import dgt.geom : Rectangle;
 
