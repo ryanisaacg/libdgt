@@ -2,6 +2,15 @@ module dgt.font;
 import derelict.sdl2.sdl, derelict.sdl2.ttf;
 import dgt.array, dgt.color, dgt.geom, dgt.io, dgt.texture, dgt.window;
 
+enum FontStyle : int
+{
+    normal = TTF_STYLE_NORMAL,
+    bold = TTF_STYLE_BOLD,
+    italic = TTF_STYLE_ITALIC,
+    underline = TTF_STYLE_UNDERLINE,
+    strikethrough = TTF_STYLE_STRIKETHROUGH
+}
+
 struct Font
 {
     static immutable FONT_MAX_CHARS = 223;
@@ -13,9 +22,10 @@ struct Font
     @disable this(this);
 
     @nogc nothrow public:
-	this(in string filename, in int size, in Color col)
+	this(in string filename, in int size, in Color col, in FontStyle style)
     {
         TTF_Font* font = TTF_OpenFont(filename.ptr, size);
+        TTF_SetFontStyle(font, style);
         if (font == null)
             println("Font with filename ", filename, " not found");
 		SDL_Color color = cast(SDL_Color)col;
