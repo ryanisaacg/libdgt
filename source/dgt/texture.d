@@ -4,6 +4,8 @@ import derelict.opengl;
 import dgt.io;
 import dgt.geom : Rectangle;
 
+import core.stdc.string;
+
 struct Texture
 {
     package uint id;
@@ -37,7 +39,8 @@ struct Texture
         SDL_Surface* surface = IMG_Load(name.ptr);
         if (surface == null)
         {
-            println("Texture with filename ", name, " not found");
+            auto buffer = IMG_GetError();
+            println("Image loading error: ", buffer[0..strlen(buffer)]);
             this(null, 0, 0, false);
         }
         else
