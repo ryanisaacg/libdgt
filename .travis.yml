@@ -1,6 +1,4 @@
 language: d
 before_install:
-  - sudo apt-get install xpra xserver-xorg-video-dummy freeglut3-dev;
-  - "xpra --xvfb=\"Xorg +extension GLX -config `pwd`/test/dummy.xorg.conf -logfile ${HOME}/.xpra/xorg.log\"  start :9"
   - sudo apt-get -qq update
   - sudo apt-get install -y libsdl2-dev libsdl2-mixer-dev libsdl2-image-dev libsdl2-ttf-dev

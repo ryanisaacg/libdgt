@@ -214,11 +214,3 @@ unittest
 	auto vert = Vertex(Vectorf(0, 0), Vectorf(1, 1), Color(1, 1, 1, 1));
 	println("Should print a white vertex at 0, 0 from 1, 1: ", vert);
 }
-unittest
-{
-	import dgt;
-    WindowConfig config;
-	config.resizable = true;
-	Window window = Window("Test title", 640, 480, config);
-    window.setShader("broken", "broken");
-}

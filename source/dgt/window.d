@@ -427,27 +427,3 @@ public @nogc nothrow ref Window getWindow()
 {
     return *globalWindow;
 }
-
-unittest
-{
-    import dgt;
-    WindowConfig config;
-	config.resizable = true;
-	Window window = Window("Test title", 640, 480, config);
-    auto tex = Texture("test.png");
-    scope(exit) tex.destroy();
-    auto camera = Rectanglei(0, 0, 640, 480);
-    auto map = Tilemap!bool(640, 480, 32);
-    while(window.isOpen)
-    {
-        window.begin(black, camera);
-        scope(exit)
-        {
-            window.end(map);
-            window.close();
-        }
-        window.draw(tex, 100, 0, 32, 32);
-        window.draw(red, Rectanglei(30, 30, 40, 40));
-        window.draw(Color(0, 1, 0, 0.5), Circlei(100, 100, 32));
-    }
-}
