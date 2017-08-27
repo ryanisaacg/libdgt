@@ -1,7 +1,7 @@
 # libdgt
 
 [![Build Status](https://travis-ci.org/ryanisaacg/libdgt.svg?branch=master)](https://travis-ci.org/ryanisaacg/libdgt)
-[![DUB](https://img.shields.io/dub/v/vibe-d.svg)](https://code.dlang.org/packages/dgt)
+[![DUB](https://raw.githubusercontent.com/ryanisaacg/libdgt/master/dub-version.svg)
 
 ## A D Game Toolkit library
 
