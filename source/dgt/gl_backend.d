@@ -219,6 +219,6 @@ unittest
 	import dgt;
     WindowConfig config;
 	config.resizable = true;
-	Window window = new Window("Test title", 640, 480, config);
+	Window window = Window("Test title", 640, 480, config);
     window.setShader("broken", "broken");
 }

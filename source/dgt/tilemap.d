@@ -83,7 +83,7 @@ struct Tilemap(T)
 	@property int tileSize() const { return size; }
 }
 
-unittest
+/*unittest
 {
     Tilemap!int map = Tilemap!int(640, 480, 32);
     map[35, 35] = Tile!int(5, true);
@@ -98,4 +98,4 @@ unittest
     assert(moved.x == 20 && moved.y == 30);
     moved = map.slideContact(600, 10, 30, 10, Vectori(15, 10));
     assert(moved.x == 7 && moved.y == 10);
-}
+}*/

@@ -433,7 +433,7 @@ unittest
     import dgt;
     WindowConfig config;
 	config.resizable = true;
-	Window window = new Window("Test title", 640, 480, config);
+	Window window = Window("Test title", 640, 480, config);
     auto tex = Texture("test.png");
     scope(exit) tex.destroy();
     auto camera = Rectanglei(0, 0, 640, 480);
