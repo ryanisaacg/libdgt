@@ -7,6 +7,6 @@ dependency "derelict-sdl2" version="~>3.0.0-beta.4"
 versions "DerelictSDL2_Static" platform="posix"
 dependency "derelict-gl3" version="~>2.0.0-beta.3"
 
-libs "sdl2_ttf" "sdl2_mixer" "sdl2_image" "sdl2" platform="posix"
+libs "SDL2_ttf" "SDL2_mixer" "SDL2_image" "SDL2" platform="posix"
 
 targetPath "lib"
