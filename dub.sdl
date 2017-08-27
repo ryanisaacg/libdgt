@@ -4,7 +4,7 @@ authors "Ryan Goldstein"
 copyright "Copyright © 2017, Ryan Goldstein"
 license "MIT"
 dependency "derelict-sdl2" version="~>3.0.0-beta.4"
-subConfiguration "derelict-sdl2" "derelict-sdl2-static" platform="posix"
+versions "DerelictSDL2_Static" platform="posix"
 dependency "derelict-gl3" version="~>2.0.0-beta.3"
 
 libs "sdl2_ttf" "sdl2_mixer" "sdl2_image" "sdl2" platform="posix"
