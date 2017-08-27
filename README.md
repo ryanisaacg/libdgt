@@ -2,6 +2,7 @@
 
 [![Build Status](https://travis-ci.org/ryanisaacg/libdgt.svg?branch=master)](https://travis-ci.org/ryanisaacg/libdgt)
 [![DUB](https://img.shields.io/badge/dub-v0.1.1-orange.svg)](https://code.dlang.org/packages/dgt)
+[![License](https://img.shields.io/badge/license-Apache-blue.svg)](https://github.com/ryanisaacg/libdgt/blob/master/LICENSE)
 
 ## A D Game Toolkit library
 
