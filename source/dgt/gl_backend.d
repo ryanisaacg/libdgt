@@ -7,7 +7,7 @@ import dgt.color : Color;
 import dgt.geom;
 import dgt.io;
 
-string DEFAULT_VERTEX_SHADER = "#version 130
+string DEFAULT_VERTEX_SHADER = "#version 150
 in vec2 position;
 in vec2 tex_coord;
 in vec4 color;
@@ -21,7 +21,7 @@ void main() {
 	transformed.z = 0;
 	gl_Position = vec4(transformed, 1.0);
 }";
-string DEFAULT_FRAGMENT_SHADER = "#version 130
+string DEFAULT_FRAGMENT_SHADER = "#version 150
 in vec4 Color;
 in vec2 Tex_coord;
 out vec4 outColor;
@@ -69,6 +69,9 @@ struct GLBackend
 		DerelictGL3.load();
 		this.window = window;
 		SDL_GL_SetSwapInterval(1);
+        SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
+        SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 2);
+        SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
 		ctx = SDL_GL_CreateContext(window);
 		DerelictGL3.reload();
 		glGenVertexArrays(1, &vao);
