@@ -1,5 +1,7 @@
 # libdgt
 
+[![Build Status](https://travis-ci.org/ryanisaacg/libdgt.svg?branch=master)](https://travis-ci.org/ryanisaacg/libdgt)
+
 ## A D Game Toolkit library
 
 The project is written in D to take advantage of its ability for both low and high level programming. There's no need for a separate scripting language like Lua; both the engine and high-level code can be written in the same language.
