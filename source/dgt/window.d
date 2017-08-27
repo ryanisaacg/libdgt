@@ -56,14 +56,20 @@ struct Window
 
     this(in string title, in int width, in int height, in WindowConfig config, in int scale = 1, in bool bindToGlobal = true)
     {
+        version(Windows)
+        {
+            DerelictSDL2.load(SharedLibVersion(2, 0, 3));
+        }
         //Initialize libraries
-        DerelictSDL2.load(SharedLibVersion(2, 0, 3));
         SDL_Init(SDL_INIT_VIDEO);
         new Thread({
             SDL_Init(SDL_INIT_AUDIO | SDL_INIT_GAMECONTROLLER);
-            DerelictSDL2Image.load();
-            DerelictSDL2ttf.load();
-            DerelictSDL2Mixer.load();
+            version(Windows)
+            {
+                DerelictSDL2Image.load();
+                DerelictSDL2ttf.load();
+                DerelictSDL2Mixer.load();
+            }
             IMG_Init(IMG_INIT_JPG | IMG_INIT_PNG);
             TTF_Init();
             Mix_Init(MIX_INIT_FLAC | MIX_INIT_MOD | MIX_INIT_MP3 | MIX_INIT_OGG);
