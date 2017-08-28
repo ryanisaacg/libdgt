@@ -4,9 +4,9 @@ import std.datetime;
 
 void main()
 {
-	WindowConfig config = { resizable : true, highdpi : true };
+	WindowConfig config = { resizable : true };
 	Window engine = Window("Test title", 640, 480, config);
-	auto tex = Texture("test.png");
+    auto tex = Texture("test.png");
 	scope(exit) tex.destroy();
 	auto map = Tilemap!bool(640, 480, 32);
 	scope(exit) map.destroy();

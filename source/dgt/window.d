@@ -9,7 +9,7 @@ import dgt.array, dgt.color, dgt.font, dgt.gamepad, dgt.geom, dgt.gl_backend, dg
 
 struct WindowConfig
 {
-    bool fullscreen, resizable, borderless, minimized, maximized, input_grabbed, highdpi;
+    bool fullscreen, resizable, borderless, minimized, maximized, input_grabbed;
 
     @property SDL_WindowFlags flags() const
     {
@@ -19,8 +19,7 @@ struct WindowConfig
         (borderless ? SDL_WINDOW_BORDERLESS : cast(SDL_WindowFlags)0) |
         (minimized ? SDL_WINDOW_MINIMIZED : cast(SDL_WindowFlags)0) |
         (maximized ? SDL_WINDOW_MAXIMIZED : cast(SDL_WindowFlags)0) |
-        (input_grabbed ? SDL_WINDOW_INPUT_GRABBED : cast(SDL_WindowFlags)0) |
-        (highdpi ? SDL_WINDOW_ALLOW_HIGHDPI : cast(SDL_WindowFlags)0);
+        (input_grabbed ? SDL_WINDOW_INPUT_GRABBED : cast(SDL_WindowFlags)0);
     }
 }
 
