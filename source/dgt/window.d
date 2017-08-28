@@ -287,7 +287,7 @@ struct Window
                         in float rot = 0, in float or_x = 0, in float or_y = 0,
                         in float scale_x = 1, in float scale_y = 1,
                         in bool flip_x = false, in bool flip_y = false,
-                        in Color color = dgt.color.white)
+                        in Color color = Color.white)
     {
         auto trans = identity() * translate(-or_x, -or_y) * rotate(rot)
             * dgt.geom.scale(scale_x, scale_y);
@@ -296,7 +296,7 @@ struct Window
 
     void draw(in Texture tex, in Transform!float trans, in float x, in float y,
                        in float w, in float h, in bool flip_x = false, in bool flip_y = false,
-                       in Color color = dgt.color.white)
+                       in Color color = Color.white)
     {
         //Calculate the destination points with the transformation
         auto tl = (trans * Vectorf(0, 0)) / scale;

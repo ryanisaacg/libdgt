@@ -34,15 +34,15 @@ void main()
     int carouselOption = 0;
 	while(engine.isOpen)
 	{
-		engine.begin(black, camera);
+		engine.begin(Color.black, camera);
 		scope(exit) engine.end(map);
 
 		engine.draw(tex, 100, 0, 32, 32);
 		engine.draw(tex, 200, 400, 32, 32);
 		engine.draw(tex, 300, 400, 32, 32);
 
-		engine.draw(red, Rectanglei(30, 30, 40, 40));
-		engine.draw(blue, Rectanglei(100, 100, 40, 40));
+		engine.draw(Color.red, Rectanglei(30, 30, 40, 40));
+		engine.draw(Color.blue, Rectanglei(100, 100, 40, 40));
 		engine.draw(Color(0, 1, 0, 0.5), Circlei(100, 100, 32));
 
         if(engine.gamepads.length)
@@ -50,7 +50,7 @@ void main()
                 writeln("Face button down");
 
         engine.inUIMode = true;
-        engine.draw(white, Rectanglei(50, 50, 100, 10));
+        engine.draw(Color.white, Rectanglei(50, 50, 100, 10));
         if (button.draw(engine))
             writeln("Button pressed");
 		n = slider.draw(engine, n);
