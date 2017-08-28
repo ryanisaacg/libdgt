@@ -45,7 +45,9 @@ struct Texture
         }
         else
         {
-            this(surface);
+            SDL_Surface* converted = SDL_ConvertSurfaceFormat(surface, SDL_PIXELFORMAT_RGBA8888, 0);
+            this(converted);
+            SDL_FreeSurface(converted);
             SDL_FreeSurface(surface);
         }
     }
