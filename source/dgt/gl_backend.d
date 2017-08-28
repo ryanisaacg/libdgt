@@ -74,8 +74,9 @@ struct GLBackend
         SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
 		ctx = SDL_GL_CreateContext(window);
 		DerelictGL3.reload();
-		glGenVertexArrays(1, &vao);
-		glBindVertexArray(vao);
+        DerelictGL3.loadExtra();
+        glGenVertexArrays(1, &vao);
+        glBindVertexArray(vao);
 		glGenBuffers(1, &vbo);
 		glGenBuffers(1, &ebo);
 		setShader(DEFAULT_VERTEX_SHADER, DEFAULT_FRAGMENT_SHADER);
@@ -98,7 +99,7 @@ struct GLBackend
 		glDeleteBuffers(1, &vbo);
 		glDeleteBuffers(1, &ebo);
 
-		glDeleteVertexArrays(1, &vao);
+        glDeleteVertexArrays(1, &vao);
 		SDL_GL_DeleteContext(ctx);
 	}
 
