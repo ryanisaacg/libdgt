@@ -36,7 +36,7 @@ void main()
 	while(engine.isOpen)
 	{
 		engine.begin(Color.black, camera);
-		scope(exit) engine.end(map);
+		scope(exit) engine.end();
 
 		engine.draw(tex, 100, 0, 32, 32);
 		engine.draw(tex, 200, 400, 32, 32);

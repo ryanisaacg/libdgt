@@ -193,10 +193,12 @@ struct Window
         ];
     }
 
-    void stepParticles(T)(in Tilemap!T map)
+    private void filterParticles(T)(in Tilemap!T map)
     {
-        for(size_t i = 0; i < particles.length; i++) {
-            switch (particles[i].behavior) {
+        for(size_t i = 0; i < particles.length; i++)
+        {
+            switch (particles[i].behavior)
+            {
             case ParticleBehavior.Die:
                 if (!map.empty(particles[i].position.x, particles[i].position.y))
                     particles[i].lifetime = 0;
@@ -210,29 +212,33 @@ struct Window
             default: break;
             }
         }
-
-        for (size_t i = 0; i < particles.length; i++) {
-            particles[i].update();
-            if (particles[i].lifetime <= 0) {
-                particles.remove(i);
-                i--;
-            } else {
-                draw(particles[i].region, particles[i].position.x, particles[i].position.y);
-            }
-        }
     }
 
-    void end(T)(in Tilemap!T map)
+    void end()
     {
         ctx.flip();
-
-        stepParticles(map);
-
+        for (size_t i = 0; i < particles.length; i++)
+        {
+            particles[i].update();
+            if (particles[i].lifetime <= 0)
+            {
+                particles.remove(i);
+                i--;
+            }
+            else
+                draw(particles[i].region, particles[i].position.x, particles[i].position.y);
+        }
         uint time = SDL_GetTicks();
         if (time - previous_ticks < 1000 / fps) {
             SDL_Delay(1000 / fps - (time - previous_ticks)); //account for the time elapsed during the frame
         }
         previous_ticks = time;
+    }
+
+    void end(T)(in Tilemap!T map)
+    {
+        filterParticles(map);
+        end();
     }
 
     void draw(size_t Len)(in Color color, in Vectori[Len] points)
