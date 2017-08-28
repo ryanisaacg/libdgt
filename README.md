@@ -43,7 +43,7 @@ The example assets are stored using Git LFS. You'll need to install it to downlo
 
 - Documentation
 	- Write documentation for each module
-        - [ ] Animation
+        - [x] Animation
         - [ ] Array
         - [ ] Color
         - [ ] Font
