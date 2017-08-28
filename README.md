@@ -35,6 +35,10 @@ The project is written in D to take advantage of its ability for both low and hi
 - Gamepad API
 - Tiled JSON format support
 
+## Examples
+
+The example assets are stored using Git LFS. You'll need to install it to download them.
+
 ## Roadmap
 
 - Documentation
