@@ -3,6 +3,7 @@ import derelict.opengl;
 import derelict.sdl2.sdl, derelict.sdl2.image, derelict.sdl2.mixer, derelict.sdl2.ttf;
 import core.stdc.stdio, core.stdc.stdlib, core.stdc.time, core.thread;
 
+import std.ascii;
 import std.typecons : Nullable;
 
 import dgt.array, dgt.color, dgt.font, dgt.gamepad, dgt.geom, dgt.gl_backend, dgt.io, dgt.sound, dgt.music, dgt.particle, dgt.sprite, dgt.texture, dgt.tilemap, dgt.util;
@@ -367,15 +368,38 @@ struct Window
         {
             char c = str[i];
             if (c == '\t')
-            {
-                for (int j = 0; j < 4; i++)
-                {
+                for (int j = 0; j < 4; j++)
                     position += draw(font, ' ', position + x, cursor);
-                }
-            } else if (c == '\n')
-                cursor += font.height;
+            else if (c == '\n')
+            {
+                position = 0;
+                cursor += font.characterHeight;
+            }
             else if (c != '\r')
                 position += draw(font, c, position + x, cursor);
+        }
+    }
+
+    void draw(ref in Font font, in string str, in float x, in float y,
+        in float maxWidth, in bool wrapOnWord = true)
+    {
+        size_t left = 0;
+        float cursor = y;
+        while(left < str.length)
+        {
+            size_t right = str.length;
+            while(right > left && font.getSizeOfString(str[left..right]).width > maxWidth)
+            {
+                do
+                {
+                    right--;
+                } while(wrapOnWord && right > left && str[right - 1].isAlphaNum);
+            }
+            if(right == left)
+                right = str.length;
+            draw(font, str[left..right], x, cursor);
+            cursor += font.getSizeOfString(str[left..right]).height;
+            left = right;
         }
     }
 

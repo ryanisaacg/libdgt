@@ -16,7 +16,7 @@ struct Font
     static immutable FONT_MAX_CHARS = 223;
     static immutable FONT_CHAR_OFFSET = 32;
 	Array!Texture characterTextures;
-	int height;
+	private int height;
 
     @disable this();
     @disable this(this);
@@ -37,7 +37,7 @@ struct Font
     	for (int i = 0; i < FONT_MAX_CHARS; i++)
 		{
     		buffer[0] = getCharFromIndex(i);
-    		characters[i] = TTF_RenderText_Blended(font, buffer.ptr, color);
+    		characters[i] = TTF_RenderText_Solid(font, buffer.ptr, color);
     		total_width += characters[i].w;
     		if (characters[i].h > height)
     			height = characters[i].h;
@@ -60,7 +60,7 @@ struct Font
         characterTextures = Array!Texture(FONT_MAX_CHARS);
         for (int i = 0; i < FONT_MAX_CHARS; i++)
 		{
-            characterTextures[i] = texture.getSlice(Rectanglei(position, 0, characters[i].w, characters[i].h));
+            characterTextures.add(texture.getSlice(Rectanglei(position, 0, characters[i].w, characters[i].h)));
             position += characterTextures[i].size.width;
             SDL_FreeSurface(characters[i]);
         }
@@ -90,7 +90,7 @@ struct Font
     			position += 4 * render(' ').size.width;
             else if (c == '\n')
             {
-    			height += render('\n').size.height;
+    			height += characterHeight;
     			position = 0;
     		}
             else if (c != '\r')
@@ -98,6 +98,8 @@ struct Font
     	}
     	return Rectanglei(0, 0, width, height);
     }
+
+    @property int characterHeight() const { return height; }
 
     private int getIndexFromChar(in char c) const
     {
