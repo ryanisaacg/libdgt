@@ -1,4 +1,5 @@
 module dgt.geom;
+import std.algorithm.comparison;
 import std.math : sqrt, cos, sin, PI;
 import dgt.io;
 
@@ -67,6 +68,12 @@ struct Vector(T)
     {
         return sqrt(len2());
     }
+
+    Vector!T clamp(in Vector!T min, in Vector!T max) const
+    {
+        return Vector!T(std.algorithm.comparison.clamp(x, min.x, max.x), std.algorithm.comparison.clamp(y, min.y, max.y));
+    }
+
 }
 
 unittest
@@ -141,6 +148,11 @@ struct Rectangle(T)
         y = newY;
         width = newWidth;
         height = newHeight;
+    }
+
+    Rectangle!T constrain(in Rectangle!T outer) const
+    {
+        return Rectangle!T(clamp(x, outer.x, outer.x + outer.width - width), clamp(y, outer.y, outer.y + outer.height - height), width, height);
     }
 }
 
@@ -419,6 +431,28 @@ unittest
     assert(circ.overlaps(rec1) && rec1.overlaps(circ));
     assert(!circ.overlaps(rec2) && !rec2.overlaps(circ));
 }
+unittest
+{
+    auto min = Vectori(-10, -2);
+    auto max = Vectori(5, 6);
+    auto a = Vectori(-11, 3);
+    auto clamped = a.clamp(min, max);
+    assert(clamped.x == -10 && clamped.y == 3);
+    auto b = Vectori(2, 8);
+    clamped = b.clamp(min, max);
+    assert(clamped.x == 2 && clamped.y == 6);
+}
+unittest
+{
+    auto constraint = Rectanglei(0, 0, 10, 10);
+    auto a = Rectanglei(-1, 3, 5, 5);
+    auto b = Rectanglei(4, 4, 8, 3);
+    a = a.constrain(constraint);
+    assert(a.x == 0 && a.y == 3);
+    b = b.constrain(constraint);
+    assert(b.x == 2 && b.y == 4);
+}
+
 unittest
 {
     println("Should print a vector at 0, 0: ", Vectori(0, 0));
