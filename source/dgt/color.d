@@ -22,7 +22,7 @@ struct Color
 		);
 		return c;
 	}
-    
+
     static immutable white = Color(1, 1, 1, 1);
     static immutable black = Color(0, 0, 0, 0);
     static immutable red = Color(1, 0, 0, 1);
@@ -40,7 +40,7 @@ struct Color
 unittest
 {
     import dgt.io : println;
-    println("Should print a color equivalent to white: ", white);
-    SDL_Color orangeSDL = cast(SDL_Color)orange;
+    println("Should print a color equivalent to white: ", Color.white);
+    SDL_Color orangeSDL = cast(SDL_Color)Color.orange;
     assert(orangeSDL.r == 255 && orangeSDL.g == 127 && orangeSDL.b == 0 && orangeSDL.a == 255);
 }
