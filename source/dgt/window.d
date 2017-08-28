@@ -9,7 +9,7 @@ import dgt.array, dgt.color, dgt.font, dgt.gamepad, dgt.geom, dgt.gl_backend, dg
 
 struct WindowConfig
 {
-    bool fullscreen, resizable, borderless, minimized, maximized, input_grabbed;
+    bool fullscreen, resizable, borderless, minimized, maximized, input_grabbed, vsync = true;
 
     @property SDL_WindowFlags flags() const
     {
@@ -76,7 +76,7 @@ struct Window
         window = SDL_CreateWindow(title.ptr,
             SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width, height,
             config.flags);
-        ctx = GLBackend(window);
+        ctx = GLBackend(window, config.vsync);
         particles = Array!Particle(128);
         camera.set(0, 0, width * scale, height * scale);
         windowWidth = width;

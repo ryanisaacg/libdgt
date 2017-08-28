@@ -4,7 +4,7 @@ import std.datetime;
 
 void main()
 {
-	WindowConfig config = { resizable : true };
+	WindowConfig config = { resizable : true, vsync : true };
 	Window engine = Window("Test title", 640, 480, config);
     auto tex = Texture("test.png");
 	scope(exit) tex.destroy();
