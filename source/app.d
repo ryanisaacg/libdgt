@@ -6,12 +6,12 @@ void main()
 {
 	WindowConfig config = { resizable : true, vsync : true };
 	Window engine = Window("Test title", 640, 480, config);
-    auto tex = Texture("test.png");
+    auto tex = Texture("example/test.png");
 	scope(exit) tex.destroy();
 	auto map = Tilemap!bool(640, 480, 32);
 	scope(exit) map.destroy();
     float n = 0;
-    auto buttonTex = Texture("button.png");
+    auto buttonTex = Texture("example/button.png");
     auto camera = Rectanglei(0, 0, 640, 480);
     float value = 0;
 	auto button = Button(Rectanglei(300, 300, 32, 32), Vectori(300, 300),
@@ -19,7 +19,7 @@ void main()
 				buttonTex.getSlice(Rectanglei(32, 0, 32, 32)),
 				buttonTex.getSlice(Rectanglei(64, 0, 32, 32)));
 	auto slider = Slider(Rectanglei(0, 440, 640, 32), tex);
-	auto carouselTex = Texture("carousel.png");
+	auto carouselTex = Texture("example/carousel.png");
 	auto leftButtonTex = carouselTex.getSlice(Rectanglei(0, 0, 32, 32));
 	auto rightButtonTex = carouselTex.getSlice(Rectanglei(128, 0, 32, 32));
 	Array!Texture carouselOptions = Array!Texture([
@@ -32,7 +32,7 @@ void main()
 		Button(Rectanglei(464, 0, 32, 32), Vectori(464, 0), rightButtonTex, rightButtonTex, rightButtonTex),
 		Vectori(432, 0), carouselOptions);
     int carouselOption = 0;
-	auto font = Font("DejaVuSansMono.ttf", 14, Color.white, FontStyle.normal);
+	auto font = Font("example/DejaVuSansMono.ttf", 14, Color.white, FontStyle.normal);
 	while(engine.isOpen)
 	{
 		engine.begin(Color.black, camera);

@@ -12,7 +12,7 @@
          "width":32,
          "x":0,
          "y":0
-        }, 
+        },
         {
          "draworder":"topdown",
          "name":"Object Layer 1",
@@ -28,7 +28,7 @@
                  "width":32,
                  "x":184,
                  "y":356
-                }, 
+                },
                 {
                  "gid":3221225478,
                  "height":32,
@@ -56,7 +56,7 @@
         {
          "columns":2,
          "firstgid":1,
-         "image":"tiles.png",
+         "image":"example/tiles.png",
          "imageheight":64,
          "imagewidth":64,
          "margin":0,
@@ -65,11 +65,11 @@
          "tilecount":4,
          "tileheight":32,
          "tilewidth":32
-        }, 
+        },
         {
          "columns":2,
          "firstgid":5,
-         "image":"tiles.png",
+         "image":"example/tiles.png",
          "imageheight":64,
          "imagewidth":64,
          "margin":0,
