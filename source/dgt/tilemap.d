@@ -22,8 +22,8 @@ struct Tilemap(T)
 		this._height = mapHeight;
 		this.size = size;
         buffer = Array!(Tile!T)((width / size) * (height / size));
-		for(size_t i = 0; i < width; i++)
-			for(size_t j = 0; j < height; j++)
+		for(size_t i = 0; i < width; i += size)
+			for(size_t j = 0; j < height; j += size)
 				buffer.add(Tile!T(T(), false));
 	}
 
