@@ -1,6 +1,7 @@
 module dgt.util;
 import core.stdc.math, core.stdc.stdlib;
 
+import dgt.array;
 import dgt.geom;
 
 @nogc nothrow:
