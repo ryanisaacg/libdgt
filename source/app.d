@@ -35,7 +35,7 @@ void main()
 	auto font = Font("example/DejaVuSansMono.ttf", 14, Color.white, FontStyle.normal);
 	while(engine.isOpen)
 	{
-		engine.begin(Color.black, camera);
+		engine.begin(Color.black);
 		scope(exit) engine.end();
 
 		engine.draw(tex, 100, 0, 32, 32);

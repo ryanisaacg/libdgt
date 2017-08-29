@@ -122,6 +122,12 @@ struct Window
         SDL_Quit();
     }
 
+    void begin(in Color bg)
+    {
+        auto camera = Rectangle!int(0, 0, windowWidth, windowHeight);
+        begin(bg, camera);
+    }
+
     void begin(in Color bg, in Rectangle!int cam)
     {
         camera = cam;
