@@ -1,5 +1,6 @@
 module dgt.sound;
 import derelict.sdl2.mixer;
+import dgt.util : nullTerminate;
 
 struct SoundClip
 {
@@ -11,7 +12,9 @@ struct SoundClip
     @nogc nothrow:
     this(in string path)
     {
-        source = Mix_LoadWAV(path.ptr);
+		auto pathNullTerminated = nullTerminate(path);
+        source = Mix_LoadWAV(pathNullTerminated.ptr);
+		pathNullTerminated.destroy();
     }
 	~this()
 	{

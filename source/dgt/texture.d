@@ -1,8 +1,10 @@
 module dgt.texture;
 import derelict.sdl2.sdl, derelict.sdl2.image;
 import derelict.opengl;
+import dgt.array : Array;
 import dgt.io;
 import dgt.geom : Rectangle;
+import dgt.util : nullTerminate;
 
 import core.stdc.string;
 
@@ -36,7 +38,9 @@ struct Texture
 
     this(string name)
     {
-        SDL_Surface* surface = IMG_Load(name.ptr);
+        auto nameNullTerminated = nullTerminate(name);
+        SDL_Surface* surface = IMG_Load(nameNullTerminated.ptr);
+        nameNullTerminated.destroy();
         if (surface == null)
         {
             auto buffer = IMG_GetError();

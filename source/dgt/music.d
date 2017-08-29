@@ -1,5 +1,6 @@
 module dgt.music;
 import derelict.sdl2.mixer;
+import dgt.util : nullTerminate;
 
 struct Music
 {
@@ -11,7 +12,9 @@ struct Music
     @nogc nothrow:
     this(string path)
     {
-        source = Mix_LoadMUS(path.ptr);
+		auto pathNullTerminated = nullTerminate(path);
+        source = Mix_LoadMUS(pathNullTerminated.ptr);
+		pathNullTerminated.destroy();
     }
 
 	~this()

@@ -1,6 +1,7 @@
 module dgt.font;
 import derelict.sdl2.sdl, derelict.sdl2.ttf;
 import dgt.array, dgt.color, dgt.geom, dgt.io, dgt.texture, dgt.window;
+import dgt.util : nullTerminate;
 
 enum FontStyle : int
 {
@@ -24,7 +25,9 @@ struct Font
     @nogc nothrow public:
 	this(in string filename, in int size, in Color col, in FontStyle style)
     {
-        TTF_Font* font = TTF_OpenFont(filename.ptr, size);
+        auto pathNullTerminated = nullTerminate(filename);
+        TTF_Font* font = TTF_OpenFont(pathNullTerminated.ptr, size);
+		pathNullTerminated.destroy();
         TTF_SetFontStyle(font, style);
         if (font == null)
             println("Font with filename ", filename, " not found");

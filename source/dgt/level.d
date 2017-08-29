@@ -2,6 +2,7 @@ module dgt.level;
 
 import std.file : readText;
 import std.json;
+import std.path : dirName;
 
 import dgt.array, dgt.color, dgt.geom, dgt.texture, dgt.tilemap;
 
@@ -77,6 +78,8 @@ struct Map
         tileLayers = Array!TileLayer(4);
         entityLayers = Array!EntityLayer(4);
 
+        auto pathToMap = dirName(path);
+
         auto contents = parseJSON(readText(path));
         widthInTiles = cast(int)contents["width"].integer;
         heightInTiles = cast(int)contents["height"].integer;
@@ -85,7 +88,7 @@ struct Map
 
         foreach(tileset; contents["tilesets"].array)
         {
-            auto image = Texture(tileset["image"].str);
+            auto image = Texture(pathToMap ~ "/" ~ tileset["image"].str);
             sourceImages.add(image);
             int margin = cast(int)tileset["margin"].integer;
             int spacing = cast(int)tileset["spacing"].integer;

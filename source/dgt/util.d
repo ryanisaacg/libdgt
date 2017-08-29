@@ -26,6 +26,14 @@ Vector!int randomRange(in Vector!int a, in Vector!int b)
 {
     return Vector!int(randomRange(a.x, b.x), randomRange(a.y, b.y));
 }
+Array!char nullTerminate(in string str)
+{
+    Array!char nameNullTerminated = Array!char(str.length + 1);
+    for(size_t i = 0; i < str.length; i++)
+        nameNullTerminated.add(str[i]);
+    nameNullTerminated.add('\0');
+    return nameNullTerminated;
+}
 unittest
 {
     for(size_t i = 0; i < 1000; i++)

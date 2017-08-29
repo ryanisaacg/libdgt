@@ -56,7 +56,7 @@
         {
          "columns":2,
          "firstgid":1,
-         "image":"example/tiles.png",
+         "image":"tiles.png",
          "imageheight":64,
          "imagewidth":64,
          "margin":0,
@@ -69,7 +69,7 @@
         {
          "columns":2,
          "firstgid":5,
-         "image":"example/tiles.png",
+         "image":"tiles.png",
          "imageheight":64,
          "imagewidth":64,
          "margin":0,
