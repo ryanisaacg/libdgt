@@ -124,7 +124,7 @@ struct Window
 
     void begin(in Color bg)
     {
-        auto camera = Rectangle!int(0, 0, windowWidth, windowHeight);
+        auto camera = Rectangle!int(0, 0, windowWidth * scale, windowHeight * scale);
         begin(bg, camera);
     }
 
