@@ -46,7 +46,7 @@ void main()
 		engine.draw(Color.blue, Rectanglei(100, 100, 40, 40));
 		engine.draw(Color(0, 1, 0, 0.5), Circlei(100, 100, 32));
 
-		engine.draw(font, "abcdef ghijkl\nmopqrstuvwxyz", 200, 200, 60);
+		engine.draw(font, "abcdef ghijkl\nmopqrstuvwxyz", 200, 200, 60, false, 2);
 
         if(engine.gamepads.length)
             if(engine.gamepads[0].faceDown)
