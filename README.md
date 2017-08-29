@@ -51,7 +51,7 @@ The example assets are stored using Git LFS. You'll need to install it to downlo
         - [ ] Geometry
         - [ ] OpenGL Backend
         - [ ] IO
-		- [ ] Level
+	- [ ] Level
         - [ ] Music
         - [ ] Particles
         - [ ] Sound
