@@ -122,6 +122,12 @@ struct Window
         SDL_Quit();
     }
 
+    void begin(in Color bg)
+    {
+        auto camera = Rectangle!int(0, 0, windowWidth, windowHeight);
+        begin(bg, camera);
+    }
+
     void begin(in Color bg, in Rectangle!int cam)
     {
         camera = cam;
@@ -365,7 +371,7 @@ struct Window
         return renderChar.size.width;
     }
 
-    void draw(ref in Font font, in string str, in float x, in float y)
+    void draw(ref in Font font, in string str, in float x, in float y, float lineHeight = 1)
     {
         int position = 0;
         float cursor = y;
@@ -379,7 +385,7 @@ struct Window
             else if (c == '\n')
             {
                 position = 0;
-                cursor += font.characterHeight;
+                cursor += font.characterHeight * lineHeight;
             }
             else if (c != '\r')
                 position += draw(font, c, position + x, cursor);
@@ -387,7 +393,7 @@ struct Window
     }
 
     void draw(ref in Font font, in string str, in float x, in float y,
-        in float maxWidth, in bool wrapOnWord = true)
+        in float maxWidth, in bool wrapOnWord = true, float lineHeight = 1)
     {
         size_t left = 0;
         float cursor = y;
@@ -403,8 +409,8 @@ struct Window
             }
             if(right == left)
                 right = str.length;
-            draw(font, str[left..right], x, cursor);
-            cursor += font.getSizeOfString(str[left..right]).height;
+            draw(font, str[left..right], x, cursor, lineHeight);
+            cursor += font.getSizeOfString(str[left..right], lineHeight).height;
             left = right;
         }
     }

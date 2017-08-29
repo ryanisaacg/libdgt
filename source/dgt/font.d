@@ -80,10 +80,10 @@ struct Font
         return characterTextures[getIndexFromChar(c)];
     }
 
-    Rectangle!int getSizeOfString(in string str) const
+    Rectangle!int getSizeOfString(in string str, float lineHeight = 1) const
     {
     	int position = 0;
-    	int width = 0, height = this.height;
+    	int width = 0, height = cast(int)(this.height * lineHeight);
     	for(size_t i = 0; i < str.length; i++)
         {
             char c = str[i];
@@ -93,7 +93,7 @@ struct Font
     			position += 4 * render(' ').size.width;
             else if (c == '\n')
             {
-    			height += characterHeight;
+    			height += cast(int)(characterHeight * lineHeight);
     			position = 0;
     		}
             else if (c != '\r')
