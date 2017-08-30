@@ -4,9 +4,21 @@ import dgt.io;
 
 import derelict.sdl2.sdl : SDL_Color;
 
+/**
+Represents a color with 4 floating-point values
+
+The values are clamped between 0 and 1
+*/
 struct Color
 {
-	float r, g, b, a;
+    ///The red component
+    float r = 0;
+    ///The green component
+    float g = 0;
+    ///The blue component
+    float b = 0;
+    ///The alpha component
+    float a = 1;
 
 	@nogc nothrow:
 	void print() const
