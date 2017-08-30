@@ -84,7 +84,7 @@ struct Window
         windowHeight = height;
 
         ubyte[3] white_pixel = [ 255, 255, 255 ];
-        white = Texture(white_pixel.ptr, 1, 1, false);
+        white = Texture(white_pixel.ptr, 1, 1, PixelFormat.RGB);
         glViewport(0, 0, width, height);
         aspectRatio = cast(float)width / height;
         this.scale = scale;
