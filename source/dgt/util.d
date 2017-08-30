@@ -48,3 +48,10 @@ unittest
         assert(vector.x >= -1 && vector.y >= -1 && vector.x < 5 && vector.y < 5);
     }
 }
+unittest
+{
+    auto str = nullTerminate("Test string");
+    auto expected = "Test string\0";
+    for(size_t i = 0; i < expected.length; i++)
+        assert(str[i] == expected[i]);
+}
