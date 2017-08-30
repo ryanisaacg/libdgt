@@ -8,6 +8,14 @@ import dgt.util : nullTerminate;
 
 import core.stdc.string;
 
+enum PixelFormat : GLenum
+{
+    RGB = GL_RGB,
+    RGBA = GL_RGBA,
+    BGR = GL_BGR,
+    BGRA = GL_BGRA
+}
+
 struct Texture
 {
     package uint id;
@@ -18,7 +26,7 @@ struct Texture
     @disable this();
 
     @nogc nothrow public:
-    this(ubyte* data, int w, int h, bool has_alpha)
+    this(ubyte* data, int w, int h, PixelFormat format)
     {
         GLuint texture;
         glGenTextures(1, &texture);
@@ -27,8 +35,7 @@ struct Texture
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        glTexImage2D(GL_TEXTURE_2D, 0, has_alpha ? GL_RGBA : GL_RGB, w, h, 0, has_alpha ? GL_RGBA : GL_RGB, GL_UNSIGNED_BYTE,
-                     data);
+        glTexImage2D(GL_TEXTURE_2D, 0, format, w, h, 0, format, GL_UNSIGNED_BYTE, data);
         glGenerateMipmap(GL_TEXTURE_2D);
         id = texture;
         width = w;
@@ -45,20 +52,29 @@ struct Texture
         {
             auto buffer = IMG_GetError();
             println("Image loading error: ", buffer[0..strlen(buffer)]);
-            this(null, 0, 0, false);
+            this(null, 0, 0, PixelFormat.RGB);
         }
         else
         {
-            SDL_Surface* converted = SDL_ConvertSurfaceFormat(surface, SDL_PIXELFORMAT_RGBA8888, 0);
-            this(converted);
-            SDL_FreeSurface(converted);
+            this(surface);
             SDL_FreeSurface(surface);
         }
     }
 
     this(SDL_Surface* sur)
     {
-        this(cast(ubyte*)sur.pixels, sur.w, sur.h, sur.format.BytesPerPixel == 4);
+        PixelFormat format;
+        if(sur.format.BytesPerPixel == 4)
+            if(sur.format.Rmask == 0x000000ff)
+                format = PixelFormat.RGBA;
+            else
+                format = PixelFormat.BGRA;
+        else
+            if(sur.format.Rmask == 0x000000ff)
+                format = PixelFormat.RGB;
+            else
+                format = PixelFormat.BGR;
+        this(cast(ubyte*)sur.pixels, sur.w, sur.h, format);
     }
 
     void destroy()
