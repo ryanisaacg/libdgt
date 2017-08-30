@@ -1,8 +1,16 @@
+/**
+Allows the user to load and create bitmap fonts
+
+To actually draw text on the screen use the Window draw functions
+*/
 module dgt.font;
 import derelict.sdl2.sdl, derelict.sdl2.ttf;
 import dgt.array, dgt.color, dgt.geom, dgt.io, dgt.texture, dgt.window;
 import dgt.util : nullTerminate;
 
+/**
+An enum that determines character styling
+*/
 enum FontStyle : int
 {
     normal = TTF_STYLE_NORMAL,
@@ -12,6 +20,9 @@ enum FontStyle : int
     strikethrough = TTF_STYLE_STRIKETHROUGH
 }
 
+/**
+A structure that stores rendered font glyps for drawing on the screen
+*/
 struct Font
 {
     static immutable FONT_MAX_CHARS = 223;
@@ -23,8 +34,12 @@ struct Font
     @disable this(this);
 
     @nogc nothrow public:
+    /**
+    Load a font from a TTF file with a given size, color, and style
+    */
 	this(in string filename, in int size, in Color col, in FontStyle style)
     {
+        //Pass the C function a null-terminated path to avoid string literal issues
         auto pathNullTerminated = nullTerminate(filename);
         TTF_Font* font = TTF_OpenFont(pathNullTerminated.ptr, size);
 		pathNullTerminated.destroy();
@@ -32,6 +47,7 @@ struct Font
         if (font == null)
             println("Font with filename ", filename, " not found");
 		SDL_Color color = cast(SDL_Color)col;
+        //Create a null-terminated buffer to send glyphs to the TTF library
         char[2] buffer = ['\0', '\0'];
         SDL_Surface*[FONT_MAX_CHARS] characters;
         int total_width = 0;
@@ -40,6 +56,7 @@ struct Font
     	for (int i = 0; i < FONT_MAX_CHARS; i++)
 		{
     		buffer[0] = getCharFromIndex(i);
+            //Render the character and note how much space it takes up
     		characters[i] = TTF_RenderText_Solid(font, buffer.ptr, color);
     		total_width += characters[i].w;
     		if (characters[i].h > height)
@@ -75,11 +92,13 @@ struct Font
     }
 
     pure:
+    /// Get the glyph for a given character
     Texture render(in char c) const
     {
         return characterTextures[getIndexFromChar(c)];
     }
 
+    ///Find how much space a string would take when rendered
     Rectangle!int getSizeOfString(in string str, float lineHeight = 1) const
     {
     	int position = 0;
@@ -89,8 +108,10 @@ struct Font
             char c = str[i];
     		if (position > width)
     			width = position;
+            //a tab is equivalent to 4 space characters
     		if (c == '\t')
     			position += 4 * render(' ').size.width;
+            //Move down a line
             else if (c == '\n')
             {
     			height += cast(int)(characterHeight * lineHeight);
@@ -102,6 +123,7 @@ struct Font
     	return Rectanglei(0, 0, width, height);
     }
 
+    //Get the pixel height of the characters in the font
     @property int characterHeight() const { return height; }
 
     private int getIndexFromChar(in char c) const
