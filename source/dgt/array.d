@@ -1,27 +1,47 @@
+/**
+A type-safe growable buffer designed for low overhead
+*/
 module dgt.array;
 import core.stdc.stdlib : malloc, realloc, free;
 import dgt.io;
 
+/**
+A growable buffer that attempts to keep as many operations amortized as possible
+*/
 struct Array(T)
 {
 
 	private void* backingBuffer = null;
-	private static immutable initialSize = 16;
 
     @disable this();
 
 	@nogc @trusted nothrow public:
+    /**
+    Create a buffer with a given initial capacity
+
+    When a buffer runs out of capacity it has to reallocate, which is much slower than a normal add
+    */
     this(in size_t initialCapacity)
     {
         ensureCapacity(initialCapacity);
     }
 
+    /**
+    Create a buffer from a fixed-size array of elements
+
+    This is useful for initializing with an array literal
+    */
     this(size_t N)(in T[N] array)
     {
         this = array;
     }
 
-	void ensureCapacity(in size_t newCapacity)
+    /**
+    Resizes the the array to be a given size manually
+
+    Not generally a good idea unless you have a specific reason
+    */
+	@system void ensureCapacity(in size_t newCapacity)
 	{
 		void* old = backingBuffer;
 		backingBuffer = realloc(backingBuffer, size_t.sizeof * 2 + T.sizeof * newCapacity);
@@ -29,6 +49,11 @@ struct Array(T)
 		if (old == null) *count = 0;
 	}
 
+    /**
+    Appends a value to the end of the array
+
+    If more memory is required, the array is resized
+    */
 	void add(scope T val)
 	{
 		if (*count >= *capacity)
@@ -37,6 +62,9 @@ struct Array(T)
 		*count += 1;
 	}
 
+    /**
+    Add many values in a compile-time list
+    */
 	void addAll(A...)(scope A a)
 	{
 		foreach(val; a)
@@ -45,6 +73,9 @@ struct Array(T)
 		}
 	}
 
+    /*
+    Free the memory associated with the Array
+    */
 	void destroy()
 	{
 		free(backingBuffer);
@@ -84,6 +115,9 @@ struct Array(T)
 	}
 
 	pure:
+    /**
+    Remove an element at an index by swapping it with the last element
+    */
 	void remove(in size_t index)
 	{
 		buffer[index] = buffer[*count];
@@ -102,13 +136,22 @@ struct Array(T)
 		return buffer[index] = value;
 	}
 
+    /**
+    Reset the element count without changing the size of the allocated chunk
+    */
 	void clear()
 	{
 		*count = 0;
 	}
-
-	 @property T* ptr() const { return buffer; }
-	 @property size_t length() const { return *count; }
+    
+    /**
+    Get the pointer to the elements stored in the buffer
+    */
+    @property T* ptr() const { return buffer; }
+    /**
+    Find the number of valid elements currently in the array
+    */
+    @property size_t length() const { return *count; }
 
 	private:
 	private @property size_t* count() const { return cast(size_t*) backingBuffer; }
