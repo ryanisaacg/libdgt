@@ -1,3 +1,4 @@
+///Adds integration with the Tiled map editor
 module dgt.level;
 
 import std.file : readText;
@@ -6,6 +7,7 @@ import std.path : dirName;
 
 import dgt.array, dgt.color, dgt.geom, dgt.texture, dgt.tilemap;
 
+///A layer of tiles represented by integer constants
 struct TileLayer
 {
     string name;
@@ -26,6 +28,7 @@ struct TileLayer
     }
 }
 
+///A layer of free-floating objects
 struct EntityLayer
 {
     string name;
@@ -40,6 +43,7 @@ struct EntityLayer
     }
 }
 
+////A free-floating entity 
 struct Entity
 {
     string name, type;
@@ -49,6 +53,7 @@ struct Entity
     bool visible;
 }
 
+///A structure to load the Tiled map into
 struct Map
 {
     static immutable FLIPPED_HORIZONTALLY_FLAG = 0x80000000;
@@ -71,6 +76,7 @@ struct Map
         return gid & ~(FLIPPED_HORIZONTALLY_FLAG | FLIPPED_VERTICALLY_FLAG | FLIPPED_DIAGONALLY_FLAG);
     }
 
+    ///Load a Tiled map from a path in the filesystem
     this(in string path, in int scale = 1)
     {
         sourceImages = Array!Texture(4);
@@ -142,6 +148,11 @@ struct Map
         }
     }
 
+    /**
+    Free all of the data in the map
+
+    Also destroys the textures the map loads, so be careful
+    */
     @nogc nothrow void destroy()
     {
         foreach(tex; sourceImages)
