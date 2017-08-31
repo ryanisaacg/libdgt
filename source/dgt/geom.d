@@ -1,10 +1,17 @@
+/**
+Contains various generic geometry containers
+
+The entire module is designed for 2D, because libdgt is for 2D development
+*/
 module dgt.geom;
 import std.algorithm.comparison;
 import std.math : sqrt, cos, sin, PI;
 import dgt.io;
 
 @safe:
-
+/**
+A 2D vector with an arbitrary numeric type
+*/
 struct Vector(T)
 {
     T x = 0, y = 0;
@@ -15,12 +22,14 @@ struct Vector(T)
     }
 
     @nogc nothrow pure:
+    ///Create a vector with an x and a y
     this(T x, T y)
     {
         this.x = x;
         this.y = y;
     }
 
+    ///Create a vector from a different vector with a different numeric type
     this(U)(in Vector!U vec)
     {
         this.x = cast(T)vec.x;
@@ -59,16 +68,19 @@ struct Vector(T)
         }
     }
 
+    ///Get the squared length of the vector (faster than getting the length)
     float len2() const
     {
         return x * x + y * y;
     }
 
+    ///Get the length of the vector
     float len() const
     {
         return sqrt(len2());
     }
 
+    ///Clamp a vector somewhere between a minimum and a maximum
     Vector!T clamp(in Vector!T min, in Vector!T max) const
     {
         return Vector!T(std.algorithm.comparison.clamp(x, min.x, max.x), std.algorithm.comparison.clamp(y, min.y, max.y));
@@ -85,9 +97,15 @@ unittest
     assert((a - b).y == 12);
 }
 
+/**
+An axis-aligned rectangle made of some numeric type
+*/
 struct Rectangle(T)
 {
-    public Vector!T topLeft = Vector!T(0, 0), size = Vector!T(0, 0);
+    ///The top left of the rectangle
+    public Vector!T topLeft = Vector!T(0, 0);
+    ///The width and height of the rectangle
+    public Vector!T size = Vector!T(0, 0);
 
     @nogc nothrow void print() const
     {
@@ -95,6 +113,7 @@ struct Rectangle(T)
     }
 
     @nogc nothrow pure public:
+    ///Create a rectangle with the given dimension
     this(T x, T y, T width, T height)
     {
         topLeft = Vector!T(x, y);
@@ -110,16 +129,19 @@ struct Rectangle(T)
     @property T height() const { return size.y; }
     @property T height(T val) { return size.y = val; }
 
+    ///Checks if a point falls within the rectangle
     bool contains(in Vector!T v) const
     {
         return v.x >= x && v.y >= y && v.x < x + width && v.y < y + height;
     }
 
+    ///Check if any of the area bounded by this rectangle is bounded by another
     bool overlaps(in Rectangle!T b) const
     {
         return x < b.x + b.width && x + width > b.x && y < b.y + b.height && y + height > b.y;
     }
 
+    ///Check if any of the area bounded by this rectangle is bounded by a circle
     bool overlaps(in Circle!T c) const
     {
         Vector!T closest;
@@ -142,6 +164,7 @@ struct Rectangle(T)
         return (closest.x * closest.x) + (closest.y * closest.y) < c.radius * c.radius;
     }
 
+    ///Set the rectangle's dimensions
     void set(T newX, T newY, T newWidth, T newHeight)
     {
         x = newX;
@@ -150,6 +173,11 @@ struct Rectangle(T)
         height = newHeight;
     }
 
+    /**
+    Move the rectangle so it is entirely contained with another
+
+    If the rectangle is moved it will always be flush with a border of the given area
+    */
     Rectangle!T constrain(in Rectangle!T outer) const
     {
         return Rectangle!T(clamp(x, outer.x, outer.x + outer.width - width), clamp(y, outer.y, outer.y + outer.height - height), width, height);
@@ -166,6 +194,9 @@ unittest
     assert(!a.overlaps(c));
 }
 
+/**
+A circle with a center and a radius
+*/
 struct Circle(T)
 {
     public Vector!T center = Vector!T(0, 0);
@@ -187,17 +218,26 @@ struct Circle(T)
     @property T y() const { return center.y; }
     @property T y(T val) { return center.y = val; }
 
+    /**
+    Checks if a vector falls within the area bounded by a circle
+    */
     bool contains(in Vector!T v) const
     {
         Vector!T dist = v - center;
         return dist.len2 < radius * radius;
     }
 
+    /**
+    Checks to see if the circle and the rectangle share any area
+    */
     bool overlaps(in Rectangle!T r) const
     {
         return r.overlaps(this);
     }
 
+    /**
+    Checks to see if the circles have any overlapping area
+    */
     bool overlaps(in Circle!T c) const
     {
         float xDiff = x - c.x;
@@ -206,6 +246,9 @@ struct Circle(T)
         return xDiff * xDiff + yDiff * yDiff < rad * rad;
     }
 
+    /**
+    Sets the dimensions of a circle
+    */
     void set(T newX, T newY, T newRadius)
     {
         x = newX;
@@ -228,6 +271,9 @@ unittest
     assert(!c.overlaps(d));
 }
 
+/**
+A Transformation 3x3 matrix to make transformations more efficient
+*/
 struct Transform(T)
 {
     private T[9] data = [
@@ -255,6 +301,7 @@ struct Transform(T)
 
     @nogc nothrow pure:
 
+    ///A pointer to the internal buffer to pass the matrix to C
     public T* ptr()
     {
         return &data[0];
@@ -310,11 +357,13 @@ struct Transform(T)
 
 @nogc nothrow:
 
+///Create an identity matrix
 pure Transformf identity()
 {
     return Transform!float();
 }
 
+///Create a rotation matrix
 pure Transformf rotate(float angle)
 {
     float c = cos(angle * PI / 180);
@@ -328,6 +377,7 @@ pure Transformf rotate(float angle)
     return transform;
 }
 
+///Create a translation matrix
 pure Transformf translate(float x, float y)
 {
     Transform!float transform;
@@ -339,6 +389,7 @@ pure Transformf translate(float x, float y)
     return transform;
 }
 
+///Create a scale matrix
 pure Transformf scale(float x, float y)
 {
     Transform!float transform;
