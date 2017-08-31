@@ -7,6 +7,7 @@ import dgt.color : Color;
 import dgt.geom;
 import dgt.io;
 
+///The default vertex shader
 string DEFAULT_VERTEX_SHADER = "#version 150
 in vec2 position;
 in vec2 tex_coord;
@@ -21,6 +22,7 @@ void main() {
 	transformed.z = 0;
 	gl_Position = vec4(transformed, 1.0);
 }";
+///The default fragment shader
 string DEFAULT_FRAGMENT_SHADER = "#version 150
 in vec4 Color;
 in vec2 Tex_coord;
@@ -31,6 +33,7 @@ void main() {
 	outColor = Color * tex_color;
 }";
 
+///Represents a vertex to pass to OpenGL
 struct Vertex
 {
 	Vectorf pos, texPos;
@@ -44,6 +47,9 @@ struct Vertex
 	}
 }
 
+/**
+Handles opengl contexts and passing data to OpenGL such as shaders and vertices
+*/
 struct GLBackend
 {
 	//The draw data
@@ -64,7 +70,7 @@ struct GLBackend
 	@disable this(this);
 
 	@trusted:
-	public this(SDL_Window* window, bool vsync)
+	package this(SDL_Window* window, bool vsync)
 	{
 		DerelictGL3.load();
 		this.window = window;
@@ -103,6 +109,7 @@ struct GLBackend
 		SDL_GL_DeleteContext(ctx);
 	}
 
+    ///Set the current shader
 	public void setShader(in string vertexShader, in string fragmentShader)
 	{
 		if(shader != 0) glDeleteProgram(shader);
@@ -145,6 +152,11 @@ struct GLBackend
 		glUseProgram(shader);
 	}
 
+    /**
+    Clear the screen and the vertex and index buffers
+    
+    Any data that hasn't been drawn will be lost
+    */
 	public void clear(in Color col)
 	{
 		vertices.clear();
@@ -153,6 +165,7 @@ struct GLBackend
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	}
 
+    ///Draw the current vertices and indices and clear the buffers
 	public void flush()
 	{
 		GLint transform_attrib = glGetUniformLocation(shader, "transform");
@@ -184,11 +197,13 @@ struct GLBackend
 		indices.clear();
 	}
 
+    ///Flush the buffers and display the new screen
 	public void flip()
 	{
 		flush();
 		SDL_GL_SwapWindow(window);
 	}
+
 
 	private void switchTexture(in GLuint texture)
 	{
@@ -197,6 +212,11 @@ struct GLBackend
 		this.texture = texture;
 	}
 
+    /**
+    Add some vertices and indices to the backend
+
+    The 0th index is the first vertex in this add, not since the last flush
+    */
 	public void add(size_t Vertices, size_t Indices)(in GLuint texture,
 					in Vertex[Vertices] newVertices, in GLuint[Indices] newIndices)
 	{
