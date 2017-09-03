@@ -182,6 +182,12 @@ struct Rectangle(T)
     {
         return Rectangle!T(clamp(x, outer.x, outer.x + outer.width - width), clamp(y, outer.y, outer.y + outer.height - height), width, height);
     }
+
+    ///Translate the rectangle by a vector
+    Rectangle!T translate(in Vector!T vec) const
+    {
+        return Rectangle!T(x + vec.x, y + vec.y, width, height);
+    }
 }
 
 unittest
@@ -254,6 +260,12 @@ struct Circle(T)
         x = newX;
         y = newY;
         radius = newRadius;
+    }
+
+    ///Translate the circle by a given vector
+    Circle!T translate(Vector!T vec)
+    {
+        return Circle!T(x + vec.x, y + vec.y, radius);
     }
 }
 
@@ -510,4 +522,14 @@ unittest
     println("Should print a circle at 0, 0 with a radius of 10: ", Circlei(0, 0, 10));
     println("Should print a rectangle at 0, 0, with a side of 5", Rectanglei(0, 0, 5, 5));
     println("Should print an identity matrix: ", identity());
+}
+unittest
+{
+    auto a = Rectanglei(10, 10, 5, 5);
+    auto b = Circlei(10, 10, 5);
+    auto c = Vectori(1, -1);
+    auto aTranslate = a.translate(c);
+    auto bTranslate = b.translate(c);
+    assert(aTranslate.y == a.y + c.y && aTranslate.y == a.y + c.y);
+    assert(bTranslate.x == b.x + c.x && bTranslate.y == b.y + c.y);
 }
