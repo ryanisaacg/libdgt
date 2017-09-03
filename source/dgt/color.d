@@ -36,7 +36,7 @@ struct Color
 	}
 
     static immutable white = Color(1, 1, 1, 1);
-    static immutable black = Color(0, 0, 0, 0);
+    static immutable black = Color(0, 0, 0, 1);
     static immutable red = Color(1, 0, 0, 1);
     static immutable orange = Color(1, 0.5, 0, 1);
     static immutable yellow = Color(1, 1, 0, 1);
