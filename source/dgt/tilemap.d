@@ -37,21 +37,25 @@ struct Tilemap(T)
 	{
 		return valid(x, y) ? buffer[(x / size) * height / size + (y / size)] : INVALID_TILE;
 	}
+    Tile!T opIndex(in Vector!int vec) const { return this[vec.x, vec.y]; }
 
 	ref Tile!T opIndexAssign(in Tile!T tile, in int x, in int y)
 	{
 		return buffer[(x / size) * height / size + (y / size)] = tile;
 	}
+    ref Tile!T opIndexAssign(in Tile!T tile, in Vector!int vec) { return this[vec.x, vec.y] = tile; }
 
 	bool valid(in int x, in int y) const
 	{
 		return x >= 0 && y >= 0 && x < width && y < height;
 	}
+    bool valid(in Vector!int vec) const { return valid(vec.x, vec.y); }
 
 	bool empty(in int x, in int y) const
 	{
 		return !this[x, y].solid;
 	}
+    bool empty(in Vector!int vec) const { return empty(vec.x, vec.y); }
 
 	bool empty(in int x, in int y, in int width, in int height) const
 	{
@@ -61,6 +65,7 @@ struct Tilemap(T)
 					return false;
 		return empty(x + width, y) && empty(x, y + height) && empty(x + width, y + height);
 	}
+    bool empty(in Rectangle!int rect) const { return empty(rect.x, rect.y, rect.width, rect.height); }
 
     //TODO: Increase resolution of slideContact
 	Vector!int slideContact(in int x, in int y, in int width, in int height, in Vector!int v) const
@@ -77,6 +82,7 @@ struct Tilemap(T)
 			return attempt;
 		}
 	}
+    Vector!int slideContact(in Rectangle!int rect, in Vector!int vec) const { return slideContact(rect.x, rect.y, rect.width, rect.height, vec); }
 
 	@property int width() const { return _width; }
 	@property int height() const { return _height; }
