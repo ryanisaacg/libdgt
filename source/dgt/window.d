@@ -74,12 +74,15 @@ struct Window
             TTF_Init();
             Mix_Init(MIX_INIT_FLAC | MIX_INIT_MOD | MIX_INIT_MP3 | MIX_INIT_OGG);
         }).start();
+        const unscaledWidth = width / scale;
+        const unscaledHeight = height / scale;
         window = SDL_CreateWindow(title.ptr,
-            SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width, height,
+            SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 
+            unscaledWidth, unscaledHeight,
             config.flags);
         ctx = GLBackend(window, config.vsync);
         particles = Array!Particle(128);
-        camera.set(0, 0, width * scale, height * scale);
+        camera.set(0, 0, width, height);
         windowWidth = width;
         windowHeight = height;
 
@@ -451,8 +454,8 @@ struct Window
     @property bool mouseMiddleReleased() const { return !mouseMiddle && mouseMiddlePrevious; }
     @property bool isOpen() const { return shouldContinue; }
     @property Array!Gamepad gamepads() { return connectedGamepads; }
-    @property int width() const { return windowWidth; }
-    @property int height() const { return windowHeight; }
+    @property int width() const { return windowWidth * scale; }
+    @property int height() const { return windowHeight * scale; }
     @property int unitsPerPixel() const { return scale; }
 }
 
