@@ -1,6 +1,6 @@
 module dgt.texture;
 import derelict.sdl2.sdl, derelict.sdl2.image;
-import derelict.opengl;
+import opengl.gl3;
 import dgt.array : Array;
 import dgt.io;
 import dgt.geom : Rectangle;
@@ -8,7 +8,7 @@ import dgt.util : nullTerminate;
 
 import core.stdc.string;
 
-enum PixelFormat : GLenum
+enum ColorFormat : GLenum
 {
     RGB = GL_RGB,
     RGBA = GL_RGBA,
@@ -26,7 +26,7 @@ struct Texture
     @disable this();
 
     @nogc nothrow public:
-    this(ubyte* data, int w, int h, PixelFormat format)
+    this(ubyte* data, int w, int h, ColorFormat format)
     {
         GLuint texture;
         glGenTextures(1, &texture);
@@ -52,7 +52,7 @@ struct Texture
         {
             auto buffer = IMG_GetError();
             println("Image loading error: ", buffer[0..strlen(buffer)]);
-            this(null, 0, 0, PixelFormat.RGB);
+            this(null, 0, 0, ColorFormat.RGB);
         }
         else
         {
@@ -63,17 +63,17 @@ struct Texture
 
     this(SDL_Surface* sur)
     {
-        PixelFormat format;
+        ColorFormat format;
         if(sur.format.BytesPerPixel == 4)
             if(sur.format.Rmask == 0x000000ff)
-                format = PixelFormat.RGBA;
+                format = ColorFormat.RGBA;
             else
-                format = PixelFormat.BGRA;
+                format = ColorFormat.BGRA;
         else
             if(sur.format.Rmask == 0x000000ff)
-                format = PixelFormat.RGB;
+                format = ColorFormat.RGB;
             else
-                format = PixelFormat.BGR;
+                format = ColorFormat.BGR;
         this(cast(ubyte*)sur.pixels, sur.w, sur.h, format);
     }
 

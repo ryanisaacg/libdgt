@@ -1,6 +1,8 @@
 module dgt.gl_backend;
-import derelict.opengl;
 import derelict.sdl2.sdl;
+
+import opengl.gl3;
+import opengl.loader;
 
 import dgt.array : Array;
 import dgt.color : Color;
@@ -69,18 +71,16 @@ struct GLBackend
     @disable this();
 	@disable this(this);
 
-	@trusted:
+	@trusted @nogc nothrow:
 	package this(SDL_Window* window, bool vsync)
 	{
-		DerelictGL3.load();
 		this.window = window;
 		SDL_GL_SetSwapInterval(vsync ? 1 : 0);
         SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
         SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 2);
         SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
 		ctx = SDL_GL_CreateContext(window);
-		DerelictGL3.reload();
-        DerelictGL3.loadExtra();
+		loadGL!(opengl.gl3);
         glGenVertexArrays(1, &vao);
         glBindVertexArray(vao);
 		glGenBuffers(1, &vbo);
@@ -91,8 +91,6 @@ struct GLBackend
 		vertices = Array!float(1024);
 		indices = Array!GLuint(1024);
 	}
-
-	@nogc nothrow:
 
 	~this()
 	{

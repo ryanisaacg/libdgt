@@ -5,8 +5,10 @@ copyright "Copyright © 2017, Ryan Goldstein"
 license "Apache-2.0"
 dependency "derelict-sdl2" version="~>3.0.0-beta.4"
 versions "DerelictSDL2_Static" platform="posix"
-dependency "derelict-gl3" version="~>2.0.0-beta.3"
+dependency "opengl" version="~>1.0.0"
+dependency "opengl:gl3" version="~>1.0.0"
 
+libs "opengl32" platform="windows"
 libs "SDL2_ttf" "SDL2_mixer" "SDL2_image" "SDL2" platform="posix"
 
 targetPath "lib"

@@ -1,5 +1,5 @@
 module dgt.window;
-import derelict.opengl;
+import opengl.gl3;
 import derelict.sdl2.sdl, derelict.sdl2.image, derelict.sdl2.mixer, derelict.sdl2.ttf;
 import core.stdc.stdio, core.stdc.stdlib, core.stdc.time, core.thread;
 
@@ -84,7 +84,7 @@ struct Window
         windowHeight = height;
 
         ubyte[3] white_pixel = [ 255, 255, 255 ];
-        white = Texture(white_pixel.ptr, 1, 1, PixelFormat.RGB);
+        white = Texture(white_pixel.ptr, 1, 1, ColorFormat.RGB);
         glViewport(0, 0, width, height);
         aspectRatio = cast(float)width / height;
         this.scale = scale;
