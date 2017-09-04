@@ -7,6 +7,38 @@ void main()
 	WindowConfig config = { resizable : true, vsync : true };
 	Window engine = Window("Test title", 640, 480, config);
 	auto level = Level("example/example.json");
+	engine.setShader(
+"#version 150
+in vec2 pos;
+in vec2 texPos;
+in vec4 col;
+uniform mat3 trans;
+out vec4 Color;
+out vec2 Tex_coord;
+void main() {
+	Color = col;
+	Tex_coord = texPos;
+	vec3 transformed = trans * vec3(pos, 1.0);
+	transformed.z = 0;
+	gl_Position = vec4(transformed, 1.0);
+}",
+"#version 150
+in vec4 Color;
+in vec2 Tex_coord;
+out vec4 outCol;
+uniform sampler2D image;
+void main() {
+	vec4 tex_color = texture(image, Tex_coord);
+	outCol = Color * tex_color;
+}",
+"trans",
+"pos",
+"texPos",
+"col",
+"image",
+"outCol"
+);
+	auto level = Map("example/example.json");
     auto tex = Texture("example/test.png");
 	scope(exit) tex.destroy();
 	auto map = Tilemap!bool(640, 480, 32);

@@ -435,9 +435,19 @@ struct Window
         return previous_keys[SDL_GetScancodeFromName(name.ptr)];
     }
 
-    void setShader(in string vertexShader, in string fragmentShader)
+    void setShader(in string vertexShader, 
+		in string fragmentShader,
+		in string transformAttributeName = "transform",
+		in string positionAttributeName = "position",
+		in string texPositionAttributeName = "tex_coord",
+		in string colorAttributeName = "color",
+		in string textureAttributeName = "tex",
+		in string colorOutputName = "outColor")
     {
-        ctx.setShader(vertexShader, fragmentShader);
+        ctx.setShader(vertexShader, fragmentShader, 
+            transformAttributeName, positionAttributeName,
+            texPositionAttributeName, colorAttributeName,
+            textureAttributeName, colorOutputName);
     }
 
     pure:
