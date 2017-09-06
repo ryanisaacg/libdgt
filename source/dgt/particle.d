@@ -1,11 +1,21 @@
 module dgt.particle;
 import dgt.array, dgt.geom, dgt.texture, dgt.util;
 
+/**
+Controls the behavior of particles when they collide with a tilemap
+
+Ignore means the particles will continue as normal, Die will mean the particle disappears, and Bounce will mean the particle rebounds from the wall
+*/
 enum ParticleBehavior
 {
     Ignore, Die, Bounce
 }
 
+/**
+An individual instance of a particle
+
+If you want to spawn particles use Window.addParticleBurst
+*/
 struct Particle
 {
     Texture region;
@@ -14,6 +24,7 @@ struct Particle
     int lifetime = 0;
     ParticleBehavior behavior = ParticleBehavior.Ignore;
 
+    ///Step a particle forward a frame
     @safe @nogc nothrow pure public void update()
     {
         velocity = velocity + acceleration;
@@ -24,6 +35,9 @@ struct Particle
     }
 }
 
+/**
+A structure that allows particle spawn settings to be tweaked
+*/
 struct ParticleEmitter
 {
     const(Array!Texture) regions;
@@ -36,12 +50,18 @@ struct ParticleEmitter
     int particle_min, particle_max;
     ParticleBehavior behavior = ParticleBehavior.Ignore;
 
+    @disable this();
+
     @nogc nothrow public:
+    /**
+    A list of all possible texture regions that the particles can source from
+    */
     this(in Array!Texture regions)
     {
         this.regions = regions;
     }
 
+    ///Create a single particle
     Particle emit() const
     {
         return Particle(regions[randomRange(0, cast(int)regions.length)],
