@@ -60,6 +60,10 @@ struct GLBackend
 	private SDL_GLContext ctx;
 	//OpenGL objects
 	private GLuint shader, fragment, vertex, vbo, ebo, vao, texture_location;
+	private string transformAttribute,
+		positionAttribute,
+		texPositionAttribute,
+		colorAttribute, textureAttribute;
 	private SDL_Window* window;
 	public Transform!float transform;
 
@@ -109,9 +113,32 @@ struct GLBackend
 		SDL_GL_DeleteContext(ctx);
 	}
 
-    ///Set the current shader
-	public void setShader(in string vertexShader, in string fragmentShader)
+    /**
+	Set the current shader and its attributes
+
+	The GL backend passes a uniform 3x3 matrix to a uniform with a name
+	given by 'transformAttributeName.' This matrix is a transformation
+	applied to every vertex. Each vertex receives a vec2 of its position
+	and texture coordinate, given by 'positionAttributeName' and
+	'texPositionAttributeName.' Vertices also are blended with a color,
+	given by 'colorAttributeName.' The texture is passed as a uniform
+	sampler2D to 'textureAttributeName.' The output of the shader is a
+	vec4 for a color, given by 'colorOutputName'
+	*/
+	public void setShader(in string vertexShader, 
+		in string fragmentShader,
+		in string transformAttributeName = "transform",
+		in string positionAttributeName = "position",
+		in string texPositionAttributeName = "tex_coord",
+		in string colorAttributeName = "color",
+		in string textureAttributeName = "tex",
+		in string colorOutputName = "outColor")
 	{
+		transformAttribute = transformAttributeName;
+		positionAttribute = positionAttributeName;
+		texPositionAttribute = texPositionAttributeName,
+		colorAttribute = colorAttributeName;
+		textureAttribute = textureAttributeName;
 		if(shader != 0) glDeleteProgram(shader);
 		if(vertex != 0) glDeleteShader(vertex);
 		if(fragment != 0) glDeleteShader(fragment);
@@ -147,14 +174,14 @@ struct GLBackend
 		shader = glCreateProgram();
 		glAttachShader(shader, vertex);
 		glAttachShader(shader, fragment);
-		glBindFragDataLocation(shader, 0, "outColor");
+		glBindFragDataLocation(shader, 0, colorOutputName.ptr);
 		glLinkProgram(shader);
 		glUseProgram(shader);
 	}
 
     /**
     Clear the screen and the vertex and index buffers
-    
+
     Any data that hasn't been drawn will be lost
     */
 	public void clear(in Color col)
@@ -168,7 +195,7 @@ struct GLBackend
     ///Draw the current vertices and indices and clear the buffers
 	public void flush()
 	{
-		GLint transform_attrib = glGetUniformLocation(shader, "transform");
+		GLint transform_attrib = glGetUniformLocation(shader, transformAttribute.ptr);
 		glUniformMatrix3fv(transform_attrib, 1, GL_FALSE, transform.ptr);
 		//Bind the vertex data
 		glBindBuffer(GL_ARRAY_BUFFER, vbo);
@@ -177,17 +204,17 @@ struct GLBackend
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
 		glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.length * GLuint.sizeof, indices.ptr, GL_STREAM_DRAW);
 		//Set up the vertex attributes
-		GLint posAttrib = glGetAttribLocation(shader, "position");
+		GLint posAttrib = glGetAttribLocation(shader, positionAttribute.ptr);
 		glEnableVertexAttribArray(posAttrib);
 		glVertexAttribPointer(posAttrib, 2, GL_FLOAT, GL_FALSE, 8 * GLfloat.sizeof, cast(void*)0);
-		GLint texAttrib = glGetAttribLocation(shader, "tex_coord");
+		GLint texAttrib = glGetAttribLocation(shader, texPositionAttribute.ptr);
 		glEnableVertexAttribArray(texAttrib);
 		glVertexAttribPointer(texAttrib, 2, GL_FLOAT, GL_FALSE, 8 * GLfloat.sizeof, cast(void*)(2 * GLfloat.sizeof));
-		GLint colAttrib = glGetAttribLocation(shader, "color");
+		GLint colAttrib = glGetAttribLocation(shader, colorAttribute.ptr);
 		glEnableVertexAttribArray(colAttrib);
 		glVertexAttribPointer(colAttrib, 4, GL_FLOAT, GL_FALSE, 8 * GLfloat.sizeof, cast(void*)(4 * GLfloat.sizeof));
 		//Upload the texture to the GPU
-		texture_location = glGetUniformLocation(shader, "tex");
+		texture_location = glGetUniformLocation(shader, textureAttribute.ptr);
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, texture);
 		glUniform1i(texture_location, 0);

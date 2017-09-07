@@ -54,7 +54,7 @@ struct Entity
 }
 
 ///A structure to load the Tiled map into
-struct Map
+struct Level
 {
     static immutable FLIPPED_HORIZONTALLY_FLAG = 0x80000000;
     static immutable FLIPPED_VERTICALLY_FLAG = 0x40000000;
