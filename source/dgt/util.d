@@ -6,27 +6,32 @@ import dgt.geom;
 
 @nogc nothrow:
 
-//A normalized random function
+///A normalized random function
 float random()
 {
     return cast(float) rand() / RAND_MAX;
 }
+///Generate a random float in a range
 float randomRange(in float min, in float max)
 {
     return (max - min) * random() + min;
 }
+///Generate a random int in a range
 int randomRange(in int min, in int max)
 {
     return cast(int)randomRange(cast(float)min, cast(float)max);
 }
+///Generate a vector of a float in a range
 Vector!float randomRange(in Vector!float a, in Vector!float b)
 {
     return Vector!float(randomRange(a.x, b.x), randomRange(a.y, b.y));
 }
+///Generate a vector of an int in a range
 Vector!int randomRange(in Vector!int a, in Vector!int b)
 {
     return Vector!int(randomRange(a.x, b.x), randomRange(a.y, b.y));
 }
+///Create a null terminated buffer from a string
 Array!char nullTerminate(in string str)
 {
     Array!char nameNullTerminated = Array!char(str.length + 1);
