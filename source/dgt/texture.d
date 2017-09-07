@@ -8,6 +8,7 @@ import dgt.util : nullTerminate;
 
 import core.stdc.string;
 
+///The format of each pixel in byte order
 enum PixelFormat : GLenum
 {
     RGB = GL_RGB,
@@ -16,6 +17,9 @@ enum PixelFormat : GLenum
     BGRA = GL_BGRA
 }
 
+/**
+A drawable texture which can also be a region of a larger texture
+*/
 struct Texture
 {
     package uint id;
@@ -26,6 +30,7 @@ struct Texture
     @disable this();
 
     @nogc nothrow public:
+    ///Create a Texture from data in memory
     this(ubyte* data, int w, int h, PixelFormat format)
     {
         GLuint texture;
@@ -43,6 +48,7 @@ struct Texture
         region = Rectangle!int(0, 0, w, h);
     }
 
+    ///Load a texture from a file with a given path
     this(string name)
     {
         auto nameNullTerminated = nullTerminate(name);
@@ -61,6 +67,7 @@ struct Texture
         }
     }
 
+    ///Load a texture from an SDL_Surface in memory
     this(SDL_Surface* sur)
     {
         PixelFormat format;
@@ -77,12 +84,14 @@ struct Texture
         this(cast(ubyte*)sur.pixels, sur.w, sur.h, format);
     }
 
+    ///Remove the texture from GPU memory
     void destroy()
     {
         glDeleteTextures(1, &id);
     }
 
     pure:
+    ///Get a texture that represents a region of a larger texture
     Texture getSlice(Rectangle!int region)
     {
         Texture tex = this;
@@ -90,7 +99,10 @@ struct Texture
                 this.region.y + region.y, region.width, region.height);
         return tex;
     }
+    ///Get the width of the source image
     @property int sourceWidth() const { return width; }
+    ///Get the height of the source image
     @property int sourceHeight() const { return height; }
+    ///Get the size of the texture's region
     @property Rectangle!int size() const { return region; }
 }
