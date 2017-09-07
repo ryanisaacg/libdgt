@@ -8,11 +8,12 @@ import std.typecons : Nullable;
 
 import dgt.array, dgt.color, dgt.font, dgt.gamepad, dgt.geom, dgt.gl_backend, dgt.io, dgt.sound, dgt.music, dgt.particle, dgt.sprite, dgt.texture, dgt.tilemap, dgt.util;
 
+///The flags used to control a window's initial behavior
 struct WindowConfig
 {
     bool fullscreen, resizable, borderless, minimized, maximized, input_grabbed, vsync = true;
 
-    @property SDL_WindowFlags flags() const
+    @property package SDL_WindowFlags flags() const
     {
         return SDL_WINDOW_OPENGL |
         (resizable ? SDL_WINDOW_RESIZABLE : cast(SDL_WindowFlags)0) |
@@ -24,8 +25,13 @@ struct WindowConfig
     }
 }
 
-static immutable SDL_NUM_KEYS = 284;
+private static immutable SDL_NUM_KEYS = 284;
 
+/**
+The main window
+
+Handles drawing and input
+*/
 struct Window
 {
     private:
@@ -50,10 +56,24 @@ struct Window
     @disable this(this);
 
     public:
+    ///If the window is drawing in UI Mode, where drawing ignores the camera
     bool inUIMode = false;
+    ///The number of target frames per second
     uint fps = 60;
+    ///The target aspect ratio of the window
     float aspectRatio;
 
+    /**
+    Create a window
+
+    Params:
+    title = The window's stitle
+    width = The window width in units
+    height = The window height in units
+    config = The flags that control the behavior of the window
+    scale = the number of 'units' per pixel
+    bindToGlobal = set the global window reference to this window
+    */
     this(in string title, in int width, in int height, in WindowConfig config, in int scale = 1, in bool bindToGlobal = true)
     {
         version(Windows)
@@ -109,6 +129,7 @@ struct Window
 
     @nogc nothrow @trusted:
 
+    ///Stop keeping the window alive
     void close()
     {
         shouldContinue = false;
@@ -125,12 +146,23 @@ struct Window
         SDL_Quit();
     }
 
+    /**
+    Start a frame
+    Params:
+    bg = The color to clear with
+    */
     void begin(in Color bg)
     {
         auto camera = Rectangle!int(0, 0, windowWidth * scale, windowHeight * scale);
         begin(bg, camera);
     }
 
+    /**
+    Start a frame
+    Params:
+    bg = The color to clear with
+    cam = the region to draw
+    */
     void begin(in Color bg, in Rectangle!int cam)
     {
         camera = cam;
@@ -223,9 +255,9 @@ struct Window
         }
     }
 
+    ///Update particles and display the drawn objects
     void end()
     {
-        ctx.flip();
         for (size_t i = 0; i < particles.length; i++)
         {
             particles[i].update();
@@ -237,6 +269,7 @@ struct Window
             else
                 draw(particles[i].region, particles[i].position.x, particles[i].position.y);
         }
+        ctx.flip();
         uint time = SDL_GetTicks();
         if (time - previous_ticks < 1000 / fps) {
             SDL_Delay(1000 / fps - (time - previous_ticks)); //account for the time elapsed during the frame
@@ -244,12 +277,14 @@ struct Window
         previous_ticks = time;
     }
 
+    ///Update particles, check particles against the tilemap, and display the drawn objects
     void end(T)(in Tilemap!T map)
     {
         filterParticles(map);
         end();
     }
 
+    ///Draw a polygon with each point following the next in a circle around the edge
     void draw(size_t Len)(in Color color, in Vectori[Len] points)
     {
         static immutable Indices = (Len - 2) * 3;
@@ -274,6 +309,11 @@ struct Window
     }
 
 
+    /**
+    Draw a circle with a given color
+
+    The circle is actually draawn as a polygon, with NumPoints points. Increase or decrease it to increase or decrease the points on the circle
+    */
     void draw(size_t NumPoints = 32)(in Color color, in Circlei circle)
     {
         Vectori[NumPoints] points; //A large array of points to simulate a circle
@@ -287,6 +327,7 @@ struct Window
         draw(color, points);
     }
 
+    ///Draw a rectangle with a color
     void draw(in Color color, in Rectanglei rect)
     {
         Vectori[4] points = [ rect.topLeft, Vectori(rect.x + rect.width, rect.y),
@@ -294,11 +335,28 @@ struct Window
         draw(color, points);
     }
 
+    ///Draw a texture at the given units
     void draw(in Texture tex, in float x, in float y)
     {
         draw(tex, x, y, tex.size.width * scale, tex.size.height * scale);
     }
 
+    /**
+    Draw a transformed texture 
+
+    Params:
+    tex = the texture
+    x = the x in units
+    y = the y in units
+    w = the width in units
+    h = the height in units
+    rot = the rotation angle from 0 to 360
+    scale_x = the x scale of the draw
+    scale_y = the y scale of the draw
+    flip_x = if the texture should be flipped horizontally
+    flip_y = if the texture should be flipped vertically
+    color = the color to blend with
+    */
     void draw(in Texture tex, in float x, in float y, in float w, in float h,
                         in float rot = 0, in float or_x = 0, in float or_y = 0,
                         in float scale_x = 1, in float scale_y = 1,
@@ -310,6 +368,20 @@ struct Window
         draw(tex, trans, x + or_x, y + or_y, w, h, flip_x, flip_y, color);
     }
 
+
+    /**
+    Draw a texture with a precalculated transform
+
+    Params:
+    tex = the texture
+    x = the x in units
+    y = the y in units
+    w = the width in units
+    h = the height in units
+    flip_x = if the texture should be flipped horizontally
+    flip_y = if the texture should be flipped vertically
+    color = the color to blend with
+    */
     void draw(in Texture tex, in Transform!float trans, in float x, in float y,
                        in float w, in float h, in bool flip_x = false, in bool flip_y = false,
                        in Color color = Color.white)
@@ -359,6 +431,7 @@ struct Window
         ctx.add!(4, 6)(tex.id, vertices, indices);
     }
 
+    ///Draw a sprite to the screen
     void draw(ref scope Sprite sprite)
     {
         sprite.update();
@@ -367,6 +440,7 @@ struct Window
                 sprite.scaleX, sprite.scaleY, sprite.flipX, sprite.flipY, sprite.color);
     }
 
+    ///Draw a character using a font and find the width it took
     int draw(ref in Font font, in char c, in float x, in float y)
     {
         Texture renderChar = font.render(c);
@@ -374,6 +448,7 @@ struct Window
         return renderChar.size.width;
     }
 
+    ///Draw a string using a font
     void draw(ref in Font font, in string str, in float x, in float y, float lineHeight = 1)
     {
         int position = 0;
@@ -395,6 +470,7 @@ struct Window
         }
     }
 
+    ///Draw a wrapped string that can wrap on word or by character
     void draw(ref in Font font, in string str, in float x, in float y,
         in float maxWidth, in bool wrapOnWord = true, float lineHeight = 1)
     {
@@ -418,23 +494,15 @@ struct Window
         }
     }
 
+    ///Create a burst of particles using the emitter
     void addParticleBurst(in ParticleEmitter emitter)
     {
         int parts = randomRange(emitter.particle_min, emitter.particle_max);
         for (int i = 0; i < parts; i++)
             particles.add(emitter.emit());
     }
-
-    bool isKeyDown(in string name) const
-    {
-        return current_keys[SDL_GetScancodeFromName(name.ptr)];
-    }
-
-    bool wasKeyDown(in string name) const
-    {
-        return previous_keys[SDL_GetScancodeFromName(name.ptr)];
-    }
-
+    
+    ///Sets the GLSL shader, see the GL backend docs
     void setShader(in string vertexShader, 
 		in string fragmentShader,
 		in string transformAttributeName = "transform",
@@ -450,7 +518,27 @@ struct Window
             textureAttributeName, colorOutputName);
     }
 
+    ///Checks if a key is being held down by a key name
+    bool isKeyDown(in string name) const
+    {
+        return current_keys[SDL_GetScancodeFromName(name.ptr)];
+    }
+
+    ///Checks if key was down previously by a key name
+    bool wasKeyDown(in string name) const
+    {
+        return previous_keys[SDL_GetScancodeFromName(name.ptr)];
+    }
+
+    private static Window* globalWindow;
+    ///Get a global instance of the window
+    public static @nogc Window* getInstance()
+    {
+        return globalWindow;
+    }
+
     pure:
+    ///Get the position of the mouse
     @property Vector!int mouse() const
     {
         return mousePos * camera.width / windowWidth - Vectori(offsetX, offsetY)
@@ -467,11 +555,5 @@ struct Window
     @property int width() const { return windowWidth * scale; }
     @property int height() const { return windowHeight * scale; }
     @property int unitsPerPixel() const { return scale; }
-}
 
-private Window* globalWindow;
-
-public @nogc nothrow ref Window getWindow()
-{
-    return *globalWindow;
 }
