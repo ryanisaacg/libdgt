@@ -4,6 +4,11 @@ import dgt.animation;
 import dgt.color;
 import dgt.texture;
 
+/**
+A drawable object attached to a transformation
+
+Can be either static (Texture) or dynamic (Animation)
+*/
 struct Sprite
 {
     private:
@@ -28,49 +33,53 @@ struct Sprite
     bool flipX = false, flipY = false;
     Color color = Color.white;
 
-    this(Texture tex)
+    ///Create a static sprite
+    this(in Texture tex)
     {
         data.tex = tex;
-        type = SpriteType.Static;
-        width = tex.size.width;
-        height = tex.size.height;
+        source = tex;
     }
 
-    this(Animation anim)
+    ///Create a dynamic sprite
+    this(scope Animation anim)
     {
         data.anim = anim;
-        type = SpriteType.Animated;
-        width = anim.texture.size.width;
-        height = anim.texture.size.height;
+        source = anim;
     }
 
-    void setDrawable(Texture tex)
-    {
-        data.tex = tex;
-        type = SpriteType.Static;
-        width = tex.size.width;
-        height = tex.size.height;
-    }
-
-    void setDrawable(Animation anim)
-    {
-        data.anim = anim;
-        type = SpriteType.Animated;
-        width = anim.texture.size.width;
-        height = anim.texture.size.height;
-    }
-
+    ///Update the sprite (only affects dynamic sprites)
     void update()
     {
         if(type == SpriteType.Animated)
             data.anim.update();
     }
 
+    ///Get the current texture of the sprite
     @property ref const(Texture) texture() const
     {
         if(type == SpriteType.Animated)
             return data.anim.texture;
         else
             return data.tex;
+    }
+
+    ///Set the source of the sprite to a static texture
+    @property Texture source(in Texture tex)
+    {
+        data.tex = tex;
+        type = SpriteType.Static;
+        width = tex.size.width;
+        height = tex.size.height;
+        return tex;
+    }
+
+    ///Set the source of the sprite to a dynamic animation
+    @property Animation source(scope Animation anim)
+    {
+        data.anim = anim;
+        type = SpriteType.Animated;
+        width = anim.texture.size.width;
+        height = anim.texture.size.height;
+        return anim;
     }
 }
