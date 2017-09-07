@@ -6,7 +6,6 @@ void main()
 {
 	WindowConfig config = { resizable : true, vsync : true };
 	Window engine = Window("Test title", 640, 480, config);
-	auto level = Level("example/example.json");
 	engine.setShader(
 "#version 150
 in vec2 pos;
@@ -38,7 +37,7 @@ void main() {
 "image",
 "outCol"
 );
-	auto level = Map("example/example.json");
+	auto level = Level("example/example.json");
     auto tex = Texture("example/test.png");
 	scope(exit) tex.destroy();
 	auto map = Tilemap!bool(640, 480, 32);
