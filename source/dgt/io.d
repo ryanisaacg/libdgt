@@ -38,7 +38,7 @@ void print(T)(in T[] items)
 ///Print a string (special case of an array)
 void print(T:char)(in T[] items)
 {
-    printf("%s", items.ptr);
+    printf("%.*s", items.length, items.ptr);
 }
 
 ////Print some number of objects
