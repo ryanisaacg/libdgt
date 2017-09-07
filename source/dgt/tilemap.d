@@ -2,12 +2,20 @@ module dgt.tilemap;
 import dgt.array, dgt.geom;
 import std.math;
 
+/**
+A single tile with an arbitrary value and if the tile is solid or not
+
+A solid tile will indicate its square is not empty
+*/
 struct Tile(T)
 {
 	T value;
 	bool solid;
 }
 
+/**
+A fixed-size grid of tiles that can be queried
+*/
 struct Tilemap(T)
 {
 	static immutable INVALID_TILE = Tile!T(T(), true);
@@ -16,6 +24,7 @@ struct Tilemap(T)
 	private int size, _width, _height;
 
 	@nogc nothrow public:
+    ///Create a tilemap with a given unit width and height and the units for the size of each tile square
 	this(in int mapWidth, in int mapHeight, in int size)
 	{
 		this._width = mapWidth;
@@ -27,36 +36,46 @@ struct Tilemap(T)
 				buffer.add(Tile!T(T(), false));
 	}
 
+    ///Free the underlying tilemap memory
 	void destroy()
 	{
 		buffer.destroy();
 	}
 
 	pure:
+    ///Get a tile from a location
 	Tile!T opIndex(in int x, in int y) const
 	{
 		return valid(x, y) ? buffer[(x / size) * height / size + (y / size)] : INVALID_TILE;
 	}
+    ///Get a tile from a location
     Tile!T opIndex(in Vector!int vec) const { return this[vec.x, vec.y]; }
 
+    ///Set a tile from a location
 	ref Tile!T opIndexAssign(in Tile!T tile, in int x, in int y)
 	{
 		return buffer[(x / size) * height / size + (y / size)] = tile;
 	}
+    ///Set a tile from a location
     ref Tile!T opIndexAssign(in Tile!T tile, in Vector!int vec) { return this[vec.x, vec.y] = tile; }
 
-	bool valid(in int x, in int y) const
+	///Checks if a point falls within a tilemap
+    bool valid(in int x, in int y) const
 	{
 		return x >= 0 && y >= 0 && x < width && y < height;
 	}
+	///Checks if a point falls within a tilemap
     bool valid(in Vector!int vec) const { return valid(vec.x, vec.y); }
 
+    ///Checks if a point is both valid and empty
 	bool empty(in int x, in int y) const
 	{
 		return !this[x, y].solid;
 	}
+    ///Checks if a point is both valid and empty
     bool empty(in Vector!int vec) const { return empty(vec.x, vec.y); }
 
+    ///Checks of a region is both valid and empty
 	bool empty(in int x, in int y, in int width, in int height) const
 	{
 		for(int i = x; i < x + width; i += size)
@@ -65,9 +84,11 @@ struct Tilemap(T)
 					return false;
 		return empty(x + width, y) && empty(x, y + height) && empty(x + width, y + height);
 	}
+    ///Checks of a region is both valid and empty
     bool empty(in Rectangle!int rect) const { return empty(rect.x, rect.y, rect.width, rect.height); }
 
     //TODO: Increase resolution of slideContact
+    ///Determine the furthest a region can move without hitting a wall
 	Vector!int slideContact(in int x, in int y, in int width, in int height, in Vector!int v) const
 	{
 		if (empty(x + v.x, y + v.y, width, height))
@@ -82,10 +103,14 @@ struct Tilemap(T)
 			return attempt;
 		}
 	}
+    ///Determine the furthest a region can move without hitting a wall
     Vector!int slideContact(in Rectangle!int rect, in Vector!int vec) const { return slideContact(rect.x, rect.y, rect.width, rect.height, vec); }
 
+    ///The width of the map in units
 	@property int width() const { return _width; }
+    ///The height of the map in units
 	@property int height() const { return _height; }
+    ///The size of a tile in units (both width and height)
 	@property int tileSize() const { return size; }
 }
 
