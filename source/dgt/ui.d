@@ -1,3 +1,4 @@
+///A collection of immediate-mode UI widgets
 module dgt.ui;
 
 import dgt.array : Array;
@@ -5,6 +6,7 @@ import dgt.geom : Rectanglei, Vectori;
 import dgt.texture : Texture;
 import dgt.window : Window;
 
+///A clickable button
 struct Button
 {
     @disable this();
@@ -15,6 +17,16 @@ struct Button
     Vectori position;
     Texture tex, hover, press;
 
+    /**
+    Defines a button
+
+    Params:
+    area = The clickable region of the button
+    position = The spot to draw the button
+    tex = The default texture of the button
+    hover = The texture when the button is hovered over
+    press = The texture when the button is pressed down
+    */
     this(in Rectanglei area, in Vectori position, in Texture tex, in Texture hover, in Texture press)
     {
         this.area = area;
@@ -24,6 +36,7 @@ struct Button
         this.press = press;
     }
 
+    ///Draw a button and return if it is pressed
     bool draw(ref scope Window window) const
     {
         bool mouseContained = area.contains(window.mouse);
@@ -33,6 +46,7 @@ struct Button
     }
 }
 
+///A slider that can be moved along a horizontal axis
 struct Slider
 {
     public @nogc nothrow:
@@ -41,12 +55,20 @@ struct Slider
 
     @disable this();
 
+    /**
+    Create a slider
+
+    Params:
+    area = The region the slider can move around in
+    sliderHead = The image to draw where the slider is currently pointing
+    */
     this(in Rectanglei area, in Texture sliderHead)
     {
         this.area = area;
         this.slider = sliderHead;
     }
 
+    ///Draw a slider with a given normalized value and return its new value
     float draw(ref scope Window window, in float current) const
     {
         window.draw(slider, -slider.size.width / 2 + area.x + current * area.width,
@@ -59,6 +81,7 @@ struct Slider
 
 }
 
+///A rotating selection of options
 struct Carousel
 {
     @disable this();
@@ -67,6 +90,7 @@ struct Carousel
     Vectori position;
     const(Array!Texture) textures;
 
+    ///Create a carousel with a given set of options 
     this(in Button left, in Button right, in Vectori currentItemPosition, in Array!Texture textures)
     {
         this.left = left;
@@ -75,6 +99,7 @@ struct Carousel
         this.textures = textures;
     }
 
+    ///Draw a carousel with a given current index and return the new index
     int draw(ref scope Window window, in int current) const
     {
         int next = current;
