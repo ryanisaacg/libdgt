@@ -93,6 +93,8 @@ struct Tilemap(T)
 	{
 		if (empty(x + v.x, y + v.y, width, height))
 			return v;
+		else if(!empty(x, y, width, height))
+			return Vector!int(0, 0);
 		else
 		{
             Vector!int attempt = v;
