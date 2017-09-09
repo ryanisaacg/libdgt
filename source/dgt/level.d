@@ -7,6 +7,8 @@ import std.path : dirName;
 
 import dgt.array, dgt.color, dgt.geom, dgt.texture, dgt.tilemap;
 
+import dgt.io;
+
 ///A layer of tiles represented by integer constants
 struct TileLayer
 {
@@ -101,7 +103,6 @@ struct Level
         heightInTiles = cast(int)contents["height"].integer;
         tileWidth = cast(int)contents["tilewidth"].integer;
         tileHeight = cast(int)contents["tileheight"].integer;
-
         foreach(tileset; contents["tilesets"].array)
         {
             auto image = Texture(pathToMap ~ "/" ~ tileset["image"].str);
@@ -130,7 +131,7 @@ struct Level
                     cast(int)layer["height"].integer,
                     opacity, visible);
                 foreach(tile; layer["data"].array)
-                    tlayer.tiles.add(cast(int)tile.integer);
+                    tlayer.tiles.add(cast(int)tile.integer - 1);
                 tileLayers.add(tlayer);
             }
             else if(layer["type"].str == "objectgroup")
@@ -144,13 +145,13 @@ struct Level
                     elayer.entities.add(Entity(
                         object["name"].str,
                         object["type"].str,
-                        scale * cast(int)object["x"].integer,
-                        scale * cast(int)object["y"].integer,
+                        scale * cast(int)object["x"].floating,
+                        scale * cast(int)object["y"].floating,
                         scale * cast(int)object["width"].integer,
                         scale * cast(int)object["height"].integer,
                         cast(int)object["rotation"].integer,
                         flipX, flipY,
-                        tileImages[gid], object["visible"].type == JSON_TYPE.TRUE
+                        tileImages[gid - 1], object["visible"].type == JSON_TYPE.TRUE
                     ));
                 }
                 entityLayers.add(elayer);
