@@ -31,42 +31,18 @@ It progresses linearly from frame to frame and loops when it finishes.
 struct Animation
 {
     private:
-    Array!Frame frames;
-    int currentFrame, currentTime;
+    const(Frame[]) frames;
+    int currentFrame = 0, currentTime = 0;
 
     @nogc nothrow public:
     /**
-    Create an animation from a fixed-size array of frames.
-
-    The frame array is copied into a local buffer.
-    The Animation must be destroyed with `destroy`.
+    Create an animation from an array of frames
     */
-    pure this(size_t N)(in Frame[N] frames)
-    {
-        this(Array!Frame(frames));
-    }
-
-    /**
-    Create an animation from a variable-sized buffer of frames
-
-    The animation now owns the frame buffer and destroys it when it is destroyed.
-    The Animation must be destroyed with `destroy`.
-    */
-    pure this(Array!Frame frames)
+    pure this(in Frame[] frames)
     {
         this.frames = frames;
-        currentFrame = 0;
-        currentTime = 0;
-        assert(frames.length > 0);
     }
 
-    /**
-    Destroy an animation and free its internal memory
-    */
-    void destroy()
-    {
-        frames.destroy();
-    }
 
     /**
     Tick the animation forward one frame

@@ -244,8 +244,8 @@ struct GLBackend
 
     The 0th index is the first vertex in this add, not since the last flush
     */
-	public void add(size_t Vertices, size_t Indices)(in GLuint texture,
-					in Vertex[Vertices] newVertices, in GLuint[Indices] newIndices)
+	public void add(in GLuint texture,
+					in Vertex[] newVertices, in GLuint[] newIndices)
 	{
 		if(this.texture != texture)
 			switchTexture(texture);

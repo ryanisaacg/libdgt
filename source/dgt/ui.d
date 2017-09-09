@@ -1,7 +1,6 @@
 ///A collection of immediate-mode UI widgets
 module dgt.ui;
 
-import dgt.array : Array;
 import dgt.geom : Rectanglei, Vectori;
 import dgt.texture : Texture;
 import dgt.window : Window;
@@ -88,10 +87,10 @@ struct Carousel
     public @nogc nothrow:
     Button left, right;
     Vectori position;
-    const(Array!Texture) textures;
+    const(Texture[]) textures;
 
     ///Create a carousel with a given set of options 
-    this(in Button left, in Button right, in Vectori currentItemPosition, in Array!Texture textures)
+    this(in Button left, in Button right, in Vectori currentItemPosition, in Texture[] textures)
     {
         this.left = left;
         this.right = right;

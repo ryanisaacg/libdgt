@@ -61,10 +61,20 @@ struct Level
     static immutable FLIPPED_DIAGONALLY_FLAG = 0x20000000;
 
 
-    Array!Texture sourceImages;
-    Array!Texture tileImages;
-    Array!TileLayer tileLayers;
-    Array!EntityLayer entityLayers;
+    private
+    {
+        Array!Texture sourceImages;
+        Array!Texture tileImages;
+        Array!TileLayer tileLayers;
+        Array!EntityLayer entityLayers;
+    }
+
+    ///Get the images used by the tiles and entities
+    @property const(Texture[]) images() const { return tileImages.array; }
+    ///Get the layers with tiles fixed to the grid
+    @property const(TileLayer[]) fixedTileLayers() const { return tileLayers.array; }
+    ///Get the layers with entities that can be freely moved
+    @property const(EntityLayer[]) freeEntityLayers() const { return entityLayers.array; }
 
     int tileWidth, tileHeight, widthInTiles, heightInTiles;
 

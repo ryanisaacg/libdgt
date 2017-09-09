@@ -428,7 +428,7 @@ struct Window
             Vertex(br + translate, src_br, color),
             Vertex(bl + translate, src_bl, color)];
         GLuint[6] indices = [0, 1, 2, 2, 3, 0];
-        ctx.add!(4, 6)(tex.id, vertices, indices);
+        ctx.add(tex.id, vertices, indices);
     }
 
     ///Draw a sprite to the screen
@@ -551,7 +551,7 @@ struct Window
     @property bool mouseRightReleased() const { return !mouseRight && mouseRightPrevious; }
     @property bool mouseMiddleReleased() const { return !mouseMiddle && mouseMiddlePrevious; }
     @property bool isOpen() const { return shouldContinue; }
-    @property Array!Gamepad gamepads() { return connectedGamepads; }
+    @property Gamepad[] gamepads() { return connectedGamepads.array; }
     @property int width() const { return windowWidth * scale; }
     @property int height() const { return windowHeight * scale; }
     @property int unitsPerPixel() const { return scale; }

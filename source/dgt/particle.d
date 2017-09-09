@@ -1,5 +1,5 @@
 module dgt.particle;
-import dgt.array, dgt.geom, dgt.texture, dgt.util;
+import dgt.geom, dgt.texture, dgt.util;
 
 /**
 Controls the behavior of particles when they collide with a tilemap
@@ -40,7 +40,7 @@ A structure that allows particle spawn settings to be tweaked
 */
 struct ParticleEmitter
 {
-    const(Array!Texture) regions;
+    const(Texture[]) regions;
     Vector!int top_left, bottom_right, velocity_min, velocity_max,
         acceleration_min, acceleration_max, scale_min, scale_max,
         scale_velocity_min, scale_velocity_max;
@@ -56,7 +56,7 @@ struct ParticleEmitter
     /**
     A list of all possible texture regions that the particles can source from
     */
-    this(in Array!Texture regions)
+    this(in Texture[] regions)
     {
         this.regions = regions;
     }

@@ -31,9 +31,11 @@ struct Array(T)
 
     This is useful for initializing with an array literal
     */
-    this(size_t N)(in T[N] array)
+    this(scope T[] array)
     {
-        this = array;
+        ensureCapacity(array.length);
+        foreach(item; array)
+            add(item);
     }
 
     /**
@@ -102,18 +104,6 @@ struct Array(T)
 		dgt.io.print("]");
 	}
 
-	ref Array!T opAssign(size_t N)(in T[N] data)
-	{
-		ensureCapacity(N);
-		clear();
-		*count = N;
-		for(size_t i = 0; i < N; i++)
-		{
-			this[i] = data[i];
-		}
-		return this;
-	}
-
 	pure:
     /**
     Remove an element at an index by swapping it with the last element
@@ -152,6 +142,8 @@ struct Array(T)
     Find the number of valid elements currently in the array
     */
     @property size_t length() const { return *count; }
+    ///Get the Array data as a D array
+    @property T[] array() const { return buffer[0..length]; }
 
 	private:
 	private @property size_t* count() const { return cast(size_t*) backingBuffer; }
@@ -189,4 +181,8 @@ unittest
     x.clear();
     assert(x.length == 0);
 	x.destroy();
+    auto array = x.array;
+    assert(array.length == x.length);
+    for(size_t i = 0; i < array.length; i++)
+        assert(array[i] == x[i]);
 }

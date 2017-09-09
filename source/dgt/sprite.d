@@ -16,6 +16,10 @@ struct Sprite
     {
         Animation anim;
         Texture tex;
+
+        @nogc nothrow pure:
+        this(Animation a) { anim = a; }
+        this(Texture t) { tex = t; }
     }
 
     enum SpriteType
@@ -76,7 +80,7 @@ struct Sprite
     ///Set the source of the sprite to a dynamic animation
     @property Animation source(scope Animation anim)
     {
-        data.anim = anim;
+        data = SpriteData(anim);
         type = SpriteType.Animated;
         width = anim.texture.size.width;
         height = anim.texture.size.height;
