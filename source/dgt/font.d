@@ -27,7 +27,8 @@ struct Font
 {
     static immutable FONT_MAX_CHARS = 223;
     static immutable FONT_CHAR_OFFSET = 32;
-	Array!Texture characterTextures;
+    private Texture source;
+	private Array!Texture characterTextures;
 	private int height;
 
     @disable this();
@@ -73,14 +74,14 @@ struct Font
     		position += characters[i].w;
     	}
         //Load the surface into a texture
-        Texture texture = Texture(full);
+        source = Texture(full);
         SDL_FreeSurface(full);
         //Add reference to the texture for each character
         position = 0;
         characterTextures = Array!Texture(FONT_MAX_CHARS);
         for (int i = 0; i < FONT_MAX_CHARS; i++)
 		{
-            characterTextures.add(texture.getSlice(Rectanglei(position, 0, characters[i].w, characters[i].h)));
+            characterTextures.add(source.getSlice(Rectanglei(position, 0, characters[i].w, characters[i].h)));
             position += characterTextures[i].size.width;
             SDL_FreeSurface(characters[i]);
         }
@@ -88,6 +89,7 @@ struct Font
 
     ~this()
     {
+        source.destroy();
         characterTextures.destroy();
     }
 
