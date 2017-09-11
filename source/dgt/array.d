@@ -180,9 +180,9 @@ unittest
     println(x);
     x.clear();
     assert(x.length == 0);
-	x.destroy();
     auto array = x.array;
     assert(array.length == x.length);
     for(size_t i = 0; i < array.length; i++)
         assert(array[i] == x[i]);
+	x.destroy();
 }
