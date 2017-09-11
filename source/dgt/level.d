@@ -55,6 +55,14 @@ struct Entity
     bool visible;
 }
 
+private int number(in JSONValue json)
+{
+    if(json.type == JSON_TYPE.INTEGER)
+        return cast(int)json.integer;
+    else
+        return cast(int)json.floating;
+}
+
 ///A structure to load the Tiled map into
 struct Level
 {
@@ -99,18 +107,18 @@ struct Level
         auto pathToMap = dirName(path);
 
         auto contents = parseJSON(readText(path));
-        widthInTiles = cast(int)contents["width"].integer;
-        heightInTiles = cast(int)contents["height"].integer;
-        tileWidth = cast(int)contents["tilewidth"].integer;
-        tileHeight = cast(int)contents["tileheight"].integer;
+        widthInTiles = contents["width"].number;
+        heightInTiles = contents["height"].number;
+        tileWidth = contents["tilewidth"].number;
+        tileHeight = contents["tileheight"].number;
         foreach(tileset; contents["tilesets"].array)
         {
             auto image = Texture(pathToMap ~ "/" ~ tileset["image"].str);
             sourceImages.add(image);
-            int margin = cast(int)tileset["margin"].integer;
-            int spacing = cast(int)tileset["spacing"].integer;
-            int width = cast(int)tileset["tilewidth"].integer;
-            int height = cast(int)tileset["tileheight"].integer;
+            int margin = tileset["margin"].number;
+            int spacing = tileset["spacing"].number;
+            int width = tileset["tilewidth"].number;
+            int height = tileset["tileheight"].number;
             for(int y = margin; y < image.sourceHeight - margin; y += height + spacing)
                 for(int x = margin; x < image.sourceWidth - margin; x += width + spacing)
                     tileImages.add(image.getSlice(Rectanglei(x, y, width, height)));
@@ -119,19 +127,19 @@ struct Level
         foreach(layer; contents["layers"].array)
         {
             string name = layer["name"].str;
-            int offsetX = "offsetx" in layer ? cast(int)layer["offsetx"].integer : 0;
-            int offsetY = "offsety" in layer ? cast(int)layer["offsety"].integer : 0;
-            float opacity = layer["opacity"].type == JSON_TYPE.FLOAT ? layer["opacity"].floating : layer["opacity"].integer;
+            int offsetX = "offsetx" in layer ? layer["offsetx"].number : 0;
+            int offsetY = "offsety" in layer ? layer["offsety"].number : 0;
+            float opacity = layer["opacity"].type == JSON_TYPE.FLOAT ? layer["opacity"].floating : layer["opacity"].number;
             bool visible = layer["visible"].type == JSON_TYPE.TRUE;
             if(layer["type"].str == "tilelayer")
             {
                 TileLayer tlayer = TileLayer(name, Array!int(layer["data"].array.length),
                     offsetX, offsetY,
-                    cast(int)layer["width"].integer,
-                    cast(int)layer["height"].integer,
+                    layer["width"].number,
+                    layer["height"].number,
                     opacity, visible);
                 foreach(tile; layer["data"].array)
-                    tlayer.tiles.add(cast(int)tile.integer - 1);
+                    tlayer.tiles.add(tile.number - 1);
                 tileLayers.add(tlayer);
             }
             else if(layer["type"].str == "objectgroup")
@@ -141,15 +149,15 @@ struct Level
                 foreach(object; layer["objects"].array)
                 {
                     bool flipX, flipY;
-                    uint gid = stripGID(cast(uint)object["gid"].integer, flipX, flipY);
+                    uint gid = stripGID(cast(uint)object["gid"].number, flipX, flipY);
                     elayer.entities.add(Entity(
                         object["name"].str,
                         object["type"].str,
-                        scale * cast(int)object["x"].floating,
-                        scale * cast(int)object["y"].floating,
-                        scale * cast(int)object["width"].integer,
-                        scale * cast(int)object["height"].integer,
-                        cast(int)object["rotation"].integer,
+                        scale * object["x"].number,
+                        scale * object["y"].number,
+                        scale * object["width"].number,
+                        scale * object["height"].number,
+                        object["rotation"].number,
                         flipX, flipY,
                         tileImages[gid - 1], object["visible"].type == JSON_TYPE.TRUE
                     ));
