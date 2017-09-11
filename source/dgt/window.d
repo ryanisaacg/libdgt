@@ -120,14 +120,22 @@ struct Window
         thread_joinAll();
         Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 1024);
         Mix_AllocateChannels(512);
-
-        connectedGamepads = Array!Gamepad(SDL_NumJoysticks());
-        for(int i = 0; i < SDL_NumJoysticks(); i++)
-            if(SDL_IsGameController(i))
-                connectedGamepads.add(Gamepad(SDL_GameControllerOpen(i)));
+        connectedGamepads = Array!Gamepad(16);
+        recalculateGamepads();
     }
 
     @nogc nothrow @trusted:
+
+    private void recalculateGamepads()
+    {
+        foreach(gamepad; connectedGamepads)
+            gamepad.destroy();
+        connectedGamepads.clear();
+        int joystick_length = SDL_NumJoysticks();
+        for(int i = 0; i < joystick_length; i++)
+            if(SDL_IsGameController(i))
+                connectedGamepads.add(Gamepad(SDL_GameControllerOpen(i)));
+    }
 
     ///Stop keeping the window alive
     void close()
@@ -210,6 +218,11 @@ struct Window
                         default:
                             break;
                     }
+                    break;
+                case SDL_CONTROLLERDEVICEADDED:
+                case SDL_CONTROLLERDEVICEREMOVED:
+                case SDL_CONTROLLERDEVICEREMAPPED:
+                    recalculateGamepads();
                     break;
                 default:
                     break;
