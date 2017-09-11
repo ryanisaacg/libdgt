@@ -1,7 +1,14 @@
 language: d
-before_install:
-  - sudo apt-get -qq update
-  - sudo apt-get install -y libsdl2-dev libsdl2-mixer-dev libsdl2-image-dev libsdl2-ttf-dev libgles2-mesa-dev libegl1-mesa-dev
+addons:
+  apt:
+    packages:
+      - xvfb
+      - libsdl2-dev
+      - libsdl2-mixer-dev
+      - libsdl2-image-dev
+      - libsdl2-ttf-dev
+      - libgles2-mesa-dev
+      - libegl1-mesa-dev
 script:
  - dub test -b unittest-cov --compiler=${DC}
 after_success:
