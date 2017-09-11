@@ -5,7 +5,7 @@ To actually draw text on the screen use the Window draw functions
 */
 module dgt.font;
 import derelict.sdl2.sdl, derelict.sdl2.ttf;
-import dgt.array, dgt.color, dgt.geom, dgt.io, dgt.texture, dgt.window;
+import dgt.array, dgt.geom, dgt.io, dgt.texture, dgt.window;
 import dgt.util : nullTerminate;
 
 /**
@@ -36,9 +36,9 @@ struct Font
 
     @nogc nothrow public:
     /**
-    Load a font from a TTF file with a given size, color, and style
+    Load a font from a TTF file with a given size and style
     */
-	this(in string filename, in int size, in Color col, in FontStyle style)
+	this(in string filename, in int size, in FontStyle style)
     {
         //Pass the C function a null-terminated path to avoid string literal issues
         auto pathNullTerminated = nullTerminate(filename);
@@ -47,7 +47,7 @@ struct Font
         TTF_SetFontStyle(font, style);
         if (font == null)
             println("Font with filename ", filename, " not found");
-		SDL_Color color = cast(SDL_Color)col;
+		SDL_Color color = SDL_Color(255, 255, 255, 255);
         //Create a null-terminated buffer to send glyphs to the TTF library
         char[2] buffer = ['\0', '\0'];
         SDL_Surface*[FONT_MAX_CHARS] characters;

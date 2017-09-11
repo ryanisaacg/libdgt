@@ -336,9 +336,9 @@ struct Window
     }
 
     ///Draw a texture at the given units
-    void draw(in Texture tex, in float x, in float y)
+    void draw(in Texture tex, in float x, in float y, in Color col = Color.white)
     {
-        draw(tex, x, y, tex.size.width * scale, tex.size.height * scale);
+        draw(tex, x, y, tex.size.width * scale, tex.size.height * scale, 0, 0, 0, 1, 1, false, false, col);
     }
 
     /**
@@ -441,15 +441,15 @@ struct Window
     }
 
     ///Draw a character using a font and find the width it took
-    int draw(ref in Font font, in char c, in float x, in float y)
+    int draw(ref in Font font, in char c, in float x, in float y, in Color col = Color.white)
     {
         Texture renderChar = font.render(c);
-        draw(renderChar, x, y);
+        draw(renderChar, x, y, col);
         return renderChar.size.width;
     }
 
     ///Draw a string using a font
-    void draw(ref in Font font, in string str, in float x, in float y, float lineHeight = 1)
+    void draw(ref in Font font, in string str, in float x, in float y, in float lineHeight = 1, in Color col = Color.white)
     {
         int position = 0;
         float cursor = y;
@@ -459,20 +459,20 @@ struct Window
             char c = str[i];
             if (c == '\t')
                 for (int j = 0; j < 4; j++)
-                    position += draw(font, ' ', position + x, cursor);
+                    position += draw(font, ' ', position + x, cursor, col);
             else if (c == '\n')
             {
                 position = 0;
                 cursor += font.characterHeight * lineHeight;
             }
             else if (c != '\r')
-                position += draw(font, c, position + x, cursor);
+                position += draw(font, c, position + x, cursor, col);
         }
     }
 
     ///Draw a wrapped string that can wrap on word or by character
     void draw(ref in Font font, in string str, in float x, in float y,
-        in float maxWidth, in bool wrapOnWord = true, float lineHeight = 1)
+        in float maxWidth, in Color col = Color.white, in bool wrapOnWord = true, float lineHeight = 1)
     {
         size_t left = 0;
         float cursor = y;
@@ -488,7 +488,7 @@ struct Window
             }
             if(right == left)
                 right = str.length;
-            draw(font, str[left..right], x, cursor, lineHeight);
+            draw(font, str[left..right], x, cursor, lineHeight, col);
             cursor += font.getSizeOfString(str[left..right], lineHeight).height;
             left = right;
         }
