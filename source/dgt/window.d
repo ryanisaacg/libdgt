@@ -557,8 +557,3 @@ struct Window
     @property int unitsPerPixel() const { return scale; }
 
 }
-
-unittest
-{
-    auto window = Window("Title", 800, 600, WindowConfig());
-}
