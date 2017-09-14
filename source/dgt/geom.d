@@ -318,12 +318,12 @@ struct Transform
     }
 
     ///A pointer to the internal buffer to pass the matrix to C
-    public float* ptr()
+    float* ptr()
     {
         return &data[0];
     }
 
-    public Transform opBinary(string op)(Transform other) const
+    Transform opBinary(string op)(Transform other) const
     if (op == "*")
     {
         Transform ret;
@@ -338,27 +338,110 @@ struct Transform
         return ret;
     }
 
-    public Vector opBinary(string op)(Vector other) const
+    Vector opBinary(string op)(Vector other) const
     if (op == "*")
     {
         return Vector(other.x * this[0, 0] + other.y * this[0, 1] + this[0, 2],
             other.x * this[1, 0] + other.y * this[1, 1] + this[1, 2]);
     }
 
-    public float opIndex(size_t i, size_t j) const
+    Transform opBinary(string op)(float scalar) const
+    if(op == "*")
+    {
+        Transform ret;
+        for(int i = 0; i < 3; i++)
+            for(int j = 0; j < 3; j++)
+                ret[i, j] = this[i, j] * scalar;
+        return ret;
+    }
+
+    float opIndex(size_t i, size_t j) const
     {
         return data[i * 3 + j];
     }
 
-    public float opIndexAssign(float val, size_t i, size_t j)
+    float opIndexAssign(float val, size_t i, size_t j)
     {
         return data[i * 3 + j] = val;
     }
 
-    public ref Transform opAssign(float[9] array)
+    ref Transform opAssign(float[9] array)
     {
         data = array;
         return this;
+    }
+
+    ///Flip the underlying matrix over the xy axis
+    @property Transform transpose() const
+    {
+        return Transform([
+            this[0, 0], this[0, 1], this[0, 2],
+            this[1, 0], this[1, 1], this[1, 2],
+            this[2, 0], this[2, 1], this[2, 2]
+        ]);
+    }
+
+    /**
+    Find a 2x2 submatrix
+
+    The row and column that (x, y) sits in will be eliminated
+    */
+    float[4] submatrix(int x, int y) const
+    {
+        float[4] matrix;
+        int index = 0;
+        for(int i = 0; i < 3; i++)
+        {
+            for(int j = 0; j < 3; j++)
+            {
+                if(i == x || j == y)
+                    continue;
+                else
+                {
+                    matrix[index] = this[i, j];
+                    index++;
+                }
+            }
+        }
+        return matrix;
+    }
+
+    /**
+    Find a determinant of a 2x2 submatrix
+
+    The row and column that (x, y) sits in will be ignored
+    */
+    float determinant(int x, int y) const
+    {
+        const sub = submatrix(x, y);
+        return sub[0] * sub[3] - (sub[1] * sub[2]);
+    }
+
+    ///Find the determinant of the underlying matrix
+    float determinant() const
+    {
+        float sum = 0;
+        for(int i = 0; i < 3; i++)
+            sum += this[i, 0] * determinant(i, 0);
+        return sum;
+    }
+
+    ///Find the inverse of the transform
+    @property Transform inverse() const
+    {
+        Transform other = this;
+        //Find the matrix of minors
+        for(int i = 0; i < 3; i++)
+            for(int j = 0; j < 3; j++)
+                other[i, j] = this.determinant(i, j);
+        //Find the matrix of cofactors
+        for(int i = 0; i < 3; i++)
+            for(int j = 0; j < 3; j++)
+                if(i != j && !(i == 0 && j == 2) && !(i == 2 && j == 0))
+                    other[i, j] = -other[i, j];
+        //Find the adjutant
+        other = other.transpose;
+        return other * (1 / this.determinant);
     }
 
     ///Create an identity matrix
@@ -408,6 +491,14 @@ unittest
     auto inverse = vec.inverse;
     assert(approxEqual(inverse.x, 1.0 / 3, 0.00001) && 
         approxEqual(inverse.y, 1.0 / 5, 0.00001));
+}
+unittest
+{
+    auto vec = Vector(2, 4);
+    auto translate = Transform.scale(Vector(0.5, 0.5));
+    auto inverseTranslate = translate.inverse;
+    auto transformed = inverseTranslate * vec;
+    assert(transformed.x == 4 && transformed.y == 8);
 }
 unittest
 {
