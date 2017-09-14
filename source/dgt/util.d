@@ -21,15 +21,10 @@ int randomRange(in int min, in int max)
 {
     return cast(int)randomRange(cast(float)min, cast(float)max);
 }
-///Generate a vector of a float in a range
-Vector!float randomRange(in Vector!float a, in Vector!float b)
+///Generate a vector in a range
+Vector randomRange(in Vector a, in Vector b)
 {
-    return Vector!float(randomRange(a.x, b.x), randomRange(a.y, b.y));
-}
-///Generate a vector of an int in a range
-Vector!int randomRange(in Vector!int a, in Vector!int b)
-{
-    return Vector!int(randomRange(a.x, b.x), randomRange(a.y, b.y));
+    return Vector(randomRange(a.x, b.x), randomRange(a.y, b.y));
 }
 ///Create a null terminated buffer from a string
 Array!char nullTerminate(in string str)
@@ -44,12 +39,7 @@ unittest
 {
     for(size_t i = 0; i < 1000; i++)
     {
-        Vectori vector = randomRange(Vectori(-1, -1), Vectori(5, 5));
-        assert(vector.x >= -1 && vector.y >= -1 && vector.x < 5 && vector.y < 5);
-    }
-    for(size_t i = 0; i < 1000; i++)
-    {
-        Vectorf vector = randomRange(Vectorf(-1, -1), Vectorf(5, 5));
+        Vector vector = randomRange(Vector(-1, -1), Vector(5, 5));
         assert(vector.x >= -1 && vector.y >= -1 && vector.x < 5 && vector.y < 5);
     }
 }

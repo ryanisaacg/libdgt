@@ -19,7 +19,7 @@ If you want to spawn particles use Window.addParticleBurst
 struct Particle
 {
     Texture region;
-    Vector!int position, velocity, acceleration, scale, scale_velocity;
+    Vector position, velocity, acceleration, scale, scale_velocity;
     float rotation = 0, rotational_velocity = 0;
     int lifetime = 0;
     ParticleBehavior behavior = ParticleBehavior.Ignore;
@@ -41,7 +41,7 @@ A structure that allows particle spawn settings to be tweaked
 struct ParticleEmitter
 {
     const(Texture[]) regions;
-    Vector!int top_left, bottom_right, velocity_min, velocity_max,
+    Vector top_left, bottom_right, velocity_min, velocity_max,
         acceleration_min, acceleration_max, scale_min, scale_max,
         scale_velocity_min, scale_velocity_max;
     float rotation_min = 0, rotation_max = 0, rotational_velocity_min = 0,

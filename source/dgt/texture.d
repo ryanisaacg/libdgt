@@ -25,7 +25,7 @@ struct Texture
     package uint id;
     private:
     int width, height;
-    Rectangle!int region;
+    Rectangle region;
 
     @disable this();
 
@@ -45,7 +45,7 @@ struct Texture
         id = texture;
         width = w;
         height = h;
-        region = Rectangle!int(0, 0, w, h);
+        region = Rectangle(0, 0, w, h);
     }
 
     ///Load a texture from a file with a given path
@@ -92,10 +92,10 @@ struct Texture
 
     pure:
     ///Get a texture that represents a region of a larger texture
-    Texture getSlice(Rectangle!int region)
+    Texture getSlice(Rectangle region)
     {
         Texture tex = this;
-        tex.region = Rectangle!int(this.region.x + region.x,
+        tex.region = Rectangle(this.region.x + region.x,
                 this.region.y + region.y, region.width, region.height);
         return tex;
     }
@@ -104,5 +104,5 @@ struct Texture
     ///Get the height of the source image
     @property int sourceHeight() const { return height; }
     ///Get the size of the texture's region
-    @property Rectangle!int size() const { return region; }
+    @property Rectangle size() const { return region; }
 }

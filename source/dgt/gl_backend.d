@@ -36,7 +36,7 @@ void main() {
 ///Represents a vertex to pass to OpenGL
 struct Vertex
 {
-	Vectorf pos, texPos;
+	Vector pos, texPos;
 	Color col;
 
 	@nogc nothrow:
@@ -65,7 +65,7 @@ struct GLBackend
 		texPositionAttribute,
 		colorAttribute, textureAttribute;
 	private SDL_Window* window;
-	public Transform!float transform;
+	public Transform transform;
 
 	//The amount of floats per vertex
 	private static immutable size_t vertex_size = 8;
@@ -259,6 +259,6 @@ struct GLBackend
 }
 unittest
 {
-	auto vert = Vertex(Vectorf(0, 0), Vectorf(1, 1), Color(1, 1, 1, 1));
+	auto vert = Vertex(Vector(0, 0), Vector(1, 1), Color(1, 1, 1, 1));
 	println("Should print a white vertex at 0, 0 from 1, 1: ", vert);
 }

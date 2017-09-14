@@ -66,10 +66,10 @@ struct Font
 		TTF_CloseFont(font);
         //Blit all of the characters to a large surface
     	SDL_Surface* full = SDL_CreateRGBSurface(0, total_width, height, 32, 0xff000000, 0x00ff0000, 0x0000ff00, 0x000000ff);
-    	int position = 0;
+    	float position = 0;
     	for (int i = 0; i < FONT_MAX_CHARS; i++)
 		{
-    		SDL_Rect dest = SDL_Rect(position, 0, 0, 0);
+    		SDL_Rect dest = SDL_Rect(cast(int)position, 0, 0, 0);
     		SDL_BlitSurface(characters[i], null, full, &dest);
     		position += characters[i].w;
     	}
@@ -81,7 +81,7 @@ struct Font
         characterTextures = Array!Texture(FONT_MAX_CHARS);
         for (int i = 0; i < FONT_MAX_CHARS; i++)
 		{
-            characterTextures.add(source.getSlice(Rectanglei(position, 0, characters[i].w, characters[i].h)));
+            characterTextures.add(source.getSlice(Rectangle(position, 0, characters[i].w, characters[i].h)));
             position += characterTextures[i].size.width;
             SDL_FreeSurface(characters[i]);
         }
@@ -101,10 +101,10 @@ struct Font
     }
 
     ///Find how much space a string would take when rendered
-    Rectangle!int getSizeOfString(in string str, float lineHeight = 1) const
+    Rectangle getSizeOfString(in string str, float lineHeight = 1) const
     {
-    	int position = 0;
-    	int width = 0, height = cast(int)(this.height * lineHeight);
+    	float position = 0;
+    	float width = 0, height = cast(int)(this.height * lineHeight);
     	for(size_t i = 0; i < str.length; i++)
         {
             char c = str[i];
@@ -122,7 +122,7 @@ struct Font
             else if (c != '\r')
     			position += render(c).size.width;
     	}
-    	return Rectanglei(0, 0, width, height);
+    	return Rectangle(0, 0, width, height);
     }
 
     //Get the pixel height of the characters in the font

@@ -44,69 +44,79 @@ struct Tilemap(T)
 
 	pure:
     ///Get a tile from a location
-	Tile!T opIndex(in int x, in int y) const
+	Tile!T opIndex(in float x, in float y) const
 	{
-		return valid(x, y) ? buffer[(x / size) * height / size + (y / size)] : INVALID_TILE;
+		return valid(x, y) ? buffer[cast(int)((x / size) * height / size + (y / size))] : INVALID_TILE;
 	}
     ///Get a tile from a location
-    Tile!T opIndex(in Vector!int vec) const { return this[vec.x, vec.y]; }
+    Tile!T opIndex(in Vector vec) const { return this[vec.x, vec.y]; }
 
     ///Set a tile from a location
-	ref Tile!T opIndexAssign(in Tile!T tile, in int x, in int y)
+	ref Tile!T opIndexAssign(in Tile!T tile, in float x, in float y)
 	{
-		return buffer[(x / size) * height / size + (y / size)] = tile;
+		return buffer[cast(int)((x / size) * height / size + (y / size))] = tile;
 	}
     ///Set a tile from a location
-    ref Tile!T opIndexAssign(in Tile!T tile, in Vector!int vec) { return this[vec.x, vec.y] = tile; }
+    ref Tile!T opIndexAssign(in Tile!T tile, in Vector vec) { return this[vec.x, vec.y] = tile; }
 
 	///Checks if a point falls within a tilemap
-    bool valid(in int x, in int y) const
+    bool valid(in float x, in float y) const
 	{
 		return x >= 0 && y >= 0 && x < width && y < height;
 	}
 	///Checks if a point falls within a tilemap
-    bool valid(in Vector!int vec) const { return valid(vec.x, vec.y); }
+    bool valid(in Vector vec) const { return valid(vec.x, vec.y); }
 
     ///Checks if a point is both valid and empty
-	bool empty(in int x, in int y) const
+	bool empty(in float x, in float y) const
 	{
 		return !this[x, y].solid;
 	}
     ///Checks if a point is both valid and empty
-    bool empty(in Vector!int vec) const { return empty(vec.x, vec.y); }
+    bool empty(in Vector vec) const { return empty(vec.x, vec.y); }
 
-    ///Checks of a region is both valid and empty
-	bool empty(in int x, in int y, in int width, in int height) const
+    ///Checks if a region is both valid and empty
+	bool empty(in float x, in float y, in float width, in float height) const
 	{
-		for(int i = x; i < x + width; i += size)
-			for(int j = y; j < y + height; j += size)
+		for(float i = x; i < x + width; i += size)
+			for(float j = y; j < y + height; j += size)
 				if(!empty(i, j))
 					return false;
 		return empty(x + width, y) && empty(x, y + height) && empty(x + width, y + height);
 	}
-    ///Checks of a region is both valid and empty
-    bool empty(in Rectangle!int rect) const { return empty(rect.x, rect.y, rect.width, rect.height); }
+    ///Checks if a region is both valid and empty
+    bool empty(in Rectangle rect) const { return empty(rect.x, rect.y, rect.width, rect.height); }
 
-    //TODO: Increase resolution of slideContact
     ///Determine the furthest a region can move without hitting a wall
-	Vector!int slideContact(in int x, in int y, in int width, in int height, in Vector!int v) const
+	Vector slideContact(in float x, in float y, in float width, in float height, in Vector v) const
 	{
-		if (empty(x + v.x, y + v.y, width, height))
+		//Objects embedded in walls cannot move
+		if(!empty(x, y, width, height))
+			return Vector(0, 0);
+		float tryX = x + v.x;
+		float tryY = y + v.y;
+		//The object can move unobstructed
+		if(empty(tryX, tryY, width, height))
 			return v;
-		else if(!empty(x, y, width, height))
-			return Vector!int(0, 0);
-		else
-		{
-            Vector!int attempt = v;
-			while (!empty(x + attempt.x, y, width, height))
-				attempt.x /= 2;
-			while (!empty(x + attempt.x, y + attempt.y, width, height))
-				attempt.y /= 2;
-			return attempt;
-		}
+		//The left side is embedded in a wall
+		if(!empty(tryX, tryY) && !empty(tryX, tryY + height))
+			tryX = (cast(int)tryX / size) * size;
+		//The right side is embedded in a wall
+		if(!empty(tryX + width, tryY) && !empty(tryX + width, tryY + height))
+			tryX = (cast(int)(tryX + width) / size) * size - width;
+		//The tpp side is embedded in a wall
+		if(!empty(tryX, tryY) && !empty(tryX + width, tryY))
+			tryY = (cast(int)tryY / size) * size;
+		//The bottom side is embedded in a wall
+		if(!empty(tryX, tryY + height) && !empty(tryX + width, tryY + height))
+			tryY = (cast(int)(tryY + height) / size) * size - height;
+		return Vector(tryX - x, tryY - y);
 	}
     ///Determine the furthest a region can move without hitting a wall
-    Vector!int slideContact(in Rectangle!int rect, in Vector!int vec) const { return slideContact(rect.x, rect.y, rect.width, rect.height, vec); }
+    Vector slideContact(in Rectangle rect, in Vector vec) const 
+	{
+		return slideContact(rect.x, rect.y, rect.width, rect.height, vec); 
+	}
 
     ///The width of the map in units
 	@property int width() const { return _width; }
@@ -123,12 +133,20 @@ unittest
     assert(map[-1, 0].solid);
     assert(!map[35, 0].solid);
     assert(map[35, 35].value == 5);
-    auto moved = map.slideContact(300, 5, 32, 32, Vectori(0, -10));
+    auto moved = map.slideContact(300, 5, 32, 32, Vector(0, -10));
     assert(moved.x == 0 && moved.y == -5);
-    moved = map.slideContact(80, 10, 16, 16, Vectori(1, -20));
+    moved = map.slideContact(80, 10, 16, 16, Vector(1, -20));
     assert(moved.x == 1 && moved.y == -10);
-    moved = map.slideContact(50, 50, 10, 10, Vectori(20, 30));
+    moved = map.slideContact(50, 50, 10, 10, Vector(20, 30));
     assert(moved.x == 20 && moved.y == 30);
-    moved = map.slideContact(600, 10, 30, 10, Vectori(15, 10));
-    assert(moved.x == 7 && moved.y == 10);
+    moved = map.slideContact(600, 10, 30, 10, Vector(15, 10));
+    assert(moved.x == 10 && moved.y == 10);
+	auto movedf = map.slideContact(10.0, 5, 5, 5, Vector(2, 2));
+	assert(movedf.x == 2 && movedf.y == 2);
+	movedf = map.slideContact(5.0, 5, 10, 10, Vector(-7.2, 0));
+	assert(movedf.x == -5 && movedf.y == 0);
+	movedf = map.slideContact(600, 0, 25, 10, Vector(20, 0));
+	import dgt.io;
+	println(movedf);
+	assert(movedf.x == 15 && movedf.y == 0);
 }

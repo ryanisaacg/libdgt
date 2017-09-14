@@ -1,7 +1,7 @@
 /**
 Contains various generic geometry containers
 
-The entire module is designed for 2D, because libdgt is for 2D development
+floathe entire module is designed for 2D, because libdgt is for 2D development
 */
 module dgt.geom;
 import std.algorithm.comparison;
@@ -12,9 +12,9 @@ import dgt.io;
 /**
 A 2D vector with an arbitrary numeric type
 */
-struct Vector(T)
+struct Vector
 {
-    T x = 0, y = 0;
+    float x = 0, y = 0;
 
     @nogc nothrow void print() const
     {
@@ -23,48 +23,41 @@ struct Vector(T)
 
     @nogc nothrow pure:
     ///Create a vector with an x and a y
-    this(T x, T y)
+    this(float x, float y)
     {
         this.x = x;
         this.y = y;
     }
 
-    ///Create a vector from a different vector with a different numeric type
-    this(U)(in Vector!U vec)
-    {
-        this.x = cast(T)vec.x;
-        this.y = cast(T)vec.y;
-    }
-
-    Vector!T opUnary(string op)() const
+    Vector opUnary(string op)() const
     {
         static if (op == "-")
         {
-            return Vector!T(-x, -y);
+            return Vector(-x, -y);
         }
     }
 
-    Vector!T opBinary(string op)(in T scalar) const
+    Vector opBinary(string op)(in float scalar) const
     {
         static if (op == "*")
         {
-            return Vector!T(x * scalar, y * scalar);
+            return Vector(x * scalar, y * scalar);
         }
         static if (op == "/")
         {
-            return Vector!T(x / scalar, y / scalar);
+            return Vector(x / scalar, y / scalar);
         }
     }
 
-    Vector!T opBinary(string op)(in Vector!T other) const
+    Vector opBinary(string op)(in Vector other) const
     {
         static if (op == "+")
         {
-            return Vector!T(x + other.x, y + other.y);
+            return Vector(x + other.x, y + other.y);
         }
         static if (op == "-")
         {
-            return Vector!T(x - other.x, y - other.y);
+            return Vector(x - other.x, y - other.y);
         }
     }
 
@@ -81,18 +74,18 @@ struct Vector(T)
     }
 
     ///Clamp a vector somewhere between a minimum and a maximum
-    Vector!T clamp(in Vector!T min, in Vector!T max) const
+    Vector clamp(in Vector min, in Vector max) const
     {
-        return Vector!T(std.algorithm.comparison.clamp(x, min.x, max.x), std.algorithm.comparison.clamp(y, min.y, max.y));
+        return Vector(std.algorithm.comparison.clamp(x, min.x, max.x), std.algorithm.comparison.clamp(y, min.y, max.y));
     }
 
 }
 
 unittest
 {
-    Vector!int a, b;
-    a = Vector!int(5, 10);
-    b = Vector!int(1, -2);
+    Vector a, b;
+    a = Vector(5, 10);
+    b = Vector(1, -2);
     assert((a + b).x == 6);
     assert((a - b).y == 12);
 }
@@ -100,12 +93,12 @@ unittest
 /**
 An axis-aligned rectangle made of some numeric type
 */
-struct Rectangle(T)
+struct Rectangle
 {
-    ///The top left of the rectangle
-    public Vector!T topLeft = Vector!T(0, 0);
-    ///The width and height of the rectangle
-    public Vector!T size = Vector!T(0, 0);
+    ///floathe top left of the rectangle
+    public Vector topLeft = Vector(0, 0);
+    ///floathe width and height of the rectangle
+    public Vector size = Vector(0, 0);
 
     @nogc nothrow void print() const
     {
@@ -114,37 +107,37 @@ struct Rectangle(T)
 
     @nogc nothrow pure public:
     ///Create a rectangle with the given dimension
-    this(T x, T y, T width, T height)
+    this(float x, float y, float width, float height)
     {
-        topLeft = Vector!T(x, y);
-        size = Vector!T(width, height);
+        topLeft = Vector(x, y);
+        size = Vector(width, height);
     }
 
-    @property T x() const { return topLeft.x; }
-    @property T x(T val) { return topLeft.x = val; }
-    @property T y() const { return topLeft.y; }
-    @property T y(T val) { return topLeft.y = val; }
-    @property T width() const { return size.x; }
-    @property T width(T val) { return size.x = val; }
-    @property T height() const { return size.y; }
-    @property T height(T val) { return size.y = val; }
+    @property float x() const { return topLeft.x; }
+    @property float x(float val) { return topLeft.x = val; }
+    @property float y() const { return topLeft.y; }
+    @property float y(float val) { return topLeft.y = val; }
+    @property float width() const { return size.x; }
+    @property float width(float val) { return size.x = val; }
+    @property float height() const { return size.y; }
+    @property float height(float val) { return size.y = val; }
 
     ///Checks if a point falls within the rectangle
-    bool contains(in Vector!T v) const
+    bool contains(in Vector v) const
     {
         return v.x >= x && v.y >= y && v.x < x + width && v.y < y + height;
     }
 
     ///Check if any of the area bounded by this rectangle is bounded by another
-    bool overlaps(in Rectangle!T b) const
+    bool overlaps(in Rectangle b) const
     {
         return x < b.x + b.width && x + width > b.x && y < b.y + b.height && y + height > b.y;
     }
 
     ///Check if any of the area bounded by this rectangle is bounded by a circle
-    bool overlaps(in Circle!T c) const
+    bool overlaps(in Circle c) const
     {
-        Vector!T closest;
+        Vector closest;
         if (c.x < x) {
             closest.x = x;
         } else if (c.x > x + width) {
@@ -165,7 +158,7 @@ struct Rectangle(T)
     }
 
     ///Set the rectangle's dimensions
-    void set(T newX, T newY, T newWidth, T newHeight)
+    void set(float newX, float newY, float newWidth, float newHeight)
     {
         x = newX;
         y = newY;
@@ -178,24 +171,24 @@ struct Rectangle(T)
 
     If the rectangle is moved it will always be flush with a border of the given area
     */
-    Rectangle!T constrain(in Rectangle!T outer) const
+    Rectangle constrain(in Rectangle outer) const
     {
-        return Rectangle!T(clamp(x, outer.x, outer.x + outer.width - width), clamp(y, outer.y, outer.y + outer.height - height), width, height);
+        return Rectangle(clamp(x, outer.x, outer.x + outer.width - width), clamp(y, outer.y, outer.y + outer.height - height), width, height);
     }
 
     ///Translate the rectangle by a vector
-    Rectangle!T translate(in Vector!T vec) const
+    Rectangle translate(in Vector vec) const
     {
-        return Rectangle!T(x + vec.x, y + vec.y, width, height);
+        return Rectangle(x + vec.x, y + vec.y, width, height);
     }
 }
 
 unittest
 {
-    Rectangle!int a, b, c;
-    a = Rectangle!int(0, 0, 32, 32);
-    b = Rectangle!int(16, 16, 32, 32);
-    c = Rectangle!int(50, 50, 5, 5);
+    Rectangle a, b, c;
+    a = Rectangle(0, 0, 32, 32);
+    b = Rectangle(16, 16, 32, 32);
+    c = Rectangle(50, 50, 5, 5);
     assert(a.overlaps(b));
     assert(!a.overlaps(c));
 }
@@ -203,10 +196,10 @@ unittest
 /**
 A circle with a center and a radius
 */
-struct Circle(T)
+struct Circle
 {
-    public Vector!T center = Vector!T(0, 0);
-    public T radius = 0;
+    public Vector center = Vector(0, 0);
+    public float radius = 0;
 
     @nogc nothrow void print() const
     {
@@ -214,29 +207,29 @@ struct Circle(T)
     }
 
     @nogc nothrow pure public:
-    this(T x, T y, T radius)
+    this(float x, float y, float radius)
     {
-        center = Vector!T(x, y);
+        center = Vector(x, y);
         this.radius = radius;
     }
-    @property T x() const { return center.x; }
-    @property T x(T val) { return center.x = val; }
-    @property T y() const { return center.y; }
-    @property T y(T val) { return center.y = val; }
+    @property float x() const { return center.x; }
+    @property float x(float val) { return center.x = val; }
+    @property float y() const { return center.y; }
+    @property float y(float val) { return center.y = val; }
 
     /**
     Checks if a vector falls within the area bounded by a circle
     */
-    bool contains(in Vector!T v) const
+    bool contains(in Vector v) const
     {
-        Vector!T dist = v - center;
+        Vector dist = v - center;
         return dist.len2 < radius * radius;
     }
 
     /**
     Checks to see if the circle and the rectangle share any area
     */
-    bool overlaps(in Rectangle!T r) const
+    bool overlaps(in Rectangle r) const
     {
         return r.overlaps(this);
     }
@@ -244,7 +237,7 @@ struct Circle(T)
     /**
     Checks to see if the circles have any overlapping area
     */
-    bool overlaps(in Circle!T c) const
+    bool overlaps(in Circle c) const
     {
         float xDiff = x - c.x;
         float yDiff = y - c.y;
@@ -255,24 +248,24 @@ struct Circle(T)
     /**
     Sets the dimensions of a circle
     */
-    void set(T newX, T newY, T newRadius)
+    void set(float newX, float newY, float newRadius)
     {
         x = newX;
         y = newY;
         radius = newRadius;
     }
 
-    ///Translate the circle by a given vector
-    Circle!T translate(Vector!T vec)
+    ///floatranslate the circle by a given vector
+    Circle translate(Vector vec)
     {
-        return Circle!T(x + vec.x, y + vec.y, radius);
+        return Circle(x + vec.x, y + vec.y, radius);
     }
 }
 
 unittest
 {
-    Circle!int a, b, c;
-    Rectangle!int d;
+    Circle a, b, c;
+    Rectangle d;
     a.set(0, 0, 16);
     b.set(5, 5, 4);
     c.set(50, 50, 5);
@@ -284,11 +277,11 @@ unittest
 }
 
 /**
-A Transformation 3x3 matrix to make transformations more efficient
+A Transform 3x3 matrix to make transformations more efficient
 */
-struct Transform(T)
+struct Transform
 {
-    private T[9] data = [
+    private float[9] data = [
         1, 0, 0,
         0, 1, 0,
         0, 0, 1
@@ -313,16 +306,21 @@ struct Transform(T)
 
     @nogc nothrow pure:
 
+    this(in float[9] data)
+    {
+        this.data = data;
+    }
+
     ///A pointer to the internal buffer to pass the matrix to C
-    public T* ptr()
+    public float* ptr()
     {
         return &data[0];
     }
 
-    public Transform!T opBinary(string op)(Transform!T other) const
+    public Transform opBinary(string op)(Transform other) const
     if (op == "*")
     {
-        Transform!T ret;
+        Transform ret;
         for (size_t i = 0; i < 3; i++) {
             for (size_t j = 0; j < 3; j++) {
                 ret[i, j] = 0;
@@ -334,32 +332,24 @@ struct Transform(T)
         return ret;
     }
 
-    public Vector!T opBinary(string op)(Vector!T other) const
+    public Vector opBinary(string op)(Vector other) const
     if (op == "*")
     {
-        return Vector!T(other.x * this[0, 0] + other.y * this[0, 1] + this[0, 2],
+        return Vector(other.x * this[0, 0] + other.y * this[0, 1] + this[0, 2],
             other.x * this[1, 0] + other.y * this[1, 1] + this[1, 2]);
     }
 
-    public Vector!U opBinary(string op, U)(Vector!U other) const
-    if (op == "*")
-    {
-        auto converted = Vector!T(cast(T)other.x, cast(T)other.y);
-        auto transformed = this * converted;
-        return Vector!U(cast(U)transformed.x, cast(U)transformed.y);
-    }
-
-    public T opIndex(size_t i, size_t j) const
+    public float opIndex(size_t i, size_t j) const
     {
         return data[i * 3 + j];
     }
 
-    public T opIndexAssign(T val, size_t i, size_t j)
+    public float opIndexAssign(float val, size_t i, size_t j)
     {
         return data[i * 3 + j] = val;
     }
 
-    public ref Transform!T opAssign(T[9] array)
+    public ref Transform opAssign(float[9] array)
     {
         data = array;
         return this;
@@ -370,60 +360,46 @@ struct Transform(T)
 @nogc nothrow:
 
 ///Create an identity matrix
-pure Transformf identity()
+pure Transform identity()
 {
-    return Transform!float();
+    return Transform();
 }
 
 ///Create a rotation matrix
-pure Transformf rotate(float angle)
+pure Transform rotate(in float angle)
 {
     float c = cos(angle * PI / 180);
     float s = sin(angle * PI / 180);
-    Transform!float transform;
-    transform = [
+    return Transform([
         c, -s, 0,
         s, c, 0,
         0, 0, 1
-    ];
-    return transform;
+    ]);
 }
 
 ///Create a translation matrix
-pure Transformf translate(float x, float y)
+pure Transform translate(in float x, in float y)
 {
-    Transform!float transform;
-    transform = [
+    return Transform([
         1, 0, x,
         0, 1, y,
         0, 0, 1
-    ];
-    return transform;
+    ]);
 }
 
 ///Create a scale matrix
-pure Transformf scale(float x, float y)
+pure Transform scale(in float x, in float y)
 {
-    Transform!float transform;
-    transform = [
+    return Transform([
         x, 0, 0,
         0, y, 0,
         0, 0, 1
-    ];
-    return transform;
+    ]);
 }
-
-alias Vectori = Vector!int;
-alias Vectorf = Vector!float;
-alias Rectanglei = Rectangle!int;
-alias Rectanglef = Rectangle!float;
-alias Circlei = Circle!int;
-alias Circlef = Circle!float;
-alias Transformf = Transform!float;
 
 unittest
 {
-    Transform!int m, n;
+    Transform m, n;
     n[0, 0] = 5;
     assert(n.ptr[0] == 5);
     auto result = m * n;
@@ -435,81 +411,75 @@ unittest
 unittest
 {
     auto trans = scale(2, 2);
-    auto vec = Vectorf(2, 5);
+    auto vec = Vector(2, 5);
     auto scaled = trans * vec;
     assert(scaled.x == 4 && scaled.y == 10);
 }
 unittest
 {
     auto trans = translate(3, 4);
-    auto vec = Vectorf(1, 1);
+    auto vec = Vector(1, 1);
     vec = trans * vec;
     assert(vec.x == 4 && vec.y == 5);
 }
 unittest
 {
     auto trans = identity() * translate(-0, -0) * rotate(0) * scale(1, 1);
-    auto vec = trans * Vectorf(15, 12);
+    auto vec = trans * Vector(15, 12);
     assert(vec.x == 15);
 }
 unittest
 {
-    auto vec = Vectorf(1.5, 2.5);
-    auto ivec = Vectori(vec);
-    assert(ivec.x == 1 && ivec.y == 2);
-}
-unittest
-{
-    auto vec = Vectori(5, 0);
+    auto vec = Vector(5, 0);
     assert(vec.len2 == 25);
     assert(vec.len == 5);
 }
 unittest
 {
-    auto vec = Vectorf(10, 10);
+    auto vec = Vector(10, 10);
     vec = vec / 2;
     assert(vec.x == 5 && vec.y == 5);
 }
 unittest
 {
-    auto circ = Circlef(0, 0, 10);
-    auto vec1 = Vectorf(0, 0);
-    auto vec2 = Vectorf(11, 11);
+    auto circ = Circle(0, 0, 10);
+    auto vec1 = Vector(0, 0);
+    auto vec2 = Vector(11, 11);
     assert(circ.contains(vec1));
     assert(!circ.contains(vec2));
 }
 unittest
 {
-    auto rect = Rectanglei(0, 0, 32, 32);
-    auto vec1 = Vectori(5, 5);
-    auto vec2 = Vectori(33, 1);
+    auto rect = Rectangle(0, 0, 32, 32);
+    auto vec1 = Vector(5, 5);
+    auto vec2 = Vector(33, 1);
     assert(rect.contains(vec1));
     assert(!rect.contains(vec2));
 }
 unittest
 {
-    auto circ = Circlei(0, 0, 5);
-    auto rec1 = Rectanglei(0, 0, 2, 2);
-    auto rec2 = Rectanglei(5, 5, 4, 4);
+    auto circ = Circle(0, 0, 5);
+    auto rec1 = Rectangle(0, 0, 2, 2);
+    auto rec2 = Rectangle(5, 5, 4, 4);
     assert(circ.overlaps(rec1) && rec1.overlaps(circ));
     assert(!circ.overlaps(rec2) && !rec2.overlaps(circ));
 }
 unittest
 {
-    auto min = Vectori(-10, -2);
-    auto max = Vectori(5, 6);
-    auto a = Vectori(-11, 3);
+    auto min = Vector(-10, -2);
+    auto max = Vector(5, 6);
+    auto a = Vector(-11, 3);
     auto clamped = a.clamp(min, max);
     assert(clamped.x == -10 && clamped.y == 3);
-    auto b = Vectori(2, 8);
+    auto b = Vector(2, 8);
     clamped = b.clamp(min, max);
     assert(clamped.x == 2 && clamped.y == 6);
 }
 unittest
 {
-    auto constraint = Rectanglei(0, 0, 10, 10);
-    auto a = Rectanglei(-1, 3, 5, 5);
-    auto b = Rectanglei(4, 4, 8, 3);
+    auto constraint = Rectangle(0, 0, 10, 10);
+    auto a = Rectangle(-1, 3, 5, 5);
+    auto b = Rectangle(4, 4, 8, 3);
     a = a.constrain(constraint);
     assert(a.x == 0 && a.y == 3);
     b = b.constrain(constraint);
@@ -518,16 +488,16 @@ unittest
 
 unittest
 {
-    println("Should print a vector at 0, 0: ", Vectori(0, 0));
-    println("Should print a circle at 0, 0 with a radius of 10: ", Circlei(0, 0, 10));
-    println("Should print a rectangle at 0, 0, with a side of 5", Rectanglei(0, 0, 5, 5));
+    println("Should print a vector at 0, 0: ", Vector(0, 0));
+    println("Should print a circle at 0, 0 with a radius of 10: ", Circle(0, 0, 10));
+    println("Should print a rectangle at 0, 0, with a side of 5", Rectangle(0, 0, 5, 5));
     println("Should print an identity matrix: ", identity());
 }
 unittest
 {
-    auto a = Rectanglei(10, 10, 5, 5);
-    auto b = Circlei(10, 10, 5);
-    auto c = Vectori(1, -1);
+    auto a = Rectangle(10, 10, 5, 5);
+    auto b = Circle(10, 10, 5);
+    auto c = Vector(1, -1);
     auto aTranslate = a.translate(c);
     auto bTranslate = b.translate(c);
     assert(aTranslate.y == a.y + c.y && aTranslate.y == a.y + c.y);

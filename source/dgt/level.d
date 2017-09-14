@@ -121,7 +121,7 @@ struct Level
             int height = tileset["tileheight"].number;
             for(int y = margin; y < image.sourceHeight - margin; y += height + spacing)
                 for(int x = margin; x < image.sourceWidth - margin; x += width + spacing)
-                    tileImages.add(image.getSlice(Rectanglei(x, y, width, height)));
+                    tileImages.add(image.getSlice(Rectangle(x, y, width, height)));
         }
 
         foreach(layer; contents["layers"].array)

@@ -40,7 +40,7 @@ struct Window
     bool shouldContinue = true;
     bool[SDL_NUM_KEYS] current_keys; //The total number of SDL keys
     bool[SDL_NUM_KEYS] previous_keys;
-    Vectori mousePos = Vectori(0, 0), previousMouse = Vectori(0, 0);
+    Vector mousePos = Vector(0, 0), previousMouse = Vector(0, 0);
     bool mouseLeft = false, mouseRight = false, mouseMiddle = false,
          mouseLeftPrevious = true, mouseRightPrevious = true, mouseMiddlePrevious = true;
     //TODO: Add a function to wait on IO
@@ -48,9 +48,8 @@ struct Window
     uint previous_ticks;
     int offsetX, offsetY, windowWidth, windowHeight;
     Texture white;
-    Rectangle!int camera;
+    Rectangle camera;
     Array!Gamepad connectedGamepads;
-    int scale;
 
     @disable this();
     @disable this(this);
@@ -74,7 +73,7 @@ struct Window
     scale = the number of 'units' per pixel
     bindToGlobal = set the global window reference to this window
     */
-    this(in string title, in int width, in int height, in WindowConfig config, in int scale = 1, in bool bindToGlobal = true)
+    this(in string title, in int width, in int height, in WindowConfig config, in bool bindToGlobal = true)
     {
         version(Windows)
         {
@@ -94,23 +93,20 @@ struct Window
             TTF_Init();
             Mix_Init(MIX_INIT_FLAC | MIX_INIT_MOD | MIX_INIT_MP3 | MIX_INIT_OGG);
         }).start();
-        const unscaledWidth = width / scale;
-        const unscaledHeight = height / scale;
+        windowWidth = width;
+        windowHeight = height;
         window = SDL_CreateWindow(title.ptr,
             SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 
-            unscaledWidth, unscaledHeight,
+            width, height,
             config.flags);
         ctx = GLBackend(window, config.vsync);
         particles = Array!Particle(128);
         camera.set(0, 0, width, height);
-        windowWidth = width;
-        windowHeight = height;
 
         ubyte[3] white_pixel = [ 255, 255, 255 ];
         white = Texture(white_pixel.ptr, 1, 1, PixelFormat.RGB);
         glViewport(0, 0, width, height);
         aspectRatio = cast(float)width / height;
-        this.scale = scale;
 
         srand(cast(uint)time(null));
 
@@ -161,7 +157,7 @@ struct Window
     */
     void begin(in Color bg)
     {
-        auto camera = Rectangle!int(0, 0, windowWidth * scale, windowHeight * scale);
+        auto camera = Rectangle(0, 0, windowWidth, windowHeight);
         begin(bg, camera);
     }
 
@@ -171,7 +167,7 @@ struct Window
     bg = The color to clear with
     cam = the region to draw
     */
-    void begin(in Color bg, in Rectangle!int cam)
+    void begin(in Color bg, in Rectangle cam)
     {
         camera = cam;
         inUIMode = false;
@@ -231,15 +227,15 @@ struct Window
         int x, y;
         int button_mask = SDL_GetMouseState(&x, &y);
         previousMouse = mousePos;
-        mousePos = Vectori(x * scale, y * scale);
+        mousePos = Vector(x, y);
         mouseLeftPrevious = mouseLeft;
         mouseRightPrevious = mouseRight;
         mouseMiddlePrevious = mouseMiddlePrevious;
         mouseLeft = (button_mask & SDL_BUTTON(SDL_BUTTON_LEFT)) != 0;
         mouseRight = (button_mask & SDL_BUTTON(SDL_BUTTON_RIGHT)) != 0;
         mouseMiddle = (button_mask & SDL_BUTTON(SDL_BUTTON_MIDDLE)) != 0;
-        float left = camera.x / scale, right = left + camera.width / scale,
-                top = camera.y / scale, bottom = top + camera.height / scale;
+        float left = camera.x, right = left + camera.width,
+                top = camera.y, bottom = top + camera.height;
         ctx.transform = [
             2 / (right - left), 0, 0,
             0, 2 / (top - bottom), 0,
@@ -298,16 +294,16 @@ struct Window
     }
 
     ///Draw a polygon with each point following the next in a circle around the edge
-    void draw(size_t Len)(in Color color, in Vectori[Len] points)
+    void draw(size_t Len)(in Color color, in Vector[Len] points)
     {
         static immutable Indices = (Len - 2) * 3;
         static assert ( Len >= 3 );
         Vertex[Len] vertices;
         GLuint[Indices] indices;
-        Vectori offset = inUIMode ? camera.topLeft : Vectori(0, 0);
+        Vector offset = inUIMode ? camera.topLeft : Vector(0, 0);
         for (size_t i = 0; i < Len; i++)
         {
-            auto point = (points[i] + offset) / scale;
+            auto point = points[i] + offset;
             vertices[i].pos.x = point.x;
             vertices[i].pos.y = point.y;
             vertices[i].col = color;
@@ -327,31 +323,31 @@ struct Window
 
     The circle is actually draawn as a polygon, with NumPoints points. Increase or decrease it to increase or decrease the points on the circle
     */
-    void draw(size_t NumPoints = 32)(in Color color, in Circlei circle)
+    void draw(size_t NumPoints = 32)(in Color color, in Circle circle)
     {
-        Vectori[NumPoints] points; //A large array of points to simulate a circle
+        Vector[NumPoints] points; //A large array of points to simulate a circle
         auto rotation = rotate(360 / NumPoints);
-        auto pointer = Vectorf(0, -circle.radius);
+        auto pointer = Vector(0, -circle.radius);
         for (size_t i = 0; i < NumPoints; i++)
         {
-            points[i] = circle.center + Vectori(pointer);
+            points[i] = circle.center + pointer;
             pointer = rotation * pointer;
         }
         draw(color, points);
     }
 
     ///Draw a rectangle with a color
-    void draw(in Color color, in Rectanglei rect)
+    void draw(in Color color, in Rectangle rect)
     {
-        Vectori[4] points = [ rect.topLeft, Vectori(rect.x + rect.width, rect.y),
-            rect.topLeft + rect.size, Vectori(rect.x, rect.y + rect.height)];
+        Vector[4] points = [ rect.topLeft, Vector(rect.x + rect.width, rect.y),
+            rect.topLeft + rect.size, Vector(rect.x, rect.y + rect.height)];
         draw(color, points);
     }
 
     ///Draw a texture at the given units
     void draw(in Texture tex, in float x, in float y, in Color col = Color.white)
     {
-        draw(tex, x, y, tex.size.width * scale, tex.size.height * scale, 0, 0, 0, 1, 1, false, false, col);
+        draw(tex, x, y, tex.size.width, tex.size.height, 0, 0, 0, 1, 1, false, false, col);
     }
 
     /**
@@ -395,15 +391,15 @@ struct Window
     flip_y = if the texture should be flipped vertically
     color = the color to blend with
     */
-    void draw(in Texture tex, in Transform!float trans, in float x, in float y,
+    void draw(in Texture tex, in Transform trans, in float x, in float y,
                        in float w, in float h, in bool flip_x = false, in bool flip_y = false,
                        in Color color = Color.white)
     {
         //Calculate the destination points with the transformation
-        auto tl = (trans * Vectorf(0, 0)) / scale;
-        auto tr = (trans * Vectorf(w, 0)) / scale;
-        auto bl = (trans * Vectorf(0, h)) / scale;
-        auto br = (trans * Vectorf(w, h)) / scale;
+        auto tl = trans * Vector(0, 0);
+        auto tr = trans * Vector(w, 0);
+        auto bl = trans * Vector(0, h);
+        auto br = trans * Vector(w, h);
 
         //Calculate the source points normalized to [0, 1]
         //The conversion factor for normalizing vectors
@@ -411,12 +407,12 @@ struct Window
         float conv_factor_y = 1.0f / tex.sourceHeight;
         float norm_x = tex.size.x * conv_factor_x;
         float norm_y = tex.size.y * conv_factor_y;
-        float norm_w = tex.size.width * conv_factor_x / scale;
-        float norm_h = tex.size.height * conv_factor_y / scale;
-        auto src_tl = Vectorf(norm_x, norm_y);
-        auto src_tr = Vectorf(norm_x + norm_w, norm_y);
-        auto src_br = Vectorf(norm_x + norm_w, norm_y + norm_h);
-        auto src_bl = Vectorf(norm_x, norm_y + norm_h);
+        float norm_w = tex.size.width * conv_factor_x;
+        float norm_h = tex.size.height * conv_factor_y;
+        auto src_tl = Vector(norm_x, norm_y);
+        auto src_tr = Vector(norm_x + norm_w, norm_y);
+        auto src_br = Vector(norm_x + norm_w, norm_y + norm_h);
+        auto src_bl = Vector(norm_x, norm_y + norm_h);
         if (flip_x) {
             auto tmp = src_tr;
             src_tr = src_tl;
@@ -434,8 +430,8 @@ struct Window
             src_bl = tmp;
         }
         //Add all of the vertices to the context
-        auto translate = Vectorf(x, y) + (inUIMode ? Vectorf(camera.topLeft) : Vector!float(0, 0));
-        translate = translate / scale;
+        auto translate = Vector(x, y) + (inUIMode ? camera.topLeft : Vector(0, 0));
+        translate = translate;
         Vertex[4] vertices = [ Vertex(tl + translate, src_tl, color),
             Vertex(tr + translate, src_tr, color),
             Vertex(br + translate, src_br, color),
@@ -454,7 +450,7 @@ struct Window
     }
 
     ///Draw a character using a font and find the width it took
-    int draw(ref in Font font, in char c, in float x, in float y, in Color col = Color.white)
+    float draw(ref in Font font, in char c, in float x, in float y, in Color col = Color.white)
     {
         Texture renderChar = font.render(c);
         draw(renderChar, x, y, col);
@@ -464,7 +460,7 @@ struct Window
     ///Draw a string using a font
     void draw(ref in Font font, in string str, in float x, in float y, in float lineHeight = 1, in Color col = Color.white)
     {
-        int position = 0;
+        float position = 0;
         float cursor = y;
         //Loop from the beginning to end of the string
         for(size_t i = 0; i < str.length; i++)
@@ -552,10 +548,10 @@ struct Window
 
     pure:
     ///Get the position of the mouse
-    @property Vector!int mouse() const
+    @property Vector mouse() const
     {
-        return mousePos * camera.width / windowWidth - Vectori(offsetX, offsetY)
-            + (inUIMode ? Vectori(0, 0) : camera.topLeft);
+        return mousePos * camera.width / windowWidth - Vector(offsetX, offsetY)
+            + (inUIMode ? Vector(0, 0) : camera.topLeft);
     }
     @property bool mouseLeftPressed() const { return mouseLeft; }
     @property bool mouseRightPressed() const { return mouseRight; }
@@ -565,8 +561,7 @@ struct Window
     @property bool mouseMiddleReleased() const { return !mouseMiddle && mouseMiddlePrevious; }
     @property bool isOpen() const { return shouldContinue; }
     @property Gamepad[] gamepads() { return connectedGamepads.array; }
-    @property int width() const { return windowWidth * scale; }
-    @property int height() const { return windowHeight * scale; }
-    @property int unitsPerPixel() const { return scale; }
+    @property int width() const { return windowWidth; }
+    @property int height() const { return windowHeight; }
 
 }

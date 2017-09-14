@@ -1,7 +1,7 @@
 ///A collection of immediate-mode UI widgets
 module dgt.ui;
 
-import dgt.geom : Rectanglei, Vectori;
+import dgt.geom : Rectangle, Vector;
 import dgt.texture : Texture;
 import dgt.window : Window;
 
@@ -12,8 +12,8 @@ struct Button
 
     public @nogc nothrow:
 
-    Rectanglei area;
-    Vectori position;
+    Rectangle area;
+    Vector position;
     Texture tex, hover, press;
 
     /**
@@ -26,7 +26,7 @@ struct Button
     hover = The texture when the button is hovered over
     press = The texture when the button is pressed down
     */
-    this(in Rectanglei area, in Vectori position, in Texture tex, in Texture hover, in Texture press)
+    this(in Rectangle area, in Vector position, in Texture tex, in Texture hover, in Texture press)
     {
         this.area = area;
         this.position = position;
@@ -49,7 +49,7 @@ struct Button
 struct Slider
 {
     public @nogc nothrow:
-    Rectanglei area;
+    Rectangle area;
     Texture slider;
 
     @disable this();
@@ -61,7 +61,7 @@ struct Slider
     area = The region the slider can move around in
     sliderHead = The image to draw where the slider is currently pointing
     */
-    this(in Rectanglei area, in Texture sliderHead)
+    this(in Rectangle area, in Texture sliderHead)
     {
         this.area = area;
         this.slider = sliderHead;
@@ -86,11 +86,11 @@ struct Carousel
     @disable this();
     public @nogc nothrow:
     Button left, right;
-    Vectori position;
+    Vector position;
     const(Texture[]) textures;
 
     ///Create a carousel with a given set of options 
-    this(in Button left, in Button right, in Vectori currentItemPosition, in Texture[] textures)
+    this(in Button left, in Button right, in Vector currentItemPosition, in Texture[] textures)
     {
         this.left = left;
         this.right = right;
