@@ -4,8 +4,9 @@ Contains various generic geometry containers
 floathe entire module is designed for 2D, because libdgt is for 2D development
 */
 module dgt.geom;
+
 import std.algorithm.comparison;
-import std.math : sqrt, cos, sin, PI;
+import std.math : approxEqual, sqrt, cos, sin, PI;
 import dgt.io;
 
 @safe:
@@ -62,13 +63,13 @@ struct Vector
     }
 
     ///Get the squared length of the vector (faster than getting the length)
-    float len2() const
+    @property float len2() const
     {
         return x * x + y * y;
     }
 
     ///Get the length of the vector
-    float len() const
+    @property float len() const
     {
         return sqrt(len2());
     }
@@ -79,6 +80,11 @@ struct Vector
         return Vector(std.algorithm.comparison.clamp(x, min.x, max.x), std.algorithm.comparison.clamp(y, min.y, max.y));
     }
 
+    ///Get the vector equal to Vector(1 / x, 1 / y)
+    @property Vector inverse() const
+    {
+        return Vector(1 / x, 1 / y);
+    }
 }
 
 unittest
@@ -396,7 +402,13 @@ struct Transform
 
 
 @nogc nothrow:
-
+unittest
+{
+    auto vec = Vector(3, 5);
+    auto inverse = vec.inverse;
+    assert(approxEqual(inverse.x, 1.0 / 3, 0.00001) && 
+        approxEqual(inverse.y, 1.0 / 5, 0.00001));
+}
 unittest
 {
     Transform m, n;
