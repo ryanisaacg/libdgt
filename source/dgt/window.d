@@ -326,7 +326,7 @@ struct Window
     void draw(size_t NumPoints = 32)(in Color color, in Circle circle)
     {
         Vector[NumPoints] points; //A large array of points to simulate a circle
-        auto rotation = rotate(360 / NumPoints);
+        auto rotation = Transform.rotate(360 / NumPoints);
         auto pointer = Vector(0, -circle.radius);
         for (size_t i = 0; i < NumPoints; i++)
         {
@@ -372,8 +372,11 @@ struct Window
                         in bool flip_x = false, in bool flip_y = false,
                         in Color color = Color.white)
     {
-        auto trans = identity() * translate(-or_x, -or_y) * rotate(rot)
-            * dgt.geom.scale(scale_x, scale_y);
+        auto trans = Transform.identity() 
+            * Transform.translate(Vector(-or_x, -or_y))
+            * Transform.rotate(rot)
+            * Transform.translate(Vector(or_x, or_y))
+            * Transform.scale(Vector(scale_x, scale_y));
         draw(tex, trans, x + or_x, y + or_y, w, h, flip_x, flip_y, color);
     }
 

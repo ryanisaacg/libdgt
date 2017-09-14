@@ -354,48 +354,48 @@ struct Transform
         data = array;
         return this;
     }
+
+    ///Create an identity matrix
+    static pure Transform identity()
+    {
+        return Transform();
+    }
+
+    ///Create a rotation matrix
+    static pure Transform rotate(in float angle)
+    {
+        float c = cos(angle * PI / 180);
+        float s = sin(angle * PI / 180);
+        return Transform([
+            c, -s, 0,
+            s, c, 0,
+            0, 0, 1
+        ]);
+    }
+
+    ///Create a translation matrix
+    static pure Transform translate(in Vector vec)
+    {
+        return Transform([
+            1, 0, vec.x,
+            0, 1, vec.y,
+            0, 0, 1
+        ]);
+    }
+
+    ///Create a scale matrix
+    static pure Transform scale(in Vector vec)
+    {
+        return Transform([
+            vec.x, 0, 0,
+            0, vec.y, 0,
+            0, 0, 1
+        ]);
+    }
 }
 
 
 @nogc nothrow:
-
-///Create an identity matrix
-pure Transform identity()
-{
-    return Transform();
-}
-
-///Create a rotation matrix
-pure Transform rotate(in float angle)
-{
-    float c = cos(angle * PI / 180);
-    float s = sin(angle * PI / 180);
-    return Transform([
-        c, -s, 0,
-        s, c, 0,
-        0, 0, 1
-    ]);
-}
-
-///Create a translation matrix
-pure Transform translate(in float x, in float y)
-{
-    return Transform([
-        1, 0, x,
-        0, 1, y,
-        0, 0, 1
-    ]);
-}
-
-///Create a scale matrix
-pure Transform scale(in float x, in float y)
-{
-    return Transform([
-        x, 0, 0,
-        0, y, 0,
-        0, 0, 1
-    ]);
-}
 
 unittest
 {
@@ -410,21 +410,22 @@ unittest
 }
 unittest
 {
-    auto trans = scale(2, 2);
+    auto trans = Transform.scale(Vector(2, 2));
     auto vec = Vector(2, 5);
     auto scaled = trans * vec;
     assert(scaled.x == 4 && scaled.y == 10);
 }
 unittest
 {
-    auto trans = translate(3, 4);
+    auto trans = Transform.translate(Vector(3, 4));
     auto vec = Vector(1, 1);
     vec = trans * vec;
     assert(vec.x == 4 && vec.y == 5);
 }
 unittest
 {
-    auto trans = identity() * translate(-0, -0) * rotate(0) * scale(1, 1);
+    auto trans = Transform.identity() * Transform.translate(Vector()) 
+        * Transform.rotate(0) * Transform.scale(Vector(1, 1));
     auto vec = trans * Vector(15, 12);
     assert(vec.x == 15);
 }
@@ -491,7 +492,7 @@ unittest
     println("Should print a vector at 0, 0: ", Vector(0, 0));
     println("Should print a circle at 0, 0 with a radius of 10: ", Circle(0, 0, 10));
     println("Should print a rectangle at 0, 0, with a side of 5", Rectangle(0, 0, 5, 5));
-    println("Should print an identity matrix: ", identity());
+    println("Should print an identity matrix: ", Transform.identity());
 }
 unittest
 {
