@@ -175,7 +175,7 @@ struct Window
         previous_ticks = SDL_GetTicks();
         previous_keys = current_keys;
         SDL_Event e;
-        while (SDL_PollEvent(&e))
+        while (shouldContinue && SDL_PollEvent(&e))
         {
             switch (e.type)
             {
