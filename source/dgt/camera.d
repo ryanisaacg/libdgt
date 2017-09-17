@@ -10,10 +10,20 @@ struct Camera
     ////Create a camera with a given window size and view of the world
     pure @nogc nothrow this(in Rectangle windowSize, in Rectangle world)
     {
-        const normalizeWindow = Transform.normalize(windowSize);
-        const normalizeWorld = Transform.normalize(world);
-        project = normalizeWindow * normalizeWorld.inverse;
-        unproject = normalizeWorld * normalizeWindow.inverse;
-        opengl = normalizeWorld;
+        project = Transform.translate(-windowSize.topLeft)
+            * Transform.scale(Vector(windowSize.width / world.width, windowSize.height / world.height).inverse)
+            * Transform.translate(world.topLeft);
+        unproject = project.inverse;
+        opengl = Transform.scale(world.size.inverse * 2) 
+            * Transform.translate(Vector(-1, -1));
     }
+}
+
+unittest
+{
+    const cam = Camera(Rectangle(0, 0, 100, 100), Rectangle(0, 0, 50, 50));
+    const screenBottom = Vector(0, 100);
+    const worldBottom = Vector(0, 50);
+    assert(cam.project * screenBottom == worldBottom);
+    assert(cam.unproject * worldBottom == screenBottom);
 }

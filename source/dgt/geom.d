@@ -60,6 +60,10 @@ struct Vector
         {
             return Vector(x - other.x, y - other.y);
         }
+        static if (op == "==")
+        {
+            return approxEqual(x, other.x, 0.000001) && approxEqual(y, other.y, 0.000001);
+        }
     }
 
     ///Get the squared length of the vector (faster than getting the length)
@@ -478,16 +482,6 @@ struct Transform
         return Transform([
             vec.x, 0, 0,
             0, vec.y, 0,
-            0, 0, 1
-        ]);
-    }
-
-    ///Normalize a point from a point in an area to a region represented by [-1, 1]
-    static pure Transform normalize(in Rectangle rec)
-    {
-        return Transform([
-            2 / rec.width, 0, -2 * rec.x / rec.width - 1,
-            0, -2 / rec.height, 2 * rec.y / rec.height + 1,
             0, 0, 1
         ]);
     }
