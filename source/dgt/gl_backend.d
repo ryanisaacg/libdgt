@@ -65,7 +65,7 @@ struct GLBackend
 		texPositionAttribute,
 		colorAttribute, textureAttribute;
 	private SDL_Window* window;
-	public Transform transform;
+	private Transform transform;
 
 	//The amount of floats per vertex
 	private static immutable size_t vertex_size = 8;
@@ -256,6 +256,13 @@ struct GLBackend
 		foreach(i; newIndices)
 			indices.add(cast(uint)(i + offset));
 	}
+
+    public void setTransform(in Transform transform)
+    {
+        this.transform = transform;
+        if(indices.length != 0)
+            flush();
+    }
 }
 unittest
 {

@@ -6,7 +6,7 @@ import core.stdc.stdio, core.stdc.stdlib, core.stdc.time, core.thread;
 import std.ascii;
 import std.typecons : Nullable;
 
-import dgt.array, dgt.color, dgt.font, dgt.gamepad, dgt.geom, dgt.gl_backend, dgt.io, dgt.sound, dgt.music, dgt.particle, dgt.sprite, dgt.texture, dgt.tilemap, dgt.util;
+import dgt.array, dgt.camera, dgt.color, dgt.font, dgt.gamepad, dgt.geom, dgt.gl_backend, dgt.io, dgt.sound, dgt.music, dgt.particle, dgt.sprite, dgt.texture, dgt.tilemap, dgt.util;
 
 ///The flags used to control a window's initial behavior
 struct WindowConfig
@@ -48,7 +48,7 @@ struct Window
     uint previous_ticks;
     int offsetX, offsetY, windowWidth, windowHeight;
     Texture white;
-    Rectangle camera;
+    Camera camera;
     Array!Gamepad connectedGamepads;
 
     @disable this();
@@ -101,7 +101,8 @@ struct Window
             config.flags);
         ctx = GLBackend(window, config.vsync);
         particles = Array!Particle(128);
-        camera.set(0, 0, width, height);
+        const region = Rectangle(0, 0, width, height);
+        setTransform(Camera(region, region));
 
         ubyte[3] white_pixel = [ 255, 255, 255 ];
         white = Texture(white_pixel.ptr, 1, 1, PixelFormat.RGB);
@@ -150,6 +151,13 @@ struct Window
         SDL_Quit();
     }
 
+
+    ///Set the camera transform
+    void setTransform(in Camera cam)
+    {
+        ctx.setTransform(cam.opengl);
+    }
+
     /**
     Start a frame
     Params:
@@ -157,8 +165,8 @@ struct Window
     */
     void begin(in Color bg)
     {
-        auto camera = Rectangle(0, 0, windowWidth, windowHeight);
-        begin(bg, camera);
+        const region = Rectangle(0, 0, width, height);
+        begin(bg, Camera(region, region));
     }
 
     /**
@@ -167,9 +175,8 @@ struct Window
     bg = The color to clear with
     cam = the region to draw
     */
-    void begin(in Color bg, in Rectangle cam)
+    void begin(in Color bg, in Camera cam)
     {
-        camera = cam;
         inUIMode = false;
         ctx.clear(bg);
         previous_ticks = SDL_GetTicks();
@@ -234,13 +241,7 @@ struct Window
         mouseLeft = (button_mask & SDL_BUTTON(SDL_BUTTON_LEFT)) != 0;
         mouseRight = (button_mask & SDL_BUTTON(SDL_BUTTON_RIGHT)) != 0;
         mouseMiddle = (button_mask & SDL_BUTTON(SDL_BUTTON_MIDDLE)) != 0;
-        float left = camera.x, right = left + camera.width,
-                top = camera.y, bottom = top + camera.height;
-        ctx.transform = [
-            2 / (right - left), 0, 0,
-            0, 2 / (top - bottom), 0,
-            -(right + left) / (right - left), -(top + bottom) / (top - bottom), 1
-        ];
+        setTransform(cam);
     }
 
     private void filterParticles(T)(in Tilemap!T map)
@@ -300,10 +301,9 @@ struct Window
         static assert ( Len >= 3 );
         Vertex[Len] vertices;
         GLuint[Indices] indices;
-        Vector offset = inUIMode ? camera.topLeft : Vector(0, 0);
         for (size_t i = 0; i < Len; i++)
         {
-            auto point = points[i] + offset;
+            auto point = points[i];
             vertices[i].pos.x = point.x;
             vertices[i].pos.y = point.y;
             vertices[i].col = color;
@@ -433,8 +433,7 @@ struct Window
             src_bl = tmp;
         }
         //Add all of the vertices to the context
-        auto translate = Vector(x, y) + (inUIMode ? camera.topLeft : Vector(0, 0));
-        translate = translate;
+        auto translate = Vector(x, y);
         Vertex[4] vertices = [ Vertex(tl + translate, src_tl, color),
             Vertex(tr + translate, src_tr, color),
             Vertex(br + translate, src_br, color),
@@ -553,8 +552,7 @@ struct Window
     ///Get the position of the mouse
     @property Vector mouse() const
     {
-        return mousePos * camera.width / windowWidth - Vector(offsetX, offsetY)
-            + (inUIMode ? Vector(0, 0) : camera.topLeft);
+        return camera.unproject * mousePos;
     }
     @property bool mouseLeftPressed() const { return mouseLeft; }
     @property bool mouseRightPressed() const { return mouseRight; }

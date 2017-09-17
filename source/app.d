@@ -17,7 +17,7 @@ out vec2 Tex_coord;
 void main() {
 	Color = col;
 	Tex_coord = texPos;
-	vec3 transformed = trans * vec3(pos, 1.0);
+	vec3 transformed = vec3(pos, 1.0) * trans;
 	transformed.z = 0;
 	gl_Position = vec4(transformed, 1.0);
 }",
