@@ -73,7 +73,7 @@ struct Window
     scale = the number of 'units' per pixel
     bindToGlobal = set the global window reference to this window
     */
-    this(in string title, in int width, in int height, in WindowConfig config, in bool bindToGlobal = true)
+    this(in string title, in int width, in int height, in WindowConfig config = WindowConfig(), in bool bindToGlobal = true)
     {
         version(Windows)
         {
