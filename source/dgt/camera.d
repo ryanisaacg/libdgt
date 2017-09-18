@@ -14,7 +14,8 @@ struct Camera
             * Transform.scale(Vector(windowSize.width / world.width, windowSize.height / world.height).inverse)
             * Transform.translate(world.topLeft);
         unproject = project.inverse;
-        opengl = Transform.scale(world.size.inverse * 2)
+        opengl = Transform.translate(-world.topLeft)
+            * Transform.scale(world.size.inverse * 2)
             * Transform.translate(Vector(-1, -1))
             * Transform.scale(Vector(1, -1));
     }
@@ -28,4 +29,10 @@ unittest
     assert(cam.project * screenBottom == worldBottom);
     assert(cam.unproject * worldBottom == screenBottom);
     assert(cam.opengl * worldBottom == Vector(-1, -1));
+}
+unittest
+{
+    const cam = Camera(Rectangle(0, 0, 100, 100), Rectangle(50, 50, 50, 50));
+    const worldTop = Vector(50, 50);
+    assert(cam.opengl * worldTop == Vector(-1, 1));
 }
