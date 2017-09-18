@@ -60,10 +60,11 @@ struct Vector
         {
             return Vector(x - other.x, y - other.y);
         }
-        static if (op == "==")
-        {
-            return approxEqual(x, other.x, 0.000001) && approxEqual(y, other.y, 0.000001);
-        }
+    }
+
+    bool opEquals(Vector other) const
+    {
+        return approxEqual(x, other.x, 0.000001) && approxEqual(y, other.y, 0.000001);
     }
 
     ///Get the squared length of the vector (faster than getting the length)
