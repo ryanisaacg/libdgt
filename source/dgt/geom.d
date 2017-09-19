@@ -6,10 +6,26 @@ floathe entire module is designed for 2D, because libdgt is for 2D development
 module dgt.geom;
 
 import std.algorithm.comparison;
-import std.math : approxEqual, sqrt, cos, sin, PI;
+import std.math : approxEqual, sqrt, cos, sin, sgn, PI;
 import dgt.io;
 
 @safe:
+
+//The famous fast inverse square root
+@trusted pure nothrow @nogc private float Q_rsqrt(float number)
+{
+	long i;
+	float x2, y;
+	const float threehalfs = 1.5;
+	x2 = number * 0.5;
+	y  = number;
+	i  = *cast(long*) &y;
+	i  = 0x5f3759df - ( i >> 1 );
+    y  = * cast(float*) &i;
+	y  = y * ( threehalfs - ( x2 * y * y ) );
+    return y;
+}
+
 /**
 A 2D vector with an arbitrary numeric type
 */
@@ -85,6 +101,36 @@ struct Vector
         return Vector(std.algorithm.comparison.clamp(x, min.x, max.x), std.algorithm.comparison.clamp(y, min.y, max.y));
     }
 
+	///Get the cross product of a vector
+	float cross(in Vector other) const
+    {
+        return x * other.y - y * other.x;
+    }
+
+    ///Get the dot product of a vector
+    float dot(in Vector other) const
+    {
+        return x * other.x + y * other.y;
+    }
+
+    ///Normalize the vector's length from [0, 1]
+    Vector normalize() const
+    {
+        return this * Q_rsqrt(len2);
+    }
+
+    ///Get only the X component of the Vector, represented as a vector
+    @property Vector xComp() const
+    {
+        return Vector(x, 0);
+    }
+
+    ///Get only the Y component of the Vector, represented as a vector
+    @property Vector yComp() const
+    {
+        return Vector(0, y);
+    }
+
     ///Get the vector equal to Vector(1 / x, 1 / y)
     @property Vector inverse() const
     {
@@ -99,6 +145,72 @@ unittest
     b = Vector(1, -2);
     assert((a + b).x == 6);
     assert((a - b).y == 12);
+}
+
+///Represents a 2D line segment
+struct Line
+{
+    Vector start, end;
+
+    @nogc nothrow pure: 
+
+	bool intersects(in Line other) const
+	{
+        //See https://stackoverflow.com/a/565282 for algorithm
+		Vector p = start;
+		Vector q = other.start;
+		Vector r = end - start;
+		Vector s = other.end - other.start;
+		//t = (q - p) x s / (r x s)
+		//u = (q - p) x r / (r x s)
+		float u_numerator = (q - p).cross(r);
+        float t_numerator = (q - p).cross(s);
+        float denominator = r.cross(s);
+        if (denominator == 0) {
+			if(u_numerator != 0)
+				return false;
+			float t0 = (q - p).dot(r) / r.dot(r);
+			float t1 = t0 + s.dot(r) / r.dot(r);
+			return (t0 >= 0 && t0 <= 1) || (t1 >= 0 && t1 <= 1) || 
+				(sgn(t0) != sgn(t1));
+		} else {
+			float u = u_numerator / denominator;
+			float t = t_numerator / denominator;
+			return t >= 0 && t <= 1 && u >= 0 && u <= 1;
+		}
+	}
+
+    ///Check if a line segment intersects a circle
+    bool intersects(in Circle c) const
+    {
+        Vector center = c.center;
+        Vector line = end - start; 
+        Vector dist = center - start;
+        Vector nor_line = line.normalize();
+        float product = dist.dot(nor_line);
+        // Find the closest point on the line to check
+        Vector check_point;
+        if(product <= 0) {
+            check_point = start;
+        } else if(product >= 1) {
+            check_point = end;
+        } else {
+            check_point = start + nor_line * product;
+        }
+        // Check to see if the closest point is within the radius
+        return (center - check_point).len2 < c.radius * c.radius;
+    }
+
+    ///Check if a line segment intersects a rectangle
+    bool intersects(in Rectangle r) const
+    {
+        return r.contains(start) || r.contains(end) 
+            || Line(r.topLeft, r.topLeft + r.size.xComp).intersects(this) 
+            || Line(r.topLeft, r.topLeft + r.size.yComp).intersects(this) 
+            || Line(r.topLeft + r.size.xComp, r.topLeft + r.size).intersects(this)
+            || Line(r.topLeft + r.size.yComp, r.topLeft + r.size).intersects(this);
+    }
+
 }
 
 /**
@@ -118,10 +230,21 @@ struct Rectangle
 
     @nogc nothrow pure public:
     ///Create a rectangle with the given dimension
-    this(float x, float y, float width, float height)
+    this(in float x, in float y, in float width, in float height)
     {
         topLeft = Vector(x, y);
         size = Vector(width, height);
+    }
+    ///Create a rectangle at 0, 0 with a given size
+    this(in float width, in float height)
+    {
+        this(0, 0, width, height);
+    }
+    ///Create a rectangle with a given top left and a given size
+    this(in Vector top, in Vector dimension)
+    {
+        topLeft = top;
+        size = dimension;
     }
 
     @property float x() const { return topLeft.x; }
@@ -184,7 +307,7 @@ struct Rectangle
     */
     Rectangle constrain(in Rectangle outer) const
     {
-        return Rectangle(clamp(x, outer.x, outer.x + outer.width - width), clamp(y, outer.y, outer.y + outer.height - height), width, height);
+        return Rectangle(topLeft.clamp(outer.topLeft, outer.topLeft + outer.size - size), size);
     }
 
     ///Translate the rectangle by a vector
@@ -611,4 +734,31 @@ unittest
     auto bTranslate = b.translate(c);
     assert(aTranslate.y == a.y + c.y && aTranslate.y == a.y + c.y);
     assert(bTranslate.x == b.x + c.x && bTranslate.y == b.y + c.y);
+}
+unittest
+{
+    assert(Vector(6, 5).dot(Vector(2, -8)) == -28);
+}
+unittest
+{
+    const line1 = Line(Vector(0, 0), Vector(32, 32));
+    const line2 = Line(Vector(0, 32), Vector(32, 0));
+    const line3 = Line(Vector(32, 32), Vector(64, 64));
+    const line4 = Line(Vector(100, 100), Vector(1000, 1000));
+    assert(line1.intersects(line2));
+    assert(line1.intersects(line3));
+    assert(!line2.intersects(line3));
+    assert(!line1.intersects(line4));
+    assert(!line2.intersects(line4));
+    assert(!line3.intersects(line4));
+    const rect = Rectangle(32, 32);
+    assert(line1.intersects(rect));
+    assert(line2.intersects(rect));
+    assert(line3.intersects(rect));
+    assert(!line4.intersects(rect));
+    const circ = Circle(0, 0, 33);
+    assert(line1.intersects(circ));
+    assert(line2.intersects(circ));
+    assert(!line3.intersects(circ));
+    assert(!line4.intersects(circ));
 }
