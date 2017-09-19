@@ -350,10 +350,35 @@ struct Window
         draw(color, points);
     }
 
-    ///Draw a texture at the given units
+    ///Draw a texture at the given position with the given color
+    void draw(in Texture tex, in Vector position, in Color col = Color.white)
+    {
+        draw(tex, position.x, position.y, col);
+    }
+
+    ///Draw a texture at the given units with the given color
     void draw(in Texture tex, in float x, in float y, in Color col = Color.white)
     {
         draw(tex, x, y, tex.size.width, tex.size.height, 0, 0, 0, 1, 1, false, false, col);
+    }
+
+    /**
+    Draw a transformed textur
+    
+    Params:
+    tex = the texture
+    area = the space to draw in
+    rot = the rotation angle from 0 to 360
+    origin = the rotational origin of the image
+    scale = the scale to draw at
+    flipHorizontal = if the texture should be flipped horizontally
+    flipVertical = if the texture should be flipped vertically
+    color = the color to blend with
+    */
+    void draw(in Texture tex, in Rectangle area, in float rotation = 0, in Vector origin = Vector(0, 0), 
+            in Vector scale = Vector(1, 1), in bool flipHorizontal = false, in bool flipVertical = false, in Color color = Color.white)
+    {
+        draw(tex, area.x, area.y, area.width, area.height, rotation, origin.x, origin.y, scale.x, scale.y, flipHorizontal, flipVertical, color);
     }
 
     /**
@@ -366,24 +391,26 @@ struct Window
     w = the width in units
     h = the height in units
     rot = the rotation angle from 0 to 360
-    scale_x = the x scale of the draw
-    scale_y = the y scale of the draw
-    flip_x = if the texture should be flipped horizontally
-    flip_y = if the texture should be flipped vertically
+    originX = the x origin
+    originY = the y origin
+    scaleX = the x scale of the draw
+    scaleY = the y scale of the draw
+    flipHorizontal = if the texture should be flipped horizontally
+    flipVertical = if the texture should be flipped vertically
     color = the color to blend with
     */
     void draw(in Texture tex, in float x, in float y, in float w, in float h,
-                        in float rot = 0, in float or_x = 0, in float or_y = 0,
-                        in float scale_x = 1, in float scale_y = 1,
-                        in bool flip_x = false, in bool flip_y = false,
+                        in float rot = 0, in float originX = 0, in float originY = 0,
+                        in float scaleX = 1, in float scaleY = 1,
+                        in bool flipHorizontal = false, in bool flipVertical = false,
                         in Color color = Color.white)
     {
         auto trans = Transform.identity() 
-            * Transform.translate(Vector(-or_x, -or_y))
+            * Transform.translate(Vector(-originX, -originY))
             * Transform.rotate(rot)
-            * Transform.translate(Vector(or_x, or_y))
-            * Transform.scale(Vector(scale_x, scale_y));
-        draw(tex, trans, x + or_x, y + or_y, w, h, flip_x, flip_y, color);
+            * Transform.scale(Vector(scaleX, scaleY))
+            * Transform.translate(Vector(originX, originY));
+        draw(tex, trans, x, y, w, h, flipHorizontal, flipVertical, color);
     }
 
 
@@ -396,12 +423,12 @@ struct Window
     y = the y in units
     w = the width in units
     h = the height in units
-    flip_x = if the texture should be flipped horizontally
-    flip_y = if the texture should be flipped vertically
+    flipHorizontal = if the texture should be flipped horizontally
+    flipVertical = if the texture should be flipped vertically
     color = the color to blend with
     */
     void draw(in Texture tex, in Transform trans, in float x, in float y,
-                       in float w, in float h, in bool flip_x = false, in bool flip_y = false,
+                       in float w, in float h, in bool flipHorizontal = false, in bool flipVertical = false,
                        in Color color = Color.white)
     {
         //Calculate the destination points with the transformation
@@ -422,7 +449,7 @@ struct Window
         auto src_tr = Vector(norm_x + norm_w, norm_y);
         auto src_br = Vector(norm_x + norm_w, norm_y + norm_h);
         auto src_bl = Vector(norm_x, norm_y + norm_h);
-        if (flip_x) {
+        if (flipHorizontal) {
             auto tmp = src_tr;
             src_tr = src_tl;
             src_tl = tmp;
@@ -430,7 +457,7 @@ struct Window
             src_br = src_bl;
             src_bl = tmp;
         }
-        if (flip_y) {
+        if (flipVertical) {
             auto tmp = src_tr;
             src_tr = src_br;
             src_br = tmp;
