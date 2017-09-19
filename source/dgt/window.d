@@ -45,7 +45,6 @@ struct Window
          mouseLeftPrevious = true, mouseRightPrevious = true, mouseMiddlePrevious = true;
     //TODO: Add a function to wait on IO
     Array!Particle particles;
-    uint previous_ticks;
     int offsetX, offsetY, windowWidth, windowHeight;
     Texture white;
     Camera camera;
@@ -121,7 +120,20 @@ struct Window
         recalculateGamepads();
     }
 
-    @nogc nothrow @trusted:
+    void loop(Render, Update, A...)(Render render, Update update, A state)
+    {
+        new Thread({
+            while(isOpen)
+            {
+                update(this, state);
+                Thread.sleep(dur!"msecs"(1000 / fps));
+            }
+        }).start();
+        while(isOpen)
+            render(this, state);
+    }
+
+    nothrow @nogc @trusted:
 
     private void recalculateGamepads()
     {
@@ -179,7 +191,6 @@ struct Window
     {
         inUIMode = false;
         ctx.clear(bg);
-        previous_ticks = SDL_GetTicks();
         previous_keys = current_keys;
         SDL_Event e;
         while (shouldContinue && SDL_PollEvent(&e))
@@ -280,11 +291,6 @@ struct Window
                 draw(particles[i].region, particles[i].position.x, particles[i].position.y);
         }
         ctx.flip();
-        uint time = SDL_GetTicks();
-        if (time - previous_ticks < 1000 / fps) {
-            SDL_Delay(1000 / fps - (time - previous_ticks)); //account for the time elapsed during the frame
-        }
-        previous_ticks = time;
     }
 
     ///Update particles, check particles against the tilemap, and display the drawn objects

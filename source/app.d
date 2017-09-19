@@ -4,7 +4,7 @@ import std.datetime;
 
 void main()
 {
-	WindowConfig config = { resizable : true, vsync : true };
+	WindowConfig config = { resizable : true, vsync : false };
 	Window engine = Window("Test title", 640, 480, config);
 	engine.setShader(
 "#version 150
@@ -65,11 +65,9 @@ void main() {
 		Vector(432, 0), carouselOptions);
     int carouselOption = 0;
 	auto font = Font("example/DejaVuSansMono.ttf", 14, FontStyle.normal);
-	while(engine.isOpen)
-	{
-		engine.begin(Color.black);
-		scope(exit) engine.end();
-
+    auto rect = Rectangle(0, 0, 20, 20);
+    engine.loop((ref Window window) {
+        window.begin(Color.black);
 		engine.draw(tex, 100, 0, 32, 32);
 		engine.draw(tex, 200, 400, 32, 32);
 		engine.draw(tex, 300, 400, 32, 32);
@@ -90,5 +88,11 @@ void main() {
             writeln("Button pressed");
 		n = slider.draw(engine, n);
 		carouselOption = carousel.draw(engine, carouselOption);
-	}
+
+        window.draw(Color.blue, rect);
+
+        window.end();
+    }, (ref Window window) {
+        rect.y = rect.y + 1;
+    });
 }
