@@ -8,5 +8,6 @@ versions "DerelictSDL2_Static" platform="posix"
 dependency "derelict-gl3" version="~>2.0.0-beta.3"
 
 libs "SDL2_ttf" "SDL2_mixer" "SDL2_image" "SDL2" platform="posix"
+preGenerateCommands "prebuild.bat" platform="windows"
 
 targetPath "lib"
