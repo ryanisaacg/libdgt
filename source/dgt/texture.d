@@ -1,12 +1,13 @@
 module dgt.texture;
+
 import derelict.sdl2.sdl, derelict.sdl2.image;
 import derelict.opengl;
 import dgt.array : Array;
 import dgt.io;
 import dgt.geom : Rectangle;
-import dgt.util : nullTerminate;
+import dgt.util : nullTerminate, nextline, trimLeft;
 
-import core.stdc.string;
+import core.stdc.string, core.stdc.stdio, core.stdc.stdlib;
 
 ///The format of each pixel in byte order
 enum PixelFormat : GLenum
@@ -28,6 +29,14 @@ struct Texture
     Rectangle region;
 
     @disable this();
+
+    version(unittest)
+    {
+        @nogc nothrow this(uint mockID)
+        {
+            mockID = id;
+        }
+    }
 
     @nogc nothrow public:
     ///Create a Texture from data in memory
@@ -84,12 +93,6 @@ struct Texture
         this(cast(ubyte*)sur.pixels, sur.w, sur.h, format);
     }
 
-    ///Remove the texture from GPU memory
-    void destroy()
-    {
-        glDeleteTextures(1, &id);
-    }
-
     pure:
     ///Get a texture that represents a region of a larger texture
     Texture getSlice(Rectangle region)
@@ -105,4 +108,72 @@ struct Texture
     @property int sourceHeight() const { return height; }
     ///Get the size of the texture's region
     @property Rectangle size() const { return region; }
+}
+
+private @nogc nothrow Texture loadTexture(string filename) { return Texture(filename); }
+
+struct Atlas
+{
+    Array!Texture pages, regions;
+    Array!string regionNames;
+
+    @disable this();
+
+    @nogc nothrow:
+    this(TextureLoader)(string atlasPath, TextureLoader loader = &loadTexture)
+    {
+        pages = Array!Texture(2);
+        regions = Array!Texture(32);
+        regionNames = Array!string(32);
+        auto terminated = nullTerminate(atlasPath);
+        FILE* file = fopen(terminated.ptr, "r".ptr);
+        terminated.destroy();
+        if(file == null)
+        {
+            println("Failed to load texture atlas ", atlasPath);
+            return;
+        }
+        auto contents = Array!char(1024);
+        int next;
+        //Read the file into memory
+        while((next = fgetc(file)) != EOF)
+            contents.add(cast(char)next);
+        string text = contents.array;
+        while(text.length > 0)
+        {
+            Texture page = loader(text.nextline(text)); //Load the page texture
+            pages.add(page);
+            text.nextline(text); //ignore the line telling the size
+            text.nextline(text); //ignore the line telling the format
+            text.nextline(text); //ignore the line telling the filter
+            text.nextline(text); //ignore the line telling the repeat
+            auto regionName = text.nextline(text);
+            do
+            {
+                const rotateLine = text.nextline(text).trimLeft;
+                const positionLine = text.nextline(text).trimLeft;
+                const sizeLine = text.nextline(text).trimLeft;
+                const splitLine = text.nextline(text).trimLeft;
+                const padLine = text.nextline(text).trimLeft;
+                const originLine = text.nextline(text).trimLeft;
+                const offsetLine = text.nextline(text).trimLeft;
+                const index = text.nextline(text).trimLeft; //TODO: Handle animations
+                regionName = text.nextline(text);
+            } while(regionName.length > 0);
+        }
+        contents.destroy();
+    }
+
+    void destroy()
+    {
+        pages.destroy();
+        regions.destroy();
+    }
+}
+
+unittest
+{
+    println("Texture tests");
+    const loader = (string filename) { return Texture(0); };
+    auto atlas = Atlas("test.atlas", loader);
 }

@@ -1,0 +1,29 @@
+page1.png
+size: 640,480
+format: RGBA8888
+filter: Linear,Linear
+repeat: none
+bg-dialog
+ rotate: false
+ xy: 519, 223
+ size: 21, 42
+ split: 10, 10, 29, 10
+ pad: -1, -1, 28, 10
+ orig: 21, 42
+ offset: 0, 0
+ index: -1
+
+page2.png
+size: 640,480
+format: RGBA8888
+filter: Linear,Linear
+repeat: none
+bg-dialog
+ rotate: false
+ xy: 519, 223
+ size: 21, 42
+ split: 10, 10, 29, 10
+ pad: -1, -1, 28, 10
+ orig: 21, 42
+ offset: 0, 0
+ index: -1

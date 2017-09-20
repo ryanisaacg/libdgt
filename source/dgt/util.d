@@ -1,6 +1,10 @@
 module dgt.util;
 import core.stdc.math, core.stdc.stdlib;
 
+import std.string : indexOf;
+import std.algorithm : canFind;
+import std.algorithm.comparison : equal;
+
 import dgt.array;
 import dgt.geom;
 
@@ -35,6 +39,28 @@ Array!char nullTerminate(in string str)
     nameNullTerminated.add('\0');
     return nameNullTerminated;
 }
+pure string nextline(in string str, out string rest)
+{
+    auto index = str.indexOf('\n');
+    if(index == -1)
+    {
+        index = str.length;
+        rest = "";
+    }
+    else
+    {
+        rest = str[index + 1..str.length];
+    }
+    return str[0..index];
+}
+pure string trimLeft(in string str)
+{
+    int i = 0;
+    for(; i < str.length; i++)
+        if(str[i] != ' ' && str[i] != '\t' && str[i] != '\n' && str[i] != '\r')
+            break;
+    return str[i..str.length];
+}
 unittest
 {
     for(size_t i = 0; i < 1000; i++)
@@ -49,4 +75,30 @@ unittest
     auto expected = "Test string\0";
     for(size_t i = 0; i < expected.length; i++)
         assert(str[i] == expected[i]);
+}
+unittest
+{
+    auto manyLines = "First line
+Second line
+
+Fourth line";
+    const firstLine = manyLines.nextline(manyLines);
+    assert(firstLine == "First line");
+    const secondLine = manyLines.nextline(manyLines);
+    assert(secondLine == "Second line");
+    const thirdLine = manyLines.nextline(manyLines);
+    assert(thirdLine == "");
+    const fourthLine = manyLines.nextline(manyLines);
+    assert(fourthLine == "Fourth line");
+}
+unittest
+{
+    const noTrim = "Text";
+    const trimSpace = " Text";
+    const trimVariety = "
+
+    Text";
+    assert(noTrim == noTrim.trimLeft);
+    assert(noTrim == trimSpace.trimLeft);
+    assert(noTrim == trimVariety.trimLeft);
 }
