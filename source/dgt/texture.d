@@ -4,8 +4,10 @@ import derelict.sdl2.sdl, derelict.sdl2.image;
 import derelict.opengl;
 import dgt.array : Array;
 import dgt.io;
-import dgt.geom : Rectangle;
-import dgt.util : nullTerminate, nextline, trimLeft;
+import dgt.geom : Vector, Rectangle;
+import dgt.util : nullTerminate, nextline, parsePositiveInt, trimLeft;
+
+import std.string : indexOf;
 
 import core.stdc.string, core.stdc.stdio, core.stdc.stdlib;
 
@@ -150,15 +152,36 @@ struct Atlas
             auto regionName = text.nextline(text);
             do
             {
-                const rotateLine = text.nextline(text).trimLeft;
-                const positionLine = text.nextline(text).trimLeft;
-                const sizeLine = text.nextline(text).trimLeft;
-                const splitLine = text.nextline(text).trimLeft;
-                const padLine = text.nextline(text).trimLeft;
-                const originLine = text.nextline(text).trimLeft;
-                const offsetLine = text.nextline(text).trimLeft;
-                const index = text.nextline(text).trimLeft; //TODO: Handle animations
-                regionName = text.nextline(text);
+                auto propertyLine = text.nextline(text);
+                bool rotate;
+                Vector position, size;
+                while(propertyLine.length > 0 && propertyLine[0] == ' ')
+                {
+                    propertyLine = propertyLine.trimLeft;
+                    const colonIndex = propertyLine.indexOf(':');
+                    const property = propertyLine[0..colonIndex];
+                    const value = propertyLine[colonIndex + 1..propertyLine.length].trimLeft;
+                    if(property == "rotate")
+                    {
+                        rotate = (value == "true");
+                    } else if(property == "xy")
+                    {
+                        const x = parsePositiveInt(value[0..value.indexOf(',')]);
+                        const y = parsePositiveInt(value[value.indexOf(',') + 1..value.length].trimLeft);
+                        position = Vector(x, y);
+                    } else if(property == "size")
+                    {
+                        const x = parsePositiveInt(value[0..value.indexOf(',')]);
+                        const y = parsePositiveInt(value[value.indexOf(',') + 1..value.length].trimLeft);
+                        size = Vector(x, y);
+                    }
+                    propertyLine = text.nextline(text);
+                }
+                const region = Rectangle(position, size);
+                //TODO: ROTATE TEXTURES
+                regions.add(page.getSlice(region));
+                regionNames.add(regionName);
+                regionName = propertyLine;
             } while(regionName.length > 0);
         }
         contents.destroy();
@@ -176,4 +199,8 @@ unittest
     println("Texture tests");
     const loader = (string filename) { return Texture(0); };
     auto atlas = Atlas("test.atlas", loader);
+    assert(atlas.regionNames[0] == "bg-dialog");
+    assert(atlas.regionNames[1] == "bg-dialog2");
+    assert(atlas.regions[0].size.topLeft == Vector(519, 223));
+    assert(atlas.regions[0].size.size == Vector(21, 42));
 }
