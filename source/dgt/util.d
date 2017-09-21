@@ -1,9 +1,10 @@
 module dgt.util;
 import core.stdc.math, core.stdc.stdlib;
 
-import std.string : indexOf;
 import std.algorithm : canFind;
 import std.algorithm.comparison : equal;
+import std.math;
+import std.string : indexOf;
 
 import dgt.array;
 import dgt.geom;
@@ -61,6 +62,16 @@ pure string trimLeft(in string str)
             break;
     return str[i..str.length];
 }
+pure int parsePositiveInt(string str)
+{
+	int value = 0;
+	for(int digit = 0; digit < str.length; digit++)
+	{
+		import core.stdc.stdio;
+		value += cast(int)std.math.pow(10, digit) * (str[str.length - 1 - digit] - '0');
+	}
+	return value;
+}
 unittest
 {
     for(size_t i = 0; i < 1000; i++)
@@ -101,4 +112,9 @@ unittest
     assert(noTrim == noTrim.trimLeft);
     assert(noTrim == trimSpace.trimLeft);
     assert(noTrim == trimVariety.trimLeft);
+}
+unittest
+{
+    assert(parsePositiveInt("0") == 0);
+    assert(parsePositiveInt("234") == 234);
 }
