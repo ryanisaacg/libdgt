@@ -19,7 +19,7 @@ format: RGBA8888
 filter: Linear,Linear
 repeat: none
 bg-dialog2
- rotate: false
+ rotate: true
  xy: 519, 223
  size: 21, 42
  split: 10, 10, 29, 10
