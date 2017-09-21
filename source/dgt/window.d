@@ -4,6 +4,7 @@ import derelict.sdl2.sdl, derelict.sdl2.image, derelict.sdl2.mixer, derelict.sdl
 import core.stdc.stdio, core.stdc.stdlib, core.stdc.time, core.thread;
 
 import std.ascii;
+import std.algorithm.mutation : swap;
 import std.typecons : Nullable;
 
 import dgt.array, dgt.camera, dgt.color, dgt.font, dgt.gamepad, dgt.geom, dgt.gl_backend, dgt.io, dgt.sound, dgt.music, dgt.particle, dgt.sprite, dgt.texture, dgt.tilemap, dgt.util;
@@ -449,21 +450,21 @@ struct Window
         auto src_tr = Vector(norm_x + norm_w, norm_y);
         auto src_br = Vector(norm_x + norm_w, norm_y + norm_h);
         auto src_bl = Vector(norm_x, norm_y + norm_h);
-        if (flipHorizontal) {
-            auto tmp = src_tr;
-            src_tr = src_tl;
-            src_tl = tmp;
-            tmp = src_br;
-            src_br = src_bl;
-            src_bl = tmp;
+        if(tex.rotated)
+        {
+            swap(src_tl, src_tr);
+            swap(src_bl, src_tr);
+            swap(src_br, src_tr);
         }
-        if (flipVertical) {
-            auto tmp = src_tr;
-            src_tr = src_br;
-            src_br = tmp;
-            tmp = src_tl;
-            src_tl = src_bl;
-            src_bl = tmp;
+        if (flipHorizontal) 
+        {
+            swap(src_tr, src_tl);
+            swap(src_br, src_bl);
+        }
+        if (flipVertical) 
+        {
+            swap(src_tr, src_br);
+            swap(src_tl, src_bl);
         }
         //Add all of the vertices to the context
         auto translate = Vector(x, y);

@@ -29,6 +29,7 @@ struct Texture
     private:
     int width, height;
     Rectangle region;
+    package bool rotated = false;
 
     @disable this();
 
@@ -36,7 +37,7 @@ struct Texture
     {
         @nogc nothrow this(uint mockID)
         {
-            mockID = id;
+            id = mockID;
         }
     }
 
@@ -97,11 +98,12 @@ struct Texture
 
     pure:
     ///Get a texture that represents a region of a larger texture
-    Texture getSlice(Rectangle region)
+    Texture getSlice(Rectangle region, bool rotated = false)
     {
         Texture tex = this;
         tex.region = Rectangle(this.region.x + region.x,
                 this.region.y + region.y, region.width, region.height);
+        tex.rotated = rotated;
         return tex;
     }
     ///Get the width of the source image
@@ -112,7 +114,10 @@ struct Texture
     @property Rectangle size() const { return region; }
 }
 
-private @nogc nothrow Texture loadTexture(string filename) { return Texture(filename); }
+private @nogc nothrow Texture loadTexture(string filename)
+{
+    return Texture(filename);
+}
 
 struct Atlas
 {
@@ -178,8 +183,7 @@ struct Atlas
                     propertyLine = text.nextline(text);
                 }
                 const region = Rectangle(position, size);
-                //TODO: ROTATE TEXTURES
-                regions.add(page.getSlice(region));
+                regions.add(page.getSlice(region, rotate));
                 regionNames.add(regionName);
                 regionName = propertyLine;
             } while(regionName.length > 0);
@@ -196,11 +200,11 @@ struct Atlas
 
 unittest
 {
-    println("Texture tests");
     const loader = (string filename) { return Texture(0); };
     auto atlas = Atlas("test.atlas", loader);
     assert(atlas.regionNames[0] == "bg-dialog");
     assert(atlas.regionNames[1] == "bg-dialog2");
     assert(atlas.regions[0].size.topLeft == Vector(519, 223));
     assert(atlas.regions[0].size.size == Vector(21, 42));
+    assert(atlas.regions[1].rotated);
 }
