@@ -1,3 +1,5 @@
 @echo off
-powershell -ExecutionPolicy ByPass -File prebuild.ps1 > out
-del out
+if NOT exist "SDL2.dll" (
+    powershell -ExecutionPolicy ByPass -File prebuild.ps1 > out
+    del out
+)
