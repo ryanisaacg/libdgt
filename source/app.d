@@ -38,12 +38,13 @@ void main() {
 "outCol"
 );
 	auto level = Level("example/example.json");
-    auto tex = Texture("example/test.png");
-	scope(exit) tex.destroy();
+    auto atlas = Atlas("example/atlas.txt");
+    scope(exit) atlas.destroy();
+    auto tex = atlas["test"];
 	auto map = Tilemap!bool(640, 480, 32);
 	scope(exit) map.destroy();
     float n = 0;
-    auto buttonTex = Texture("example/button.png");
+    auto buttonTex = atlas["button"];
     auto camera = Rectangle(0, 0, 640, 480);
     float value = 0;
 	auto button = Button(Rectangle(300, 300, 32, 32), Vector(300, 300),
@@ -51,7 +52,7 @@ void main() {
 				buttonTex.getSlice(Rectangle(32, 0, 32, 32)),
 				buttonTex.getSlice(Rectangle(64, 0, 32, 32)));
 	auto slider = Slider(Rectangle(0, 440, 640, 32), tex);
-	auto carouselTex = Texture("example/carousel.png");
+	auto carouselTex = atlas["carousel"];
 	auto leftButtonTex = carouselTex.getSlice(Rectangle(0, 0, 32, 32));
 	auto rightButtonTex = carouselTex.getSlice(Rectangle(128, 0, 32, 32));
 	auto carouselOptions = [
