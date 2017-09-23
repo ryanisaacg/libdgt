@@ -7,6 +7,7 @@ import dgt.io;
 import dgt.geom : Vector, Rectangle;
 import dgt.util : nullTerminate, nextline, parsePositiveInt, trimLeft;
 
+import std.path : dirName;
 import std.string : indexOf;
 
 import core.stdc.string, core.stdc.stdio, core.stdc.stdlib;
@@ -33,13 +34,6 @@ struct Texture
 
     @disable this();
 
-    version(unittest)
-    {
-        @nogc nothrow this(uint mockID)
-        {
-            id = mockID;
-        }
-    }
 
     @nogc nothrow public:
     ///Create a Texture from data in memory
@@ -59,23 +53,33 @@ struct Texture
         height = h;
         region = Rectangle(0, 0, w, h);
     }
-
-    ///Load a texture from a file with a given path
-    this(string name)
+    
+    //Mock or don't mock the constructor
+    version(unittest)
     {
-        auto nameNullTerminated = nullTerminate(name);
-        SDL_Surface* surface = IMG_Load(nameNullTerminated.ptr);
-        nameNullTerminated.destroy();
-        if (surface == null)
+        @nogc nothrow this(string name)
         {
-            auto buffer = IMG_GetError();
-            println("Image loading error: ", buffer[0..strlen(buffer)]);
-            this(null, 0, 0, PixelFormat.RGB);
         }
-        else
+    }
+    else
+    {
+        ///Load a texture from a file with a given path
+        this(string name)
         {
-            this(surface);
-            SDL_FreeSurface(surface);
+            auto nameNullTerminated = nullTerminate(name);
+            SDL_Surface* surface = IMG_Load(nameNullTerminated.ptr);
+            nameNullTerminated.destroy();
+            if (surface == null)
+            {
+                auto buffer = IMG_GetError();
+                println("Image loading error: ", buffer[0..strlen(buffer)]);
+                this(null, 0, 0, PixelFormat.RGB);
+            }
+            else
+            {
+                this(surface);
+                SDL_FreeSurface(surface);
+            }
         }
     }
 
@@ -98,7 +102,7 @@ struct Texture
 
     pure:
     ///Get a texture that represents a region of a larger texture
-    Texture getSlice(Rectangle region, bool rotated = false)
+    Texture getSlice(Rectangle region, bool rotated = false) const
     {
         Texture tex = this;
         tex.region = Rectangle(this.region.x + region.x,
@@ -114,11 +118,6 @@ struct Texture
     @property Rectangle size() const { return region; }
 }
 
-private @nogc nothrow Texture loadTexture(string filename)
-{
-    return Texture(filename);
-}
-
 struct Atlas
 {
     Array!Texture pages, regions;
@@ -126,8 +125,8 @@ struct Atlas
 
     @disable this();
 
-    @nogc nothrow:
-    this(TextureLoader)(string atlasPath, TextureLoader loader = &loadTexture)
+    nothrow @nogc:
+    this(string atlasPath)
     {
         pages = Array!Texture(2);
         regions = Array!Texture(32);
@@ -146,9 +145,19 @@ struct Atlas
         while((next = fgetc(file)) != EOF)
             contents.add(cast(char)next);
         string text = contents.array;
+        auto texturePath = Array!char(atlasPath.length * 2);
+        scope(exit) texturePath.destroy();
         while(text.length > 0)
         {
-            Texture page = loader(text.nextline(text)); //Load the page texture
+            texturePath.clear();
+            string relativeTexturePath = text.nextline(text);
+            const atlasPathDir = dirName(atlasPath);
+            foreach(character; atlasPathDir)
+                texturePath.add(character);
+            texturePath.add('/');
+            foreach(character; relativeTexturePath)
+                texturePath.add(character);
+            const page = Texture(texturePath.array);
             pages.add(page);
             text.nextline(text); //ignore the line telling the size
             text.nextline(text); //ignore the line telling the format
@@ -183,12 +192,22 @@ struct Atlas
                     propertyLine = text.nextline(text);
                 }
                 const region = Rectangle(position, size);
+                println(region);
                 regions.add(page.getSlice(region, rotate));
                 regionNames.add(regionName);
                 regionName = propertyLine;
             } while(regionName.length > 0);
         }
         contents.destroy();
+    }
+
+    @nogc:
+    pure Texture opIndex(in string regionName, Texture notFound = Texture(null, 0, 0, PixelFormat.RGB)) const
+    {
+        for(uint i = 0; i < regionNames.length; i++)
+            if(regionNames[i] == regionName)
+                return regions[i];
+        return notFound;
     }
 
     void destroy()
@@ -200,8 +219,7 @@ struct Atlas
 
 unittest
 {
-    const loader = (string filename) { return Texture(0); };
-    auto atlas = Atlas("test.atlas", loader);
+    auto atlas = Atlas("test.atlas");
     assert(atlas.regionNames[0] == "bg-dialog");
     assert(atlas.regionNames[1] == "bg-dialog2");
     assert(atlas.regions[0].size.topLeft == Vector(519, 223));
