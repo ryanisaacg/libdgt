@@ -3,14 +3,14 @@ module dgt.texture;
 import derelict.sdl2.sdl, derelict.sdl2.image;
 import derelict.opengl;
 import dgt.array : Array;
-import dgt.io;
+import dgt.io : println;
 import dgt.geom : Vector, Rectangle;
-import dgt.util : nullTerminate, nextline, parsePositiveInt, trimLeft;
+import dgt.util;
 
 import std.path : dirName;
 import std.string : indexOf;
 
-import core.stdc.string, core.stdc.stdio, core.stdc.stdlib;
+import core.stdc.string : strlen;
 
 ///The format of each pixel in byte order
 enum PixelFormat : GLenum
@@ -119,8 +119,14 @@ struct Texture
     @property Rectangle size() const { return region; }
 }
 
+/**
+A structure that loads and stores texture atlases
+
+The loader assumes the input file is in the Spine format: http://esotericsoftware.com/spine-atlas-format
+*/
 struct Atlas
 {
+    private:
     Array!Texture pages, regions;
     Array!string regionNames;
     Array!char contents;
@@ -128,25 +134,13 @@ struct Atlas
     @disable this();
 
     nothrow @nogc:
-    this(string atlasPath)
+    ///Load the atlas and the textures from the given path
+    this(in string atlasPath)
     {
         pages = Array!Texture(2);
         regions = Array!Texture(32);
         regionNames = Array!string(32);
-        auto terminated = nullTerminate(atlasPath);
-        FILE* file = fopen(terminated.ptr, "r".ptr);
-        terminated.destroy();
-        if(file == null)
-        {
-            contents = Array!char(0);
-            println("Failed to load texture atlas ", atlasPath);
-            return;
-        }
-        contents = Array!char(1024);
-        int next;
-        //Read the file into memory
-        while((next = fgetc(file)) != EOF)
-            contents.add(cast(char)next);
+        contents = readFileToBuffer(atlasPath);
         string text = contents.array;
         auto texturePath = Array!char(atlasPath.length * 2);
         scope(exit) texturePath.destroy();
@@ -155,20 +149,16 @@ struct Atlas
             texturePath.clear();
             string relativeTexturePath = text.nextline(text);
             const atlasPathDir = dirName(atlasPath);
-            foreach(character; atlasPathDir)
-                texturePath.add(character);
+            foreach(character; atlasPathDir) texturePath.add(character);
             texturePath.add('/');
-            foreach(character; relativeTexturePath)
-                texturePath.add(character);
+            foreach(character; relativeTexturePath) texturePath.add(character);
             const page = Texture(texturePath.array);
-            println("Size loaded: ", page.width, ":", page.height);
             pages.add(page);
-            text.nextline(text); //ignore the line telling the size
-            text.nextline(text); //ignore the line telling the format
-            text.nextline(text); //ignore the line telling the filter
-            text.nextline(text); //ignore the line telling the repeat
+            //ignore the size, format, filter, and repeat lines of the format
+            for(int i = 0; i < 4; i++)
+                text.nextline(text);
             auto regionName = text.nextline(text);
-            do
+            while(regionName.length > 0)
             {
                 auto propertyLine = text.nextline(text);
                 bool rotate;
@@ -195,16 +185,17 @@ struct Atlas
                     }
                     propertyLine = text.nextline(text);
                 }
-                const region = Rectangle(position, size);
-                regions.add(page.getSlice(region, rotate));
+                regions.add(page.getSlice(Rectangle(position, size), rotate));
                 regionNames.add(regionName);
                 regionName = propertyLine;
-            } while(regionName.length > 0);
+            }
         }
     }
 
     @nogc:
-    pure Texture opIndex(in string regionName, Texture notFound = Texture(null, 0, 0, PixelFormat.RGB)) const
+    ///Get the texture by the name it has in the atlas
+    pure Texture opIndex(in string regionName, 
+            in Texture notFound = Texture(null, 0, 0, PixelFormat.RGB)) const
     {
         for(uint i = 0; i < regionNames.length; i++)
             if(regionNames[i] == regionName)
@@ -212,6 +203,7 @@ struct Atlas
         return notFound;
     }
 
+    ///Free the memory and textures associated with the atlas
     void destroy()
     {
         pages.destroy();

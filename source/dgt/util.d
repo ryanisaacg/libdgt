@@ -1,5 +1,5 @@
 module dgt.util;
-import core.stdc.math, core.stdc.stdlib;
+import core.stdc.math, core.stdc.stdlib, core.stdc.stdio;
 
 import std.algorithm : canFind;
 import std.algorithm.comparison : equal;
@@ -8,6 +8,7 @@ import std.string : indexOf;
 
 import dgt.array;
 import dgt.geom;
+import dgt.io : println;
 
 @nogc nothrow:
 
@@ -40,6 +41,7 @@ Array!char nullTerminate(in string str)
     nameNullTerminated.add('\0');
     return nameNullTerminated;
 }
+///Get a slice of the next line of the string
 pure string nextline(in string str, out string rest)
 {
     auto index = str.indexOf('\n');
@@ -54,6 +56,7 @@ pure string nextline(in string str, out string rest)
     }
     return str[0..index];
 }
+///Get a slice of the string excluding whitespace on the left
 pure string trimLeft(in string str)
 {
     int i = 0;
@@ -62,8 +65,10 @@ pure string trimLeft(in string str)
             break;
     return str[i..str.length];
 }
+///Parse a string that represents a positive int into an int
 pure int parsePositiveInt(string str)
 {
+    //TODO: use a stdc function like snprintf
 	int value = 0;
 	for(int digit = 0; digit < str.length; digit++)
 	{
@@ -71,6 +76,24 @@ pure int parsePositiveInt(string str)
 		value += cast(int)std.math.pow(10, digit) * (str[str.length - 1 - digit] - '0');
 	}
 	return value;
+}
+///Read an file into a buffer of characters
+Array!char readFileToBuffer(in string pathName)
+{
+    auto terminated = nullTerminate(pathName);
+    FILE* file = fopen(terminated.ptr, "r".ptr);
+    terminated.destroy();
+    if(file == null)
+    {
+        println("Failed to load file ", pathName);
+        return Array!char(0);
+    }
+    auto contents = Array!char(1024);
+    int next;
+    //Read the file into memory
+    while((next = fgetc(file)) != EOF)
+        contents.add(cast(char)next);
+    return contents;
 }
 unittest
 {
