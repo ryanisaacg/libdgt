@@ -26,8 +26,8 @@ A drawable texture which can also be a region of a larger texture
 */
 struct Texture
 {
-    package uint id;
-    private:
+    public uint id;
+    public:
     int width, height;
     Rectangle region;
     package bool rotated = false;
@@ -39,6 +39,7 @@ struct Texture
     ///Create a Texture from data in memory
     this(ubyte* data, int w, int h, PixelFormat format)
     {
+        println("Size: ", w, ":", h);
         GLuint texture;
         glGenTextures(1, &texture);
         glBindTexture(GL_TEXTURE_2D, texture);
@@ -57,7 +58,7 @@ struct Texture
     //Mock or don't mock the constructor
     version(unittest)
     {
-        @nogc nothrow this(string name)
+        this(string name)
         {
         }
     }
@@ -122,6 +123,7 @@ struct Atlas
 {
     Array!Texture pages, regions;
     Array!string regionNames;
+    Array!char contents;
 
     @disable this();
 
@@ -136,10 +138,11 @@ struct Atlas
         terminated.destroy();
         if(file == null)
         {
+            contents = Array!char(0);
             println("Failed to load texture atlas ", atlasPath);
             return;
         }
-        auto contents = Array!char(1024);
+        contents = Array!char(1024);
         int next;
         //Read the file into memory
         while((next = fgetc(file)) != EOF)
@@ -158,6 +161,7 @@ struct Atlas
             foreach(character; relativeTexturePath)
                 texturePath.add(character);
             const page = Texture(texturePath.array);
+            println("Size loaded: ", page.width, ":", page.height);
             pages.add(page);
             text.nextline(text); //ignore the line telling the size
             text.nextline(text); //ignore the line telling the format
@@ -192,13 +196,11 @@ struct Atlas
                     propertyLine = text.nextline(text);
                 }
                 const region = Rectangle(position, size);
-                println(region);
                 regions.add(page.getSlice(region, rotate));
                 regionNames.add(regionName);
                 regionName = propertyLine;
             } while(regionName.length > 0);
         }
-        contents.destroy();
     }
 
     @nogc:
@@ -214,6 +216,7 @@ struct Atlas
     {
         pages.destroy();
         regions.destroy();
+        contents.destroy();
     }
 }
 
