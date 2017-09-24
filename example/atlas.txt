@@ -1,0 +1,33 @@
+atlas.png
+size: 192, 96
+format: RGBA8888
+filter: Linear,Linear
+repeat: none
+button
+  rotate: false
+  xy: 96, 0
+  size: 96, 32
+  orig: 96, 32
+  offset: 0, 0
+  index: -1
+carousel
+  rotate: false
+  xy: 0, 64
+  size: 160, 32
+  orig: 160, 32
+  offset: 0, 0
+  index: -1
+test
+  rotate: false
+  xy: 0, 0
+  size: 32, 32
+  orig: 32, 32
+  offset: 0, 0
+  index: -1
+tiles
+  rotate: false
+  xy: 32, 0
+  size: 64, 64
+  orig: 64, 64
+  offset: 0, 0
+  index: -1
