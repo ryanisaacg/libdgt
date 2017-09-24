@@ -215,6 +215,7 @@ struct Atlas
 unittest
 {
     auto atlas = Atlas("test.atlas");
+    scope(exit) atlas.destroy();
     assert(atlas.regionNames[0] == "bg-dialog");
     assert(atlas.regionNames[1] == "bg-dialog2");
     assert(atlas.regions[0].size.topLeft == Vector(519, 223));
